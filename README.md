@@ -13,12 +13,13 @@ required. Open it in a browser and it runs.
   Basic Technology. SS1–SS3: Physics, Chemistry, Biology (plus Maths & English).
 - **Full lessons per topic** — long-form explanations, worked examples, common-mistake
   warnings, and inline SVG diagrams.
-- **Per-topic quizzes** — every JSS1–JSS3 topic ships with its own 10-question quiz based
-  strictly on what the lesson taught, with explanations for every answer.
-  (SS topic quizzes degrade gracefully with “Quiz being written” until authored.)
+- **Per-topic quizzes** — every one of the **83 topics** (JSS1–JSS3 and SS1–SS3) ships
+  with its own 10-question quiz based strictly on what the lesson taught, with
+  explanations for every answer — 830 questions in total.
 - **Mixed exam practice** — exam-style mock banks per subject for SS students.
-- **Flashcards with self-grading** — “✅ Got it!” / “🔁 Get it next time”, pass/fail
-  animations, confetti on success, and an automatic retry pile for missed cards.
+- **Flashcards with self-grading** — 302 topic-scoped recall cards with long explanatory
+  answers, “✅ Got it!” / “🔁 Get it next time”, pass/fail animations, confetti on
+  success, and an automatic retry pile for missed cards.
 - **Study Buddy** — an on-device tutor with a built-in knowledge engine that can also
   research live on the internet (Wikipedia + DuckDuckGo APIs) when it doesn’t know
   something. Optional Gemini API key for deeper answers.
@@ -68,18 +69,24 @@ Three automated suites verify the build (Node 18+, no dependencies):
 
 ```bash
 node verify-static.mjs                  # markup/handler integrity (59 checks)
-node verify.mjs                         # full runtime harness, placeholder config (107)
-STUDYOS_REAL_CONFIG=1 node verify.mjs   # full runtime harness, real config (142)
+node verify.mjs                         # full runtime harness, placeholder config (109)
+STUDYOS_REAL_CONFIG=1 node verify.mjs   # full runtime harness, real config (145)
 node verify-degraded.mjs                # offline / no-Firestore behaviour (11)
 ```
+
+The suites include full curriculum contracts: every topic across JSS1–SS3 must carry a
+10-question quiz and at least 3 flashcards with real answers, and the “Quiz being
+written” fallback is tested by temporarily blanking a topic quiz at runtime.
 
 ## Content tooling
 
 The Python scripts in this repo are the one-shot build scripts that generated and patch
 the curriculum data inside `index.html` (`restructure*.py`, `migrate.py`,
-`content_jss1_*.py`, `content_jss23.py`). They are kept for provenance and as the template
-for authoring the remaining SS topic quizzes — each script contains safe, assert-guarded
-splice helpers for the curriculum format.
+`content_jss1_*.py`, `content_jss23.py`, `content_ss_*.py`). All 83 topics are now fully
+authored; the scripts are kept for provenance — each contains safe, assert-guarded splice
+helpers for the curriculum format (exact title matching, 4 options per question,
+correct-index and explanation-length checks) that can be reused to patch or extend any
+topic’s quiz and flashcards.
 
 ## Deploying
 
