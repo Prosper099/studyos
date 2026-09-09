@@ -262,7 +262,22 @@ check('topicQuiz ids are stable per subject/level/topic/question', (() => {
   const q = T.topicQuiz('Mathematics', 'JSS1', 2);
   return q.length === 10 && q[0].id === 'mat-JSS1-2-0' && q[9].id === 'mat-JSS1-2-9';
 })());
-check('topicQuiz returns [] for topics without a quiz yet', T.topicQuiz('Physics', 'SS3', 0).length === 0);
+const SENIOR_SUBS = ['Mathematics', 'English Language', 'Physics', 'Chemistry', 'Biology'];
+const SENIOR_LEVELS = ['SS1', 'SS2', 'SS3'];
+check('every SS topic carries a 10-question topic quiz',
+  SENIOR_SUBS.every(sub => SENIOR_LEVELS.every(L => T.levelTopics(sub, L).every((t, i) => T.topicQuiz(sub, L, i).length === 10))),
+  SENIOR_SUBS.map(sub => sub + ':' + SENIOR_LEVELS.map(L => T.levelTopics(sub, L).map((t, i) => T.topicQuiz(sub, L, i).length).join('/')).join(' ')).join('  '));
+check('every SS topic has at least 3 flashcards with real answers',
+  SENIOR_SUBS.every(sub => SENIOR_LEVELS.every(L => T.levelTopics(sub, L).every(t =>
+    (t.cards || []).length >= 3 && t.cards.every(c => c.q && c.a && c.a.length > 20)))));
+check('topicQuiz returns [] for topics without a quiz yet (mutated empty slot)', (() => {
+  const t = T.CURRICULUM['Physics'].topics['SS3'][0];
+  const saved = t.quiz;
+  t.quiz = [];
+  const empty = T.topicQuiz('Physics', 'SS3', 0).length === 0;
+  t.quiz = saved;
+  return empty && T.topicQuiz('Physics', 'SS3', 0).length === 10;
+})());
 check('mock exam bank keeps its own id namespace', T.quizFor('Mathematics')[0].id === 'mock-mat-0');
 check('cardsFor aggregates a whole level and tags each card with its topic', (() => {
   const all = T.cardsFor('Basic Science', 'JSS1');
@@ -608,9 +623,20 @@ check('onboarding modal closed after finish', byId('onboarding-modal').classList
 // quiz flow through the UI handlers (quiz page opens in list mode; pick the mock bank)
 w.changeSubject('Physics');
 w.navigate('quiz');
-check('quiz list offers the mixed exam bank and degrades gracefully for unwritten topic quizzes',
+check('quiz list offers the mixed exam bank plus per-topic quizzes for SS3 Physics',
   byId('page-content').innerHTML.includes('startMockQuiz()')
-  && byId('page-content').innerHTML.includes('Quiz being written'));
+  && byId('page-content').innerHTML.includes('startTopicQuiz(')
+  && !byId('page-content').innerHTML.includes('Quiz being written'));
+check('quiz list degrades gracefully when a topic quiz is unwritten (mutated)', (() => {
+  const t = T.CURRICULUM['Physics'].topics['SS3'][0];
+  const saved = t.quiz;
+  t.quiz = [];
+  w.navigate('quiz');
+  const ok = byId('page-content').innerHTML.includes('Quiz being written');
+  t.quiz = saved;
+  w.navigate('quiz');
+  return ok && !byId('page-content').innerHTML.includes('Quiz being written');
+})());
 {
   const st0 = T.getState();
   const savedLevel = st0.profile.classLevel, savedSub = st0.selectedSubject;
