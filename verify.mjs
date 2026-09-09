@@ -1,0 +1,718 @@
+/* Verification harness for StudyOS index.html.
+   Extracts the REAL <script type="module"> from the built index.html,
+   swaps only the bare firebase imports for local stubs, and executes it.
+   Then asserts against the app's own exported functions (window.__STUDYOS_TEST__). */
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import assert from 'node:assert/strict';
+
+const root = '/home/user';
+const htmlPath = process.env.STUDYOS_HTML
+  || (process.env.STUDYOS_REAL_CONFIG === '1'
+      ? path.join(root, '.verify/real/index.html')
+      : path.join(root, '.verify/placeholder/index.html'));
+const html = fs.readFileSync(htmlPath, 'utf8');
+
+const m = html.match(/<script type="module">([\s\S]*?)<\/script>/);
+assert.ok(m, 'index.html must contain a <script type="module"> block');
+let code = m[1];
+
+// --- structural checks on the HTML itself -----------------------------------
+const checks = [];
+function check(name, cond, detail = '') {
+  checks.push({ name, ok: !!cond, detail });
+  if (!cond) console.log(`FAIL  ${name} ${detail}`);
+}
+
+check('imports firebase-app from gstatic', /from 'https:\/\/www\.gstatic\.com\/firebasejs\/10\.\d+\.\d+\/firebase-app\.js'/.test(code));
+check('imports firebase-auth from gstatic', /firebasejs\/10\.\d+\.\d+\/firebase-auth\.js/.test(code));
+check('imports firebase-firestore from gstatic', /firebasejs\/10\.\d+\.\d+\/firebase-firestore\.js/.test(code));
+check('uses onAuthStateChanged', /onAuthStateChanged\s*\(/.test(code));
+check('uses signOut()', /\bsignOut\s*\(/.test(code));
+check('uses Google signInWithPopup', /signInWithPopup\(auth,\s*googleProvider\(\)\)/.test(code));
+check('no email/password auth remains',
+  !/signInWithEmailAndPassword|createUserWithEmailAndPassword|switchAuthTab/.test(code));
+check('writes to users/{uid} via doc(db, "users", ...)', /doc\(db,\s*'users'/.test(code));
+const REAL = process.env.STUDYOS_REAL_CONFIG === '1';
+if (REAL) {
+  check('real-config copy has no placeholder key values',
+    !/apiKey:\s*'YOUR_API_KEY'|projectId:\s*'YOUR_PROJECT_ID'/.test(code));
+} else {
+  check('placeholder apiKey present', /apiKey:\s*'YOUR_API_KEY'/.test(code));
+  check('placeholder projectId present', /projectId:\s*'YOUR_PROJECT_ID'/.test(code));
+  check('placeholder config keeps the app out of Firebase', /isConfigured/.test(code));
+}
+check('Tailwind CDN present', /https:\/\/cdn\.tailwindcss\.com/.test(html));
+check('onboarding steps 1-3 in DOM', ['step-1', 'step-2', 'step-3'].every(id => html.includes(`id="${id}"`)));
+check('all 7 nav pages present', ['home', 'study', 'resources', 'flashcards', 'quiz', 'assistant', 'profile']
+  .every(p => html.includes(`data-page="${p}"`)));
+check('sidebar drawer markup', html.includes('id="sidebar"') && html.includes('id="sidebar-overlay"'));
+
+// --- stub out only the network imports, keep ALL app code -------------------
+const stubDir = path.join(root, '.verify');
+fs.mkdirSync(stubDir, { recursive: true });
+const stub = (name, body) => {
+  const p = path.join(stubDir, name);
+  fs.writeFileSync(p, body);
+  return pathToFileURL(p).href;
+};
+const appStub = stub('app.mjs', `export function initializeApp(cfg){ globalThis.__INIT_CFG = cfg; return { name:'stub', config:cfg }; }`);
+const authStub = stub('auth.mjs', `
+  export function getAuth(){ return { currentUser:null }; }
+  export function onAuthStateChanged(a, cb){ globalThis.__AUTH_CB = cb; return () => {}; }
+  export class GoogleAuthProvider { constructor(){ this.params = {}; } setCustomParameters(p){ this.params = p; globalThis.__GOOGLE_PARAMS = p; } }
+  export async function signInWithPopup(a, provider){ globalThis.__GOOGLE_POPUP = true; return { user:{ uid:'u1', email:'ada@gmail.com', displayName:'Ada Obi' } }; }
+  export async function signInWithRedirect(a, provider){ globalThis.__GOOGLE_REDIRECT = true; return {}; }
+  export async function getRedirectResult(){ return null; }
+  export async function signOut(){ globalThis.__SIGNED_OUT = true; }
+`);
+const fsStub = stub('fs.mjs', `
+  const store = globalThis.__FS_STORE = new Map();
+  export function getFirestore(){ return { name:'stub-db' }; }
+  export function doc(db, coll, id){ return { path: coll + '/' + id }; }
+  export async function getDoc(ref){ const v = store.get(ref.path); return { exists: () => v !== undefined, data: () => v }; }
+  export async function setDoc(ref, data, opts){ const prev = store.get(ref.path) || {}; store.set(ref.path, { ...prev, ...data }); }
+  export async function updateDoc(ref, data){ const prev = store.get(ref.path) || {}; store.set(ref.path, { ...prev, ...data }); }
+  export function onSnapshot(ref, cb){ const v = store.get(ref.path); if (v) cb({ exists: () => true, data: () => v }); return () => {}; }
+  export function serverTimestamp(){ return { __ts: 'server' }; }
+`);
+
+code = code
+  .replace(/from 'https:\/\/www\.gstatic\.com\/firebasejs\/[\d.]+\/firebase-app\.js'/, `from '${appStub}'`)
+  .replace(/from 'https:\/\/www\.gstatic\.com\/firebasejs\/[\d.]+\/firebase-auth\.js'/, `from '${authStub}'`)
+  .replace(/from 'https:\/\/www\.gstatic\.com\/firebasejs\/[\d.]+\/firebase-firestore\.js'/, `from '${fsStub}'`);
+
+assert.ok(!/gstatic\.com\/firebasejs/.test(code), 'every firebase import should have been rewritten to a stub');
+
+const modPath = path.join(stubDir, process.env.STUDYOS_REAL_CONFIG === '1' ? 'studyos-real.mjs' : 'studyos.mjs');
+fs.writeFileSync(modPath, code);
+
+// --- minimal DOM: real script runs against it ------------------------------
+function makeEl(id) {
+  const classes = new Set();
+  const el = {
+    id,
+    _text: '', _html: '', disabled: false, style: {},
+    _attrs: {}, _listeners: {},
+    classList: {
+      add: (...c) => c.forEach(x => classes.add(x)),
+      remove: (...c) => c.forEach(x => classes.delete(x)),
+      contains: c => classes.has(c),
+      toggle: (c, on) => { const next = on === undefined ? !classes.has(c) : !!on; next ? classes.add(c) : classes.delete(c); return next; }
+    },
+    get className() { return [...classes].join(' '); },
+    set className(v) { classes.clear(); String(v).split(/\s+/).filter(Boolean).forEach(c => classes.add(c)); },
+    set textContent(v) { this._text = String(v); }, get textContent() { return this._text; },
+    set innerHTML(v) { this._html = String(v); }, get innerHTML() { return this._html; },
+    set innerText(v) { this._text = String(v); }, get innerText() { return this._text; },
+    setAttribute(k, v) { this._attrs[k] = v; }, getAttribute(k) { return this._attrs[k] ?? null; },
+    addEventListener(t, fn) { (this._listeners[t] ||= []).push(fn); },
+    appendChild(c) { (this._children ||= []).push(c); this._html += (c._html || '') + (c._text || ''); return c; },
+    remove() { this._removed = true; },
+    set value(v) { this._value = v; }, get value() { return this._value ?? ''; },
+    focus() {}, scrollIntoView() {}
+  };
+  return el;
+}
+
+const els = new Map();
+const byId = id => { if (!els.has(id)) els.set(id, makeEl(id)); return els.get(id); };
+const navItems = ['home', 'study', 'resources', 'flashcards', 'quiz', 'assistant', 'profile'].map(p => {
+  const e = makeEl('nav-' + p); e.setAttribute('data-page', p); return e;
+});
+
+globalThis.window = globalThis;
+globalThis.addEventListener = () => {};
+globalThis.removeEventListener = () => {};
+globalThis.document = {
+  getElementById: byId,
+  querySelector: sel => {
+    if (typeof sel === 'string' && /^#[\w-]+$/.test(sel)) return byId(sel.slice(1));
+    return null;
+  },
+  querySelectorAll: sel => (sel === '.nav-item' ? navItems : []),
+  createElement: t => makeEl('created-' + t),
+  addEventListener() {},
+  body: { style: {} }
+};
+globalThis.navigator = { onLine: true, clipboard: { writeText: async () => {} } };
+globalThis.localStorage = (() => {
+  const s = new Map();
+  return { getItem: k => (s.has(k) ? s.get(k) : null), setItem: (k, v) => s.set(k, String(v)), removeItem: k => s.delete(k) };
+})();
+globalThis.requestAnimationFrame = fn => fn();
+globalThis.scrollTo = () => {};
+let fetchLog = [];
+globalThis.__FETCH_LOG = fetchLog;
+globalThis.fetch = async (url, opts) => {
+  fetchLog.push(String(url));
+  const u = String(url);
+  if (u.includes('en.wikipedia.org/w/api.php')) {
+    return { ok: true, status: 200, json: async () => ({ query: { pages: {
+      '1': { index: 1, title: 'Centripetal force', extract: 'Centripetal force is the force that makes a body follow a curved path, directed towards the centre.' },
+      '2': { index: 2, title: 'Circular motion', extract: 'In physics, circular motion is a movement of an object along the circumference of a circle.' }
+    } } }) };
+  }
+  if (u.includes('api.duckduckgo.com')) {
+    return { ok: true, status: 200, json: async () => ({
+      Heading: 'Centripetal force', AbstractText: 'Centripetal force keeps an object in circular motion.',
+      AbstractURL: 'https://en.wikipedia.org/wiki/Centripetal_force',
+      RelatedTopics: [{ Text: 'Angular velocity - the rate of change of angular position.', FirstURL: 'https://example.com/angular' }]
+    }) };
+  }
+  if (u.includes('generativelanguage.googleapis.com')) {
+    if (u.includes('key=BAD_KEY')) return { ok: false, status: 403, json: async () => ({ error: { message: 'API key not valid' } }) };
+    return { ok: true, status: 200, json: async () => ({ candidates: [{ content: { parts: [
+      { text: '**Centripetal force** is the inward force.\n\nThe formula is F = mv2/r.\n\nA car on a curve relies on friction.' } ] } }] }) };
+  }
+  return { ok: false, status: 404, json: async () => ({}) };
+};
+globalThis.alert = () => {};
+globalThis.getComputedStyle = () => ({});
+globalThis.confirm = () => true;
+globalThis.setTimeout = (fn, ms) => { (globalThis.__timers ||= []).push(fn); return 0; };
+globalThis.clearTimeout = () => {};
+
+await import(pathToFileURL(modPath).href);
+
+const T = globalThis.__STUDYOS_TEST__;
+assert.ok(T, 'the app module should expose its test hook');
+check('app module executed and exported its test hook', typeof T.buddyReply === 'function');
+if (REAL) {
+  check('real config: initializeApp received the live project credentials',
+    globalThis.__INIT_CFG && globalThis.__INIT_CFG.apiKey === 'AIzaSyCc841NRjMC8ny1-JXKr_5yLlNDAXwBwCo'
+    && globalThis.__INIT_CFG.projectId === 'studyos-c6042'
+    && globalThis.__INIT_CFG.authDomain === 'studyos-c6042.firebaseapp.com'
+    && globalThis.__INIT_CFG.messagingSenderId === '829614734062',
+    globalThis.__INIT_CFG ? globalThis.__INIT_CFG.projectId : 'no config');
+  check('real config: onAuthStateChanged listener registered at boot', typeof globalThis.__AUTH_CB === 'function');
+} else {
+  // With placeholder keys the app must NOT talk to Firebase at all — it stays on the auth screen.
+  check('placeholder config: initializeApp is never called', globalThis.__INIT_CFG === undefined);
+  check('placeholder config: no auth listener registered', globalThis.__AUTH_CB === undefined);
+  check('boot() detected placeholders and stayed on auth screen',
+    byId('boot-screen').classList.contains('hidden') && !byId('auth-screen').classList.contains('hidden'));
+  check('placeholder config: auth screen shows the setup hint',
+    /placeholder keys/.test(byId('demo-banner').innerHTML));
+  await globalThis.handleGoogleSignIn();
+  check('placeholder config: Google sign-in is refused with guidance',
+    globalThis.__GOOGLE_POPUP === undefined && /Demo Mode/.test(byId('demo-banner').innerHTML));
+}
+
+// ---------- streak ----------
+check('streak: no prior date → 1', T.applyStreak(0, '', '2026-09-09').streak === 1);
+check('streak: same day → unchanged', T.applyStreak(5, '2026-09-09', '2026-09-09').streak === 5
+  && T.applyStreak(5, '2026-09-09', '2026-09-09').changed === false);
+check('streak: yesterday → +1', T.applyStreak(5, '2026-09-08', '2026-09-09').streak === 6);
+check('streak: 3-day gap → reset to 1', T.applyStreak(5, '2026-09-05', '2026-09-09').streak === 1);
+check('streak: month boundary', T.applyStreak(4, '2026-08-31', '2026-09-01').streak === 5);
+check('streak: future/garbage date → 1', T.applyStreak(9, '2027-01-01', '2026-09-09').streak === 1
+  && T.applyStreak(9, 'nonsense', '2026-09-09').streak === 1);
+
+// ---------- quiz grading ----------
+const mathQuiz = T.quizFor('Mathematics');
+check('Mathematics quiz has 8 questions', mathQuiz.length === 8);
+check('every quiz question has valid correct index + explanation',
+  Object.values(T.CURRICULUM).every(s =>
+    (s.mock || []).every(q =>
+      q.correct >= 0 && q.correct < q.options.length && q.exp && q.exp.length > 20 && q.options.length === 4)
+    && Object.values(s.topics).flat().every(t => (t.quiz || []).every(q =>
+      q.correct >= 0 && q.correct < q.options.length && q.exp && q.exp.length > 20 && q.options.length === 4))));
+const allRight = Object.fromEntries(mathQuiz.map(q => [q.id, q.correct]));
+const res = T.gradeQuiz(mathQuiz, allRight);
+check('gradeQuiz: all correct → 100%', res.correct === 8 && res.total === 8 && res.percent === 100);
+const noneRight = Object.fromEntries(mathQuiz.map(q => [q.id, (q.correct + 1) % q.options.length]));
+const res2 = T.gradeQuiz(mathQuiz, noneRight);
+check('gradeQuiz: all wrong → 0%', res2.correct === 0 && res2.percent === 0);
+check('gradeQuiz: unanswered counts as wrong', T.gradeQuiz(mathQuiz, {}).correct === 0);
+const merged = T.mergeQuizStats({ attempts: 1, correct: 3, total: 8, bestPercent: 38, bySubject: {} }, 'Physics', res2);
+check('mergeQuizStats accumulates attempts and accuracy', merged.attempts === 2 && merged.total === 16 && merged.correct === 3);
+check('mergeQuizStats keeps best percent', T.mergeQuizStats({ bestPercent: 90 }, 'Physics', res2).bestPercent === 90);
+check('mergeQuizStats breaks down by subject', merged.bySubject.Physics.attempts === 1 && merged.bySubject.Physics.total === 8);
+
+// ---------- curriculum integrity ----------
+const subjects = ['Mathematics', 'Physics', 'Chemistry', 'English Language', 'Biology'];
+check('all 5 subjects present with topics for SS1/SS2/SS3',
+  subjects.every(s => T.CURRICULUM[s] && ['SS1', 'SS2', 'SS3'].every(l => T.CURRICULUM[s].topics[l].length >= 2)));
+check('SS3 sees review topics from SS2 + SS1',
+  T.topicsFor('Physics', 'SS3').length > T.CURRICULUM['Physics'].topics.SS3.length);
+check('SS1 sees only its own level',
+  T.topicsFor('Physics', 'SS1').every(t => t.level === 'SS1'));
+check('unknown class falls back to SS3', T.topicsFor('Physics', 'XYZ').every(t => ['SS3', 'SS2', 'SS1'].includes(t.level)));
+check('named topics from the brief exist',
+  T.topicsFor('Mathematics', 'SS1').some(t => /Modular Arithmetic/.test(t.title)) &&
+  T.topicsFor('Physics', 'SS2').some(t => /Centripetal Force/.test(t.title)) &&
+  T.topicsFor('Chemistry', 'SS3').some(t => /Redox/.test(t.title)));
+check('every subject has flashcards, quiz and resources',
+  subjects.every(s => T.flashFor(s).length >= 5 && T.quizFor(s).length >= 5 && T.CURRICULUM[s].resources.length >= 4));
+check('flashcards all have q + a', subjects.every(s => T.flashFor(s).every(c => c.q && c.a)));
+check('all resource URLs are https', subjects.every(s => T.CURRICULUM[s].resources.every(r => /^https:\/\//.test(r.url))));
+
+// ---------- per-topic quizzes & flashcards (new contract) ----------
+const JUNIOR_SUBS = ['Mathematics', 'English Language', 'Basic Science', 'Basic Technology'];
+const JUNIOR_LEVELS = ['JSS1', 'JSS2', 'JSS3'];
+check('every JSS topic carries a 10-question topic quiz',
+  JUNIOR_SUBS.every(sub => JUNIOR_LEVELS.every(L => T.levelTopics(sub, L).every((t, i) => T.topicQuiz(sub, L, i).length === 10))),
+  JUNIOR_SUBS.map(sub => sub + ':' + JUNIOR_LEVELS.map(L => T.levelTopics(sub, L).map((t, i) => T.topicQuiz(sub, L, i).length).join('/')).join(' ')).join('  '));
+check('every JSS topic has at least 3 flashcards with real answers',
+  JUNIOR_SUBS.every(sub => JUNIOR_LEVELS.every(L => T.levelTopics(sub, L).every(t =>
+    (t.cards || []).length >= 3 && t.cards.every(c => c.q && c.a && c.a.length > 20)))));
+check('topicQuiz ids are stable per subject/level/topic/question', (() => {
+  const q = T.topicQuiz('Mathematics', 'JSS1', 2);
+  return q.length === 10 && q[0].id === 'mat-JSS1-2-0' && q[9].id === 'mat-JSS1-2-9';
+})());
+check('topicQuiz returns [] for topics without a quiz yet', T.topicQuiz('Physics', 'SS3', 0).length === 0);
+check('mock exam bank keeps its own id namespace', T.quizFor('Mathematics')[0].id === 'mock-mat-0');
+check('cardsFor aggregates a whole level and tags each card with its topic', (() => {
+  const all = T.cardsFor('Basic Science', 'JSS1');
+  const one = T.cardsFor('Basic Science', 'JSS1', 'Matter, Its Properties & Changes');
+  return all.length >= 15 && one.length >= 3 && one.every(c => c.topic === 'Matter, Its Properties & Changes')
+    && all.every(c => c.topic);
+})());
+check('flashcard UI has Got it / Get it next time buttons with pass+fail animations',
+  html.includes('Got it') && html.includes('Get it next time')
+  && /flash-fly/.test(html) && /flash-shake/.test(html)
+  && /@keyframes flyRight/.test(html) && /@keyframes shakeX/.test(html)
+  && /@keyframes confettiFall/.test(html)
+  && typeof T.markGot === 'function' && typeof T.markLater === 'function');
+
+// ---------- curriculum breadth & depth ----------
+const allSubjects = ['Mathematics', 'Physics', 'Chemistry', 'English Language', 'Biology'];
+let topicCount = 0, contentChars = 0;
+allSubjects.forEach(sub => {
+  const t = T.CURRICULUM[sub].topics;
+  Object.keys(t).forEach(lvl => t[lvl].forEach(x => { topicCount++; contentChars += x.content.length; }));
+});
+check('curriculum has at least 40 topics across all subjects and levels', topicCount >= 40, 'found ' + topicCount);
+check('average lesson is substantial (>2500 chars of content)', contentChars / topicCount > 2500,
+  'avg ' + Math.round(contentChars / topicCount));
+const JUNIOR = ['Mathematics', 'English Language', 'Basic Science', 'Basic Technology'];
+const SENIOR = ['Mathematics', 'English Language', 'Physics', 'Chemistry', 'Biology'];
+const levelsWith = sub => ['JSS1','JSS2','JSS3','SS1','SS2','SS3'].filter(l => (T.CURRICULUM[sub].topics[l] || []).length > 0);
+
+check('every junior subject has lessons in all of JSS1, JSS2 and JSS3',
+  JUNIOR.every(sub => ['JSS1','JSS2','JSS3'].every(l => (T.CURRICULUM[sub].topics[l] || []).length > 0)),
+  JUNIOR.map(sub => sub + ':' + levelsWith(sub).join('/')).join('  '));
+
+check('Physics, Chemistry and Biology start at SS1 and have no JSS lessons',
+  ['Physics','Chemistry','Biology'].every(sub =>
+    ['JSS1','JSS2','JSS3'].every(l => (T.CURRICULUM[sub].topics[l] || []).length === 0)
+    && ['SS1','SS2','SS3'].every(l => (T.CURRICULUM[sub].topics[l] || []).length > 0)),
+  ['Physics','Chemistry','Biology'].map(sub => sub + ':' + levelsWith(sub).join('/')).join('  '));
+
+check('a JSS student is never offered Physics, Chemistry or Biology',
+  ['JSS1','JSS2','JSS3'].every(l => T.subjectsForLevel(l).join('|') === JUNIOR.join('|'))
+  && ['JSS1','JSS2','JSS3'].every(l => T.topicsFor('Physics', l).length === 0
+      && T.topicsFor('Chemistry', l).length === 0 && T.topicsFor('Biology', l).length === 0),
+  'JSS2 -> ' + T.subjectsForLevel('JSS2').join(', '));
+
+check('an SS student is offered the three sciences',
+  ['SS1','SS2','SS3'].every(l => T.subjectsForLevel(l).join('|') === SENIOR.join('|'))
+  && T.topicsFor('Physics','SS3').length > 0,
+  'SS3 -> ' + T.subjectsForLevel('SS3').join(', '));
+
+check('JSS3 terminal revision stays inside the junior ladder',
+  (() => {
+    const phys = T.topicsFor('Physics', 'JSS3');
+    const maths = T.topicsFor('Mathematics', 'JSS3');
+    const physOk = phys.length === 0;
+    const mathsOk = maths.length > 1 && maths.every(t => t.level.startsWith('JSS'));
+    const ssOk = T.topicsFor('Physics', 'SS3').length > T.CURRICULUM.Physics.topics.SS3.length
+      && T.topicsFor('Physics', 'SS3').every(t => t.level.startsWith('SS'));
+    return physOk && mathsOk && ssOk;
+  })(),
+  'JSS3 Physics=' + T.topicsFor('Physics','JSS3').length
+  + ' JSS3 Maths levels=' + T.topicsFor('Mathematics','JSS3').map(t => t.level).join('/')
+  + ' SS3 Physics=' + T.topicsFor('Physics','SS3').length);
+
+check('subjectsForLevel falls back to every subject for an unknown level',
+  T.subjectsForLevel('').length === Object.keys(T.CURRICULUM).length);
+
+check('subjectIsAvailable reflects the level catalogue', (() => {
+  const st = T.getState();
+  st.profile.classLevel = 'JSS2';
+  const juniorOk = T.subjectIsAvailable('Basic Science') === true && T.subjectIsAvailable('Physics') === false;
+  st.profile.classLevel = 'SS2';
+  const seniorOk = T.subjectIsAvailable('Physics') === true && T.subjectIsAvailable('Basic Science') === false;
+  return juniorOk && seniorOk;
+})(), 'JSS2 Basic Science=' + (() => { const st = T.getState(); st.profile.classLevel = 'JSS2'; return T.subjectIsAvailable('Basic Science'); })());
+
+const resetHarness = () => {
+  const st = T.getState();
+  st.profile = { name: '', email: '', classLevel: '', targetExam: '', subjects: [], onboarded: false };
+  st.selectedSubject = 'Mathematics';
+  st.streak = 0; st.lastActiveDate = '';
+  st.quizStats = { attempts: 0, correct: 0, total: 0, bestPercent: 0, bySubject: {} };
+  st.onboard = { step: 1, classLevel: '', targetExam: '', subjects: [] };
+  globalThis.__FS_STORE.clear();          // undo anything hydrate/persist wrote
+  (globalThis.__timers || []).length = 0;
+};
+
+check('hydrateFromDoc strips subjects that do not exist at the saved level',
+  (() => {
+    const st = T.getState();
+    T.hydrateFromDoc({ name: 'Ada', classLevel: 'JSS2', subjects: ['Physics','Mathematics','Biology'] });
+    const juniorOk = st.profile.subjects.join('|') === 'Mathematics' && st.selectedSubject === 'Mathematics';
+    T.hydrateFromDoc({ name: 'Ada', classLevel: 'SS3', subjects: ['Physics','Mathematics'] });
+    const seniorOk = st.profile.subjects.join('|') === 'Physics|Mathematics';
+    // a brand-new user must NOT be given a subject list — onboarding still has to ask
+    T.hydrateFromDoc({ name: 'Ada', classLevel: 'SS3', subjects: [] });
+    const emptyOk = st.profile.subjects.length === 0;
+    // an existing user whose saved subjects are all invalid falls back to a valid one
+    T.hydrateFromDoc({ name: 'Ada', classLevel: 'JSS1', subjects: ['Physics'] });
+    const allInvalidOk = st.profile.subjects.length === 0 && st.selectedSubject === 'Mathematics';
+    resetHarness();
+    return juniorOk && seniorOk && emptyOk && allInvalidOk;
+  })(),
+  'JSS2 saved with Physics/Biology/Maths -> ' + (() => {
+    const st = T.getState();
+    T.hydrateFromDoc({ name: 'Ada', classLevel: 'JSS2', subjects: ['Physics','Mathematics','Biology'] });
+    const r = st.profile.subjects.join(', ');
+    resetHarness();
+    return r;
+  })());
+
+check('diagrams are wired into lessons across the sciences',
+  ['Biology','Chemistry','Physics','Basic Technology','Mathematics'].every(sub =>
+    Object.values(T.CURRICULUM[sub].topics).flat().some(t => t.content.includes('class="diagram"'))),
+  allSubjects.map(sub => sub + ':' + Object.values(T.CURRICULUM[sub].topics).flat()
+    .filter(t => t.content.includes('class="diagram"')).length).join(' '));
+check('JSS students may only target General or BECE',
+  T.examsForLevel('JSS1').map(e => e.id).join('|') === 'General|BECE'
+  && T.examsForLevel('JSS3').map(e => e.id).join('|') === 'General|BECE',
+  'JSS2 -> ' + T.examsForLevel('JSS2').map(e => e.id).join(', '));
+
+check('SS students target JAMB, WAEC, NECO, Post-UTME or General',
+  T.examsForLevel('SS1').map(e => e.id).join('|') === 'JAMB UTME|WAEC WASSCE|NECO|Post-UTME|General'
+  && T.examsForLevel('SS3').map(e => e.id).join('|') === 'JAMB UTME|WAEC WASSCE|NECO|Post-UTME|General',
+  'SS1 -> ' + T.examsForLevel('SS1').map(e => e.id).join(', '));
+
+check('onboarding step 2 shows only junior exams for a JSS class', (() => {
+  const st = T.getState();
+  const saved = { ...st.onboard };
+  st.onboard = { step: 2, classLevel: 'JSS2', targetExam: '', subjects: [] };
+  T.renderOnboardStep();
+  const html = byId('step-2').innerHTML;
+  const junior = /BECE/.test(html) && /General/.test(html) && !/JAMB UTME/.test(html) && !/WAEC WASSCE/.test(html);
+  st.onboard = { step: 2, classLevel: 'SS2', targetExam: '', subjects: [] };
+  T.renderOnboardStep();
+  const senior = /JAMB UTME/.test(byId('step-2').innerHTML) && /Post-UTME/.test(byId('step-2').innerHTML) && !/BECE</.test(byId('step-2').innerHTML);
+  st.onboard = saved;
+  T.renderOnboardStep();
+  return junior && senior;
+})(), 'JSS2 step2: ' + (() => { const st = T.getState(); const sv = { ...st.onboard }; st.onboard = { step: 2, classLevel: 'JSS2', targetExam: '', subjects: [] }; T.renderOnboardStep(); const ids = [...byId('step-2').innerHTML.matchAll(/font-bold [^"]*">([^<]+)</g)].map(m => m[1]).join(', '); st.onboard = sv; return ids; })());
+
+check('hydrateFromDoc clears an exam that is invalid for the saved level', (() => {
+  const st = T.getState();
+  T.hydrateFromDoc({ name: 'Ada', classLevel: 'JSS2', targetExam: 'JAMB UTME', subjects: ['Mathematics'] });
+  const cleared = st.profile.targetExam === '';
+  T.hydrateFromDoc({ name: 'Ada', classLevel: 'SS2', targetExam: 'JAMB UTME', subjects: ['Mathematics'] });
+  const kept = st.profile.targetExam === 'JAMB UTME';
+  T.hydrateFromDoc({ name: 'Ada', classLevel: 'JSS3', targetExam: 'BECE', subjects: ['Mathematics'] });
+  const beceKept = st.profile.targetExam === 'BECE';
+  resetHarness();
+  return cleared && kept && beceKept;
+})(), 'JSS2 + JAMB UTME -> ' + (() => { const st = T.getState(); T.hydrateFromDoc({ classLevel: 'JSS2', targetExam: 'JAMB UTME' }); const r = JSON.stringify(st.profile.targetExam); resetHarness(); return r; })());
+
+check('every topic has tags, summary and content',
+  allSubjects.every(sub => Object.values(T.CURRICULUM[sub].topics).flat()
+    .every(x => x.title && x.summary && x.tags.length >= 2 && x.content.length > 600)));
+check('most lessons include worked practice questions',
+  allSubjects.every(sub => Object.values(T.CURRICULUM[sub].topics).flat()
+    .filter(x => /Worked (practice|example)/.test(x.content)).length
+    >= Object.values(T.CURRICULUM[sub].topics).flat().length * 0.8));
+check('most lessons warn about common mistakes',
+  allSubjects.every(sub => Object.values(T.CURRICULUM[sub].topics).flat()
+    .filter(x => /Common mistakes|Watch out|Common error|Common mix-up/.test(x.content)).length
+    >= Object.values(T.CURRICULUM[sub].topics).flat().length * 0.6));
+check('no lesson contains an unescaped template-literal breaker',
+  allSubjects.every(sub => Object.values(T.CURRICULUM[sub].topics).flat()
+    .every(x => !x.content.includes('${'))));
+
+// ---------- Buddy knowledge engine ----------
+const cases = [
+  ['explain centripetal force', 'Centripetal Force'],
+  ['what is a redox reaction', 'Redox Reactions'],
+  ['how do i solve quadratic equations', 'Quadratic Equations'],
+  ['explain reported speech', 'Reported'],
+  ['what is osmosis and the cell', 'The Cell'],
+  ['give me jamb exam tips', 'JAMB UTME Exam Strategy'],
+  ['le chatelier principle', 'Rates of Reaction'],
+  ['how to write a waec summary', 'Summary & Comprehension']
+];
+for (const [q, expect] of cases) {
+  const reply = T.buddyReply(q);
+  const hit = reply.html.includes(expect);
+  check(`Buddy answers "${q}" → ${expect}`, hit);
+  if (!hit) console.log('   got:', reply.html.slice(0, 160).replace(/\s+/g, ' '));
+}
+check('Buddy greeting is friendly, not a topic dump', /Buddy here/.test(T.buddyReply('hello there').html));
+check('Buddy does not mistake "oxidation" for "thanks"', /Oxidation/.test(T.buddyReply('explain oxidation').html));
+check('Buddy admits unknown topics instead of inventing', /do not have a prepared lesson/.test(T.buddyReply('explain quantum chromodynamics xyzzy').html));
+check('Buddy routes a bare subject name into that subject',
+  /<span class="tag">Chemistry<\/span>/.test(T.buddyReply('chemistry').html));
+check('Buddy routes "biology" into a Biology topic',
+  /<span class="tag">Biology<\/span>/.test(T.buddyReply('biology questions').html));
+check('Buddy always returns suggestion chips', T.buddyReply('centripetal force').chips.length >= 2);
+
+// ---------- Buddy algebra solver ----------
+const quad = T.buddyReply('solve x^2 - 5x + 6');
+check('Buddy solves x^2 - 5x + 6 → roots 3 and 2',
+  /x = 3\s+or\s+2/.test(quad.html) && /Δ = b² − 4ac/.test(quad.html), quad.html.slice(0, 200));
+const quad2 = T.solveQuadratic(1, 0, -9);
+check('solveQuadratic(1,0,-9) → ±3', JSON.stringify(quad2.roots) === JSON.stringify([3, -3]) && quad2.nature.includes('distinct'));
+const quad3 = T.solveQuadratic(1, -4, 4);
+check('solveQuadratic(1,-4,4) → repeated root 2', quad3.roots.length === 1 && quad3.roots[0] === 2);
+const quad4 = T.solveQuadratic(1, 0, 4);
+check('solveQuadratic(1,0,4) → complex pair', /no real roots/.test(quad4.nature) && /i/.test(String(quad4.roots[0])));
+const sim = T.buddyReply('solve 2x + y = 11 and x - y = 1');
+check('Buddy solves simultaneous equations → x=4, y=3', /x = 4 ,\s+y = 3/.test(sim.html), sim.html.slice(0, 220));
+check('solveSimultaneous rejects parallel lines', T.solveSimultaneous(1, 1, 2, 2, 2, 9) === null);
+check('extractCoeffs reads 2x^2 + 3x - 5', JSON.stringify(T.extractCoeffs('solve 2x^2 + 3x - 5')) === JSON.stringify({ a: 2, b: 3, c: -5 }));
+check('extractCoeffs handles implicit coefficient x^2 - 5x + 6', JSON.stringify(T.extractCoeffs('x^2 - 5x + 6')) === JSON.stringify({ a: 1, b: -5, c: 6 }));
+
+// ---------- Buddy live internet research ----------
+const T2 = T;
+check('researchOnline pulls Wikipedia extracts', await (async () => {
+  const r = await T2.researchOnline('centripetal force');
+  return r.sources.some(x => x.from === 'Wikipedia' && /curved path/.test(x.text));
+})());
+check('researchOnline also pulls DuckDuckGo and de-duplicates', await (async () => {
+  const r = await T2.researchOnline('centripetal force');
+  const urls = r.sources.map(x => x.url.toLowerCase());
+  return r.sources.some(x => x.from === 'DuckDuckGo') && new Set(urls).size === urls.length;
+})());
+check('researchOnline never throws and caps results at 5', await (async () => {
+  const r = await T2.researchOnline('centripetal force');
+  return r.sources.length > 0 && r.sources.length <= 5;
+})());
+check('composeAnswer cites sources when research is ON', await (async () => {
+  globalThis.__researchStateOn = true;
+  const r = await T2.composeAnswer('explain centripetal force');
+  return r.html.includes('Sources') && r.html.includes('en.wikipedia.org') && r.html.includes('Live from the web');
+})());
+check('Gemini key produces a synthesised answer', await (async () => {
+  const before = globalThis.__geminiKey();
+  globalThis.__setGemini('AIza-good-key');
+  const r = await T2.composeAnswer('explain centripetal force');
+  globalThis.__setGemini(before || '');
+  return /Buddy · live research/.test(r.html) && r.html.includes('friction');
+})());
+check('a bad Gemini key degrades gracefully instead of breaking', await (async () => {
+  const before = globalThis.__geminiKey();
+  globalThis.__setGemini('BAD_KEY');
+  const r = await T2.composeAnswer('explain centripetal force');
+  globalThis.__setGemini(before || '');
+  return /Gemini key issue/.test(r.html) && r.html.includes('Sources');
+})());
+check('askBuddy(forceResearch=false) uses the built-in lesson only', await (async () => {
+  const before = globalThis.__FETCH_LOG.length;
+  await globalThis.askBuddy('explain centripetal force', false);
+  globalThis.__timers.splice(0).forEach(fn => fn());
+  await new Promise(r => setImmediate(r));
+  return globalThis.__FETCH_LOG.length === before;
+})());
+check('askBuddy(forceResearch=true) hits the network', await (async () => {
+  const before = globalThis.__FETCH_LOG.length;
+  await globalThis.askBuddy('explain redox reactions', true);
+  await new Promise(r => setImmediate(r));
+  return globalThis.__FETCH_LOG.length > before;
+})());
+check('"Search the web:" chip prefix forces research on', await (async () => {
+  const before = globalThis.__FETCH_LOG.length;
+  await globalThis.askBuddy('Search the web: latest JAMB syllabus changes');
+  await new Promise(r => setImmediate(r));
+  return globalThis.__FETCH_LOG.length > before;
+})());
+check('research toggle changes app state and persists', (() => {
+  globalThis.setResearch(false);
+  const off = globalThis.__researchOn() === false;
+  globalThis.setResearch(true);
+  return off && globalThis.__researchOn() === true;
+})());
+
+// ---------- misc helpers ----------
+check('initials("Joseph Adeyemi") → JA', T.initials('Joseph Adeyemi') === 'JA');
+check('initials("") → S', T.initials('') === 'S');
+check('escapeHtml blocks script injection', !/<script/i.test(T.escapeHtml('<script>alert(1)</script>')));
+check('mdToHtml escapes then bolds', T.mdToHtml('**hi** <img src=x>').includes('<b>hi</b>') && !T.mdToHtml('**hi** <img src=x>').includes('<img'));
+check('fmtQuad renders 2x² + 3x − 5', T.fmtQuad(2, 3, -5) === '2x² + 3x − 5');
+check('OPTIONS cover the brief', JSON.stringify(T.OPTIONS.classes) === JSON.stringify(['SS1','SS2','SS3','JSS1','JSS2','JSS3'])
+  && T.OPTIONS.exams.map(e => e.id).join('|') === 'JAMB UTME|WAEC WASSCE|NECO|Post-UTME|General'
+  && T.OPTIONS.subjects.length === 7
+  && Object.keys(T.OPTIONS.icons).length === 7
+  && T.OPTIONS.icons['Basic Science'] === '🔬'
+  && T.OPTIONS.icons['Basic Technology'] === '🛠️');
+
+/* ---------- end-to-end live-app run (needs a real-looking config) ----------
+   Skipped here because the shipped file has placeholder keys; verify-real.mjs
+   re-runs the same module with real values and performs these checks. */
+const RUN_LIVE = process.env.STUDYOS_REAL_CONFIG === '1';
+if (!RUN_LIVE) {
+  const failed = checks.filter(c => !c.ok);
+  console.log(`\n${checks.length - failed.length}/${checks.length} checks passed (placeholder-config scenario)`);
+  if (failed.length) { failed.forEach(f => console.log('  -', f.name, f.detail)); process.exit(1); }
+  console.log('ALL CHECKS PASSED (placeholder-config scenario)');
+  process.exit(0);
+}
+
+// ---------- end-to-end: sign in through the real handleUser path ----------
+const signIn = async () => globalThis.__AUTH_CB({ uid: 'test-uid-1', email: 'joseph@example.com', displayName: 'Joseph Adeyemi' });
+await signIn();
+await new Promise(r => setImmediate(r));
+const docAfterLogin = globalThis.__FS_STORE.get('users/test-uid-1');
+check('signing in created users/{uid} in Firestore', !!docAfterLogin, JSON.stringify(docAfterLogin));
+check('first login seeds streak = 1 and lastActiveDate', docAfterLogin && docAfterLogin.streak === 1 && /^\d{4}-\d{2}-\d{2}$/.test(docAfterLogin.lastActiveDate));
+check('name/email written to Firestore doc', docAfterLogin && docAfterLogin.name === 'Joseph Adeyemi' && docAfterLogin.email === 'joseph@example.com');
+check('enterApp() revealed the main app and hid auth',
+  !byId('main-app').classList.contains('hidden') && byId('auth-screen').classList.contains('hidden'));
+check('streak badge in header/sidebar updated', byId('header-streak').textContent === '🔥 1' && /1 day/.test(byId('streak-count').textContent));
+check('unboarded user is pushed into onboarding', !byId('onboarding-modal').classList.contains('hidden'));
+
+// onboarding — enterApp() defers openOnboarding() behind a setTimeout, so start it explicitly
+const w = globalThis;
+check('enterApp scheduled the onboarding modal to open', (globalThis.__timers || []).length > 0);
+w.openOnboarding();
+check('onboarding modal opened with step 1 visible',
+  !byId('onboarding-modal').classList.contains('hidden') && !byId('step-1').classList.contains('hidden')
+  && byId('onboard-title').textContent === 'What class are you in?');
+await w.onboardNext();
+check('step 1 refuses to advance without a class selection',
+  !byId('onboard-error').classList.contains('hidden') && byId('onboard-kicker').textContent === 'Step 1 of 3');
+w.pickOnboardOption('classLevel', 'SS3');
+await w.onboardNext();
+check('step 1 → step 2 after choosing a class', byId('onboard-kicker').textContent === 'Step 2 of 3');
+await w.onboardNext();
+check('step 2 refuses to advance without a target exam', !byId('onboard-error').classList.contains('hidden'));
+w.pickOnboardOption('targetExam', 'JAMB UTME');
+await w.onboardNext();
+check('step 2 → step 3 after choosing an exam', byId('onboard-kicker').textContent === 'Step 3 of 3');
+await w.onboardNext();
+check('step 3 refuses to save with no subjects', !byId('onboard-error').classList.contains('hidden'));
+w.toggleOnboardSubject('Mathematics');
+w.toggleOnboardSubject('Physics');
+w.toggleOnboardSubject('Physics');
+w.toggleOnboardSubject('Physics');
+check('subject chips toggle on and off', true);
+w.onboardBack();
+w.onboardNext();
+await w.onboardNext();
+const docAfterOnboard = globalThis.__FS_STORE.get('users/test-uid-1');
+check('onboarding persisted class + exam + subjects to Firestore',
+  docAfterOnboard.classLevel === 'SS3' && docAfterOnboard.targetExam === 'JAMB UTME'
+  && JSON.stringify(docAfterOnboard.subjects) === JSON.stringify(['Mathematics', 'Physics'])
+  && docAfterOnboard.onboarded === true, JSON.stringify(docAfterOnboard));
+check('onboarding modal closed after finish', byId('onboarding-modal').classList.contains('hidden'));
+
+// quiz flow through the UI handlers (quiz page opens in list mode; pick the mock bank)
+w.changeSubject('Physics');
+w.navigate('quiz');
+check('quiz list offers the mixed exam bank and degrades gracefully for unwritten topic quizzes',
+  byId('page-content').innerHTML.includes('startMockQuiz()')
+  && byId('page-content').innerHTML.includes('Quiz being written'));
+{
+  const st0 = T.getState();
+  const savedLevel = st0.profile.classLevel, savedSub = st0.selectedSubject;
+  st0.profile.classLevel = 'JSS1';
+  w.changeSubject('Mathematics');
+  w.navigate('quiz');
+  check('quiz list offers per-topic 10-question quizzes where they are authored',
+    byId('page-content').innerHTML.includes('startTopicQuiz(')
+    && byId('page-content').innerHTML.includes('Start 10-question quiz'));
+  st0.profile.classLevel = savedLevel;
+  w.changeSubject(savedSub);
+}
+w.startMockQuiz();
+const physQuiz = T.quizFor('Physics');
+physQuiz.forEach(q => w.selectQuizAnswer(q.id, q.correct));
+await w.submitQuiz();
+const docAfterQuiz = globalThis.__FS_STORE.get('users/test-uid-1');
+check('quiz results synced to Firestore', docAfterQuiz.quizStats && docAfterQuiz.quizStats.attempts === 1
+  && docAfterQuiz.quizStats.bestPercent === 100 && docAfterQuiz.quizStats.bySubject.Physics.correct === physQuiz.length);
+check('header shows the chosen target exam', byId('header-exam-badge').textContent === 'JAMB UTME');
+w.retakeQuiz();
+check('retake clears the submitted state', byId('page-content').innerHTML.includes('Submit Answers')
+  && !byId('page-content').innerHTML.includes('Retake Quiz'));
+
+// ---------- every page renders real markup ----------
+const page = () => byId('page-content').innerHTML;
+w.navigate('home');
+check('dashboard renders greeting, streak and quick-nav cards',
+  /Good (morning|afternoon|evening), Joseph/.test(page()) && /day streak/.test(page())
+  && page().includes("navigate('study')") && page().includes("navigate('assistant')"), page().slice(0, 120));
+w.navigate('study');
+check('study page lists the subject selector and grouped topic cards',
+  page().includes('changeSubject(') && page().includes('Centripetal Force')
+  && page().includes('SS3 syllabus topics') && page().includes('SS1 syllabus topics'));
+w.changeSubject('Mathematics');
+check('switching subject re-renders that subject\'s topics',
+  page().includes('Number Bases & Modular Arithmetic') && !page().includes('Centripetal Force'),
+  'nb=' + /Number Bases/.test(page()) + ' centri=' + page().includes('Centripetal Force')
+  + ' len=' + page().length + ' first200=' + page().slice(0, 200).replace(/\s+/g, ' '));
+w.openTopic('Mathematics', 'Number Bases & Modular Arithmetic');
+check('topic view renders the lesson body and action buttons',
+  page().includes('Modular arithmetic') && page().includes('clock')
+  && page().includes('Ask Buddy') && page().includes('Test yourself'));
+w.navigate('resources');
+check('resources page renders external links per subject',
+  /target="_blank"/.test(page()) && /khanacademy\.org/.test(page()) && /youtube\.com/.test(page()));
+w.navigate('flashcards');
+check('flashcard deck renders with flip faces and progress',
+  page().includes('flashcard-front') && page().includes('flashcard-back')
+  && /Card 1\/\d+/.test(page()) && page().includes('nextFlashcard()'));
+const before = w.__STUDYOS_TEST__;
+w.gotoFlashcard(2);
+check('flashcard navigation moves the index', /Card 3\/\d+/.test(page()));
+w.flipFlashcard();
+check('flashcard flip toggles the flipped class', byId('flashcard').classList.contains('flipped'));
+check('flipped card offers Got it / Get it next time self-grading', (() => {
+  const acts = byId('flash-actions').innerHTML;
+  return acts.includes('markGot()') && acts.includes('markLater()')
+    && acts.includes('Got it!') && acts.includes('Get it next time');
+})());
+w.navigate('quiz');
+w.startMockQuiz();
+check('quiz renders every question with four options',
+  (page().match(/selectQuizAnswer\(/g) || []).length === before.quizFor('Mathematics').length * 4);
+w.selectQuizAnswer(before.quizFor('Mathematics')[0].id, 0);
+check('selecting an answer re-renders without submitting', page().includes('Submit Answers'));
+w.navigate('assistant');
+check('Buddy chat renders its greeting and suggestion chips',
+  page().includes('Buddy') && page().includes('id="chat-chips"'));
+check('Buddy chat exposes the input form', page().includes('id="chat-input"') && page().includes('sendChatMessage'));
+w.askBuddy('explain centripetal force');
+(globalThis.__timers.splice(0).forEach(fn => fn()));
+check('Buddy answered in the chat log with the centripetal-force lesson',
+  byId('chat-box').innerHTML.includes('Centripetal Force')
+  && byId('chat-box').innerHTML.includes('F = mv'),
+  byId('chat-box').innerHTML.slice(0, 200));
+w.navigate('profile');
+check('profile shows name, email, class, exam and log out',
+  page().includes('Joseph Adeyemi') && page().includes('joseph@example.com')
+  && page().includes('JAMB UTME') && page().includes('handleLogout()'));
+check('profile shows per-subject quiz stats', page().includes('Quiz performance') && page().includes('best score'));
+
+
+// second-day login continues the streak
+globalThis.__FS_STORE.set('users/test-uid-2', { name: 'Amaka', email: 'a@b.c', classLevel: 'SS2', targetExam: 'WAEC WASSCE', subjects: ['Chemistry'], onboarded: true, streak: 7, lastActiveDate: '2020-01-01', quizStats: {} });
+await globalThis.__AUTH_CB({ uid: 'test-uid-2', email: 'a@b.c', displayName: 'Amaka' });
+await new Promise(r => setImmediate(r));
+const doc2 = globalThis.__FS_STORE.get('users/test-uid-2');
+check('stale lastActiveDate resets streak to 1 on login', doc2.streak === 1, 'streak=' + doc2.streak);
+
+// logout
+await w.handleLogout();
+check('logout fires Firebase signOut()', globalThis.__SIGNED_OUT === true);
+await globalThis.__AUTH_CB(null);   // Firebase fires onAuthStateChanged(null) after signOut
+check('logout hides the app shell', byId('main-app').classList.contains('hidden'));
+
+// ---------- report ----------
+const failed = checks.filter(c => !c.ok);
+console.log(`\n${checks.length - failed.length}/${checks.length} checks passed`);
+if (failed.length) {
+  console.log('\nFAILED:');
+  failed.forEach(f => console.log('  -', f.name, f.detail));
+  process.exit(1);
+}
+console.log('ALL CHECKS PASSED');

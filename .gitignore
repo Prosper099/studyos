@@ -1,0 +1,12 @@
+# Generated verification fixtures and stubs (rebuilt by the test suites on demand)
+.verify/
+
+# Superseded original upload
+uploads/
+
+# Node / editor noise
+node_modules/
+*.log
+.DS_Store
+.arena/
+.cache/
