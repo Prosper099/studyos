@@ -1904,10 +1904,6 @@ const CURRICULUM = {
       ],
       JSS2: [
         {
-        }
-      ],
-      JSS2: [
-        {
           title: 'Simple Equations & Directed Numbers',
           tags: ['Balancing equations', 'Negative numbers', 'BODMAS'],
           summary: 'Solving one- and two-step equations and working confidently with negative numbers.',
@@ -2327,10 +2323,6 @@ const CURRICULUM = {
       ],
       JSS2: [
         {
-        }
-      ],
-      JSS2: [
-        {
           title: 'Acids, Bases & Salts in Everyday Life',
           tags: ['Indicators', 'Neutralisation', 'pH in daily life'],
           summary: 'Recognising acids and bases around the home and understanding neutralisation.',
@@ -2474,6 +2466,101 @@ const CURRICULUM = {
               exp: 'Machines change the size or direction of forces; friction means they can never reduce the total work - only make it feel easier.' },
             { q: 'The energy of a moving body is called...', options: ['potential energy', 'kinetic energy', 'chemical energy', 'nuclear energy'], correct: 1,
               exp: 'Anything in motion has kinetic energy - the faster it moves, the more it has.' }
+          ],
+        },
+
+        {
+          title: 'Human Body Systems',
+          tags: ['Digestive', 'Circulatory', 'Respiratory', 'Nervous'],
+          summary: 'The major systems of the body, the organs in each, and how they work together to keep you alive.',
+          content: `
+            <div class="diagram">
+              <div class="diagram-title">The human digestive system</div>
+              <svg viewBox="0 0 380 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagram of the digestive system from mouth to anus">
+                <rect x="6" y="6" width="368" height="208" rx="12" fill="#ecfeff"/>
+                <ellipse cx="150" cy="40" rx="26" ry="20" fill="#fde68a" stroke="#b45309" stroke-width="1.5"/>
+                <text x="150" y="44" text-anchor="middle" font-size="9" fill="#78350f">mouth</text>
+                <path d="M150 60 L150 88" stroke="#b45309" stroke-width="6" fill="none"/>
+                <text x="164" y="78" font-size="10" fill="#78350f">oesophagus</text>
+                <path d="M120 88 Q150 78 182 92 Q200 108 168 122 Q132 132 122 116 Q112 100 120 88 Z" fill="#fca5a5" stroke="#b91c1c" stroke-width="1.5"/>
+                <text x="152" y="108" text-anchor="middle" font-size="9" fill="#7f1d1d">stomach</text>
+                <path d="M176 128 Q210 130 214 150 Q216 168 186 168 L140 168" stroke="#f59e0b" stroke-width="5" fill="none"/>
+                <text x="222" y="146" font-size="10" fill="#92400e">small intestine</text>
+                <path d="M108 140 Q86 140 86 168 Q86 196 116 196 L206 196 Q236 196 236 172" stroke="#a3a3a3" stroke-width="8" fill="none" stroke-linecap="round"/>
+                <text x="60" y="150" font-size="10" fill="#404040">large</text>
+                <text x="52" y="162" font-size="10" fill="#404040">intestine</text>
+                <circle cx="236" cy="172" r="7" fill="#d6d3d1" stroke="#57534e" stroke-width="1.5"/>
+                <text x="248" y="176" font-size="10" fill="#404040">rectum &amp; anus</text>
+                <ellipse cx="262" cy="112" rx="18" ry="12" fill="#a78bfa" stroke="#6d28d9" stroke-width="1.5"/>
+                <text x="262" y="116" text-anchor="middle" font-size="8" fill="#4c1d95">liver</text>
+                <ellipse cx="296" cy="130" rx="12" ry="8" fill="#6ee7b7" stroke="#047857" stroke-width="1.5"/>
+                <text x="296" y="133" text-anchor="middle" font-size="8" fill="#064e3b">gall bladder</text>
+                <path d="M262 124 Q240 132 214 148" stroke="#6d28d9" stroke-width="2" stroke-dasharray="4 3" fill="none"/>
+                <ellipse cx="96" cy="112" rx="16" ry="10" fill="#fbcfe8" stroke="#be185d" stroke-width="1.5"/>
+                <text x="96" y="115" text-anchor="middle" font-size="8" fill="#831843">pancreas</text>
+                <text x="190" y="206" font-size="10" fill="#0f766e">Food travels mouth → oesophagus → stomach → small intestine → large intestine.</text>
+              </svg>
+            </div>
+            <h3>1. Why the body needs systems</h3>
+            <p>A single cell can only carry out a few jobs. Multicellular organisms solve this by <b>division of labour</b>: cells group into <b>tissues</b>, tissues form <b>organs</b>, organs cooperate as <b>systems</b>, and systems together make the <b>organism</b>.</p>
+            <div class="formula">cell → tissue → organ → system → organism</div>
+            <h3>2. The major systems</h3>
+            <table>
+              <tr><th>System</th><th>Main organs</th><th>Function</th></tr>
+              <tr><td>Digestive</td><td>Mouth, oesophagus, stomach, small &amp; large intestine, liver, pancreas</td><td>Breaks food down and absorbs nutrients</td></tr>
+              <tr><td>Circulatory</td><td>Heart, blood vessels, blood</td><td>Transports oxygen, nutrients, hormones and waste</td></tr>
+              <tr><td>Respiratory</td><td>Nose, trachea, bronchi, lungs, alveoli</td><td>Takes in oxygen and removes carbon dioxide</td></tr>
+              <tr><td>Nervous</td><td>Brain, spinal cord, nerves</td><td>Coordination, control and response to stimuli</td></tr>
+              <tr><td>Excretory</td><td>Kidneys, ureters, bladder, skin, lungs</td><td>Removes metabolic waste</td></tr>
+              <tr><td>Skeletal</td><td>Bones, joints, cartilage</td><td>Support, protection and movement</td></tr>
+              <tr><td>Muscular</td><td>Skeletal, smooth and cardiac muscle</td><td>Movement and posture</td></tr>
+              <tr><td>Endocrine</td><td>Pituitary, thyroid, adrenal, pancreas</td><td>Chemical control through hormones</td></tr>
+              <tr><td>Reproductive</td><td>Testes / ovaries and associated ducts</td><td>Production of offspring</td></tr>
+            </table>
+            <h3>3. How two systems cooperate</h3>
+            <p>Digestion and circulation cannot work apart. The <b>villi</b> of the small intestine are thin-walled and richly supplied with blood capillaries, so digested food passes into the blood and is carried to every cell. Likewise, the respiratory and circulatory systems cooperate at the <b>alveoli</b>, where oxygen enters the blood and carbon dioxide leaves it.</p>
+            <h3>4. Keeping the systems healthy</h3>
+            <ul>
+              <li>Eat a balanced diet containing carbohydrates, proteins, fats, vitamins, minerals, fibre and water.</li>
+              <li>Exercise regularly to strengthen the heart and lungs.</li>
+              <li>Avoid tobacco, alcohol and drug abuse — they damage the respiratory, circulatory and nervous systems.</li>
+              <li>Wash hands and drink safe water to protect the digestive system.</li>
+            </ul>
+            <div class="worked"><b>Worked practice:</b> Name the system that (a) produces bile, (b) filters urea from the blood, (c) carries hormones to target organs.<br>
+            (a) Digestive — the liver makes bile, stored in the gall bladder. (b) Excretory — the kidneys. (c) Endocrine and circulatory together — the endocrine system makes the hormone, the circulatory system transports it.</div>
+            <h3>Common mistakes</h3>
+            <ul>
+              <li>Saying the stomach is where most absorption happens — that is the <b>small intestine</b>.</li>
+              <li>Confusing the trachea (air passage) with the oesophagus (food passage).</li>
+              <li>Listing the skin only as a covering; it is also an excretory and sense organ.</li>
+            </ul>`,
+          cards: [
+            { q: 'Arrange the levels of organisation of the body, simplest first.', a: 'Cell -> tissue -> organ -> system -> organism. Cells group into tissues, tissues form organs, organs cooperate as systems, and systems make the whole organism.' },
+            { q: 'Name the nine body systems with one function each.', a: 'Digestive (breaks down food), circulatory (transport), respiratory (gas exchange), nervous (control and coordination), excretory (waste removal), skeletal (support/protection), muscular (movement), endocrine (hormones), reproductive (offspring).' },
+            { q: 'Give an example of two systems working together.', a: 'During exercise the respiratory system takes in extra oxygen while the circulatory system pumps faster to deliver it to muscles - and carries away the extra carbon dioxide.' },
+            { q: 'How do you keep your body systems healthy?', a: 'Eat a balanced diet (carbohydrates, proteins, fats, vitamins, minerals, fibre and water), exercise regularly, avoid tobacco, alcohol and drugs, wash your hands and drink safe water.' }
+          ],
+          quiz: [
+            { q: 'Which system transports oxygen, nutrients and hormones round the body?', options: ['digestive', 'circulatory', 'nervous', 'skeletal'], correct: 1,
+              exp: 'The heart, blood vessels and blood form the body\'s transport system.' },
+            { q: 'Gas exchange - oxygen in, carbon dioxide out - happens in the...', options: ['stomach', 'alveoli of the lungs', 'kidneys', 'liver'], correct: 1,
+              exp: 'The tiny air sacs (alveoli) are wrapped in capillaries, where the gases swap in and out of the blood.' },
+            { q: 'The correct order of the food channel is...', options: ['mouth -> stomach -> oesophagus -> small intestine', 'mouth -> oesophagus -> stomach -> small intestine -> large intestine', 'stomach -> mouth -> intestine', 'oesophagus -> mouth -> stomach'], correct: 1,
+              exp: 'Food is swallowed down the oesophagus into the stomach, then passes through the small and large intestines.' },
+            { q: 'Which system coordinates the body and responds to stimuli?', options: ['endocrine', 'excretory', 'nervous', 'muscular'], correct: 2,
+              exp: 'The brain, spinal cord and nerves carry messages to and from every part of the body.' },
+            { q: 'The kidneys belong to which system?', options: ['excretory', 'digestive', 'respiratory', 'circulatory'], correct: 0,
+              exp: 'The excretory system - kidneys, ureters and bladder - removes metabolic waste such as urea from the blood.' },
+            { q: 'Bile is produced by the...', options: ['stomach', 'liver', 'gall bladder', 'pancreas'], correct: 1,
+              exp: 'The liver makes bile - stored in the gall bladder - to help digest fats. The liver is a digestive-system organ.' },
+            { q: 'Chemical control of the body through hormones is the job of the...', options: ['endocrine system', 'skeletal system', 'muscular system', 'excretory system'], correct: 0,
+              exp: 'Glands such as the pituitary, thyroid and pancreas release hormones into the blood.' },
+            { q: 'How do the digestive and circulatory systems cooperate?', options: ['The stomach pumps blood', 'Digested food passes from the villi into the blood capillaries', 'Blood digests food directly', 'The heart produces enzymes'], correct: 1,
+              exp: 'The thin-walled villi of the small intestine are rich in capillaries, so absorbed food is carried to every cell.' },
+            { q: 'The functions of the skeleton include...', options: ['digestion and absorption', 'support, protection and movement', 'breathing only', 'hormone production'], correct: 1,
+              exp: 'Bones support the body, protect organs (skull -> brain, ribs -> heart and lungs) and work with muscles for movement.' },
+            { q: 'Which habit protects the digestive system?', options: ['smoking', 'washing hands and drinking safe water', 'skipping meals', 'drinking alcohol'], correct: 1,
+              exp: 'Germs enter with dirty hands and unsafe water - hygiene prevents infections such as diarrhoea and typhoid.' }
           ],
         }
       ],
@@ -3810,10 +3897,6 @@ const CURRICULUM = {
       ],
       JSS2: [
         {
-        }
-      ],
-      JSS2: [
-        {
           title: 'Verb Tenses Made Simple',
           tags: ['Simple & continuous', 'Perfect tenses', 'Sequence of tenses'],
           summary: 'When to use each tense, and the signal words that tell you which one the question needs.',
@@ -4303,10 +4386,6 @@ const CURRICULUM = {
       ],
       JSS2: [
         {
-        }
-      ],
-      JSS2: [
-        {
           title: 'Geometrical Construction & Plane Figures',
           tags: ['Bisection', 'Angles', 'Triangles & polygons'],
           summary: 'Constructing angles, bisectors, triangles and regular polygons with compass and straight edge only.',
@@ -4446,167 +4525,62 @@ const CURRICULUM = {
               exp: 'Aluminium forms a protective oxide layer so it does not rust, and its lightness makes it easy to fit.' }
           ],
         },
-        {
-          title: 'Human Body Systems',
-          tags: ['Digestive', 'Circulatory', 'Respiratory', 'Nervous'],
-          summary: 'The major systems of the body, the organs in each, and how they work together to keep you alive.',
-          content: `
-            <div class="diagram">
-              <div class="diagram-title">The human digestive system</div>
-              <svg viewBox="0 0 380 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagram of the digestive system from mouth to anus">
-                <rect x="6" y="6" width="368" height="208" rx="12" fill="#ecfeff"/>
-                <ellipse cx="150" cy="40" rx="26" ry="20" fill="#fde68a" stroke="#b45309" stroke-width="1.5"/>
-                <text x="150" y="44" text-anchor="middle" font-size="9" fill="#78350f">mouth</text>
-                <path d="M150 60 L150 88" stroke="#b45309" stroke-width="6" fill="none"/>
-                <text x="164" y="78" font-size="10" fill="#78350f">oesophagus</text>
-                <path d="M120 88 Q150 78 182 92 Q200 108 168 122 Q132 132 122 116 Q112 100 120 88 Z" fill="#fca5a5" stroke="#b91c1c" stroke-width="1.5"/>
-                <text x="152" y="108" text-anchor="middle" font-size="9" fill="#7f1d1d">stomach</text>
-                <path d="M176 128 Q210 130 214 150 Q216 168 186 168 L140 168" stroke="#f59e0b" stroke-width="5" fill="none"/>
-                <text x="222" y="146" font-size="10" fill="#92400e">small intestine</text>
-                <path d="M108 140 Q86 140 86 168 Q86 196 116 196 L206 196 Q236 196 236 172" stroke="#a3a3a3" stroke-width="8" fill="none" stroke-linecap="round"/>
-                <text x="60" y="150" font-size="10" fill="#404040">large</text>
-                <text x="52" y="162" font-size="10" fill="#404040">intestine</text>
-                <circle cx="236" cy="172" r="7" fill="#d6d3d1" stroke="#57534e" stroke-width="1.5"/>
-                <text x="248" y="176" font-size="10" fill="#404040">rectum &amp; anus</text>
-                <ellipse cx="262" cy="112" rx="18" ry="12" fill="#a78bfa" stroke="#6d28d9" stroke-width="1.5"/>
-                <text x="262" y="116" text-anchor="middle" font-size="8" fill="#4c1d95">liver</text>
-                <ellipse cx="296" cy="130" rx="12" ry="8" fill="#6ee7b7" stroke="#047857" stroke-width="1.5"/>
-                <text x="296" y="133" text-anchor="middle" font-size="8" fill="#064e3b">gall bladder</text>
-                <path d="M262 124 Q240 132 214 148" stroke="#6d28d9" stroke-width="2" stroke-dasharray="4 3" fill="none"/>
-                <ellipse cx="96" cy="112" rx="16" ry="10" fill="#fbcfe8" stroke="#be185d" stroke-width="1.5"/>
-                <text x="96" y="115" text-anchor="middle" font-size="8" fill="#831843">pancreas</text>
-                <text x="190" y="206" font-size="10" fill="#0f766e">Food travels mouth → oesophagus → stomach → small intestine → large intestine.</text>
-              </svg>
-            </div>
-            <h3>1. Why the body needs systems</h3>
-            <p>A single cell can only carry out a few jobs. Multicellular organisms solve this by <b>division of labour</b>: cells group into <b>tissues</b>, tissues form <b>organs</b>, organs cooperate as <b>systems</b>, and systems together make the <b>organism</b>.</p>
-            <div class="formula">cell → tissue → organ → system → organism</div>
-            <h3>2. The major systems</h3>
-            <table>
-              <tr><th>System</th><th>Main organs</th><th>Function</th></tr>
-              <tr><td>Digestive</td><td>Mouth, oesophagus, stomach, small &amp; large intestine, liver, pancreas</td><td>Breaks food down and absorbs nutrients</td></tr>
-              <tr><td>Circulatory</td><td>Heart, blood vessels, blood</td><td>Transports oxygen, nutrients, hormones and waste</td></tr>
-              <tr><td>Respiratory</td><td>Nose, trachea, bronchi, lungs, alveoli</td><td>Takes in oxygen and removes carbon dioxide</td></tr>
-              <tr><td>Nervous</td><td>Brain, spinal cord, nerves</td><td>Coordination, control and response to stimuli</td></tr>
-              <tr><td>Excretory</td><td>Kidneys, ureters, bladder, skin, lungs</td><td>Removes metabolic waste</td></tr>
-              <tr><td>Skeletal</td><td>Bones, joints, cartilage</td><td>Support, protection and movement</td></tr>
-              <tr><td>Muscular</td><td>Skeletal, smooth and cardiac muscle</td><td>Movement and posture</td></tr>
-              <tr><td>Endocrine</td><td>Pituitary, thyroid, adrenal, pancreas</td><td>Chemical control through hormones</td></tr>
-              <tr><td>Reproductive</td><td>Testes / ovaries and associated ducts</td><td>Production of offspring</td></tr>
-            </table>
-            <h3>3. How two systems cooperate</h3>
-            <p>Digestion and circulation cannot work apart. The <b>villi</b> of the small intestine are thin-walled and richly supplied with blood capillaries, so digested food passes into the blood and is carried to every cell. Likewise, the respiratory and circulatory systems cooperate at the <b>alveoli</b>, where oxygen enters the blood and carbon dioxide leaves it.</p>
-            <h3>4. Keeping the systems healthy</h3>
-            <ul>
-              <li>Eat a balanced diet containing carbohydrates, proteins, fats, vitamins, minerals, fibre and water.</li>
-              <li>Exercise regularly to strengthen the heart and lungs.</li>
-              <li>Avoid tobacco, alcohol and drug abuse — they damage the respiratory, circulatory and nervous systems.</li>
-              <li>Wash hands and drink safe water to protect the digestive system.</li>
-            </ul>
-            <div class="worked"><b>Worked practice:</b> Name the system that (a) produces bile, (b) filters urea from the blood, (c) carries hormones to target organs.<br>
-            (a) Digestive — the liver makes bile, stored in the gall bladder. (b) Excretory — the kidneys. (c) Endocrine and circulatory together — the endocrine system makes the hormone, the circulatory system transports it.</div>
-            <h3>Common mistakes</h3>
-            <ul>
-              <li>Saying the stomach is where most absorption happens — that is the <b>small intestine</b>.</li>
-              <li>Confusing the trachea (air passage) with the oesophagus (food passage).</li>
-              <li>Listing the skin only as a covering; it is also an excretory and sense organ.</li>
-            </ul>`,
-          cards: [
-            { q: 'Arrange the levels of organisation of the body, simplest first.', a: 'Cell -> tissue -> organ -> system -> organism. Cells group into tissues, tissues form organs, organs cooperate as systems, and systems make the whole organism.' },
-            { q: 'Name the nine body systems with one function each.', a: 'Digestive (breaks down food), circulatory (transport), respiratory (gas exchange), nervous (control and coordination), excretory (waste removal), skeletal (support/protection), muscular (movement), endocrine (hormones), reproductive (offspring).' },
-            { q: 'Give an example of two systems working together.', a: 'During exercise the respiratory system takes in extra oxygen while the circulatory system pumps faster to deliver it to muscles - and carries away the extra carbon dioxide.' },
-            { q: 'How do you keep your body systems healthy?', a: 'Eat a balanced diet (carbohydrates, proteins, fats, vitamins, minerals, fibre and water), exercise regularly, avoid tobacco, alcohol and drugs, wash your hands and drink safe water.' }
-          ],
-          quiz: [
-            { q: 'Which system transports oxygen, nutrients and hormones round the body?', options: ['digestive', 'circulatory', 'nervous', 'skeletal'], correct: 1,
-              exp: 'The heart, blood vessels and blood form the body\'s transport system.' },
-            { q: 'Gas exchange - oxygen in, carbon dioxide out - happens in the...', options: ['stomach', 'alveoli of the lungs', 'kidneys', 'liver'], correct: 1,
-              exp: 'The tiny air sacs (alveoli) are wrapped in capillaries, where the gases swap in and out of the blood.' },
-            { q: 'The correct order of the food channel is...', options: ['mouth -> stomach -> oesophagus -> small intestine', 'mouth -> oesophagus -> stomach -> small intestine -> large intestine', 'stomach -> mouth -> intestine', 'oesophagus -> mouth -> stomach'], correct: 1,
-              exp: 'Food is swallowed down the oesophagus into the stomach, then passes through the small and large intestines.' },
-            { q: 'Which system coordinates the body and responds to stimuli?', options: ['endocrine', 'excretory', 'nervous', 'muscular'], correct: 2,
-              exp: 'The brain, spinal cord and nerves carry messages to and from every part of the body.' },
-            { q: 'The kidneys belong to which system?', options: ['excretory', 'digestive', 'respiratory', 'circulatory'], correct: 0,
-              exp: 'The excretory system - kidneys, ureters and bladder - removes metabolic waste such as urea from the blood.' },
-            { q: 'Bile is produced by the...', options: ['stomach', 'liver', 'gall bladder', 'pancreas'], correct: 1,
-              exp: 'The liver makes bile - stored in the gall bladder - to help digest fats. The liver is a digestive-system organ.' },
-            { q: 'Chemical control of the body through hormones is the job of the...', options: ['endocrine system', 'skeletal system', 'muscular system', 'excretory system'], correct: 0,
-              exp: 'Glands such as the pituitary, thyroid and pancreas release hormones into the blood.' },
-            { q: 'How do the digestive and circulatory systems cooperate?', options: ['The stomach pumps blood', 'Digested food passes from the villi into the blood capillaries', 'Blood digests food directly', 'The heart produces enzymes'], correct: 1,
-              exp: 'The thin-walled villi of the small intestine are rich in capillaries, so absorbed food is carried to every cell.' },
-            { q: 'The functions of the skeleton include...', options: ['digestion and absorption', 'support, protection and movement', 'breathing only', 'hormone production'], correct: 1,
-              exp: 'Bones support the body, protect organs (skull -> brain, ribs -> heart and lungs) and work with muscles for movement.' },
-            { q: 'Which habit protects the digestive system?', options: ['smoking', 'washing hands and drinking safe water', 'skipping meals', 'drinking alcohol'], correct: 1,
-              exp: 'Germs enter with dirty hands and unsafe water - hygiene prevents infections such as diarrhoea and typhoid.' }
-          ],
-        }
       ],
       JSS3: [
         {
-          title: 'Light, Sound & Basic Electricity',
-          tags: ['Reflection', 'Refraction', 'Echoes', 'Simple circuits'],
-          summary: 'How light and sound behave, and the difference between conductors, insulators and simple circuits.',
+          title: 'Machines, Mechanisms & Maintenance',
+          tags: ['Simple machines', 'Mechanical advantage', 'Maintenance'],
+          summary: 'How levers, pulleys, gears and belts make work easier, how mechanisms turn one motion into another, and why maintaining machines saves money and lives.',
           content: `
-            <h3>1. Light</h3>
-            <p>Light travels in straight lines at about 3 × 10⁸ m/s and does not need a medium.</p>
+            <h3>1. What a machine does</h3>
+            <p>A machine never reduces the total <b>work</b> — it makes work <i>easier</i> by trading effort for distance, or by changing the direction of a force. Three numbers describe every machine:</p>
+            <div class="formula">Mechanical Advantage (MA) = Load ÷ Effort &nbsp;·&nbsp; Velocity Ratio (VR) = distance moved by effort ÷ distance moved by load &nbsp;·&nbsp; Efficiency = (MA ÷ VR) × 100%</div>
+            <p>Friction is why efficiency is always below 100% — oiling and maintaining a machine raises its MA toward its VR.</p>
+            <h3>2. The simple machines around you</h3>
             <ul>
-              <li><b>Reflection</b> — the angle of incidence equals the angle of reflection (plane mirrors).</li>
-              <li><b>Refraction</b> — light bends when it passes from one medium to another because its speed changes. This is why a pencil looks bent in water.</li>
-              <li><b>Dispersion</b> — white light splits into its colours through a prism.</li>
+              <li><b>Lever</b> — a bar turning on a fulcrum. Class 1: fulcrum in the middle (scissors, crowbar); Class 2: load in the middle (wheelbarrow, bottle opener); Class 3: effort in the middle (broom, your forearm).</li>
+              <li><b>Pulley</b> — changes direction; a block-and-tackle multiplies force (VR = number of rope sections supporting the load).</li>
+              <li><b>Inclined plane</b> — a ramp: long slope, small effort.</li>
+              <li><b>Wheel and axle</b> — steering wheel, door knob, screwdriver.</li>
+              <li><b>Gears</b> — toothed wheels that transfer rotation; a small gear driving a big one trades speed for turning force (bicycle low gear uphill).</li>
+              <li><b>Belt and chain drives</b> — the fan belt in a generator, the chain on an okada: they carry motion between shafts some distance apart.</li>
             </ul>
-            <div class="worked"><b>Worked example:</b> A ray strikes a plane mirror at 35° to the mirror surface. What is the angle of reflection?<br>
-            The angle of incidence is measured from the <b>normal</b>, so it is 90 − 35 = 55°, and the angle of reflection is also <b>55°</b>.</div>
-            <h3>2. Sound</h3>
-            <p>Sound is produced by vibrating bodies and needs a <b>material medium</b> — it cannot travel through a vacuum. It travels fastest in solids, slower in liquids, and slowest in gases (about 340 m/s in air).</p>
+            <h3>3. Mechanisms: changing the kind of motion</h3>
+            <p>A <b>mechanism</b> converts one type of motion into another. The <b>crank and slider</b> turns the up-down motion of an engine piston into the rotation of the crankshaft (or the reverse, in a water pump). <b>Cams</b> turn rotation into a repeated push (engine valves). <b>Linkages</b> such as the bicycle brake or a windscreen wiper copy and redirect a movement.</p>
+            <h3>4. Maintenance: the cheapest repair is prevention</h3>
             <ul>
-              <li><b>Pitch</b> depends on frequency; <b>loudness</b> depends on amplitude; <b>quality</b> depends on the mixture of overtones.</li>
-              <li><b>Echo</b> — a reflected sound heard separately from the original.</li>
+              <li><b>Preventive maintenance</b> — planned care: cleaning, oiling, tightening, replacing worn parts <i>before</i> failure. Servicing a generator every month is preventive maintenance.</li>
+              <li><b>Corrective (breakdown) maintenance</b> — repairing after failure; always costs more time and money.</li>
+              <li>Good habits: keep machines clean and dry (rust is a killer in the rainy season), oil moving parts, store tools properly, follow the maker's instructions.</li>
             </ul>
-            <div class="worked"><b>Worked example:</b> A boy claps 85 m from a wall. How long before he hears the echo (speed of sound 340 m/s)?<br>
-            The sound travels there and back: 170 m ÷ 340 = <b>0.5 s</b>.</div>
-            <h3>3. Basic electricity</h3>
+            <h3>Worked example</h3>
+            <p><b>A pulley system lifts a load of 600 N with an effort of 200 N. Its velocity ratio is 4. Find MA and efficiency.</b> MA = 600/200 = <b>3</b>. Efficiency = (MA/VR) × 100 = (3/4) × 100 = <b>75%</b>. The missing 25% is friction in the pulley bearings — which is exactly what oiling attacks.</p>
+            <h3>5. Safety with machines</h3>
+            <p>Guards cover moving belts and gears; loose clothing, hair and jewellery stay away from rotating parts; machines are switched off before cleaning or adjustment. Most workshop injuries happen when someone bypasses a safety guard to "work faster".</p>
+            <h3>Exam watch</h3>
             <ul>
-              <li><b>Conductors</b> allow charge to flow (copper, aluminium, iron, the human body).</li>
-              <li><b>Insulators</b> do not (rubber, plastic, dry wood, glass).</li>
-              <li>Like charges <b>repel</b>; unlike charges <b>attract</b>.</li>
+              <li>MA and VR are <b>ratios</b> — they have no units; efficiency is a percentage.</li>
+              <li>Identify the lever class by what sits in the <b>middle</b>: fulcrum (1), load (2), effort (3).</li>
+              <li>Efficiency can never reach 100% in a real machine — friction is unavoidable.</li>
             </ul>
-            <p>A simple circuit needs a <b>source</b> (cell), <b>conductors</b> (wires), a <b>load</b> (bulb) and a <b>switch</b>. In a <b>series</b> circuit there is one path — if one bulb fails they all go out. In a <b>parallel</b> circuit each bulb has its own path, which is why house wiring is parallel.</p>
-            <div class="worked"><b>Worked example:</b> Why are household appliances connected in parallel?<br>
-            So that each receives the full supply voltage and so that switching one off does not affect the others.</div>
-            <h3>Common mistakes</h3>
-            <ul>
-              <li>Measuring angles of incidence from the mirror instead of the <b>normal</b>.</li>
-              <li>Saying sound travels through a vacuum — light does, sound does not.</li>
-              <li>Confusing pitch (frequency) with loudness (amplitude).</li>
-            </ul>`,
+          `,
           cards: [
-            { q: 'Name two renewable and two non-renewable energy sources.', a: 'Renewable: solar and wind. Non-renewable: coal and petroleum.' },
-            { q: 'Give three everyday effects of refraction.', a: 'A pencil looking bent in water, swimming pools appearing shallower than they really are, and lenses (spectacles, magnifying glasses) focusing light.' },
-            { q: 'Why are metals used for wire cores while plastic covers them?', a: 'Metal - usually copper - conducts the current with little resistance. The plastic covering is an insulator that keeps the current in the wire and prevents electric shocks.' },
-            { q: 'What conditions produce a clear echo?', a: 'A loud sound, a hard flat reflecting surface some distance away, and no soft materials to absorb the sound - soft furnishings and carpets kill echoes.' }
+            { q: 'State the formulae for MA, VR and efficiency.', a: 'MA = Load ÷ Effort; VR = distance moved by effort ÷ distance moved by load; Efficiency = (MA ÷ VR) × 100%. Friction keeps efficiency below 100%.' },
+            { q: 'How do you identify the class of a lever?', a: 'Look at what is in the middle: fulcrum in the middle = class 1 (scissors); load in the middle = class 2 (wheelbarrow); effort in the middle = class 3 (broom, forearm).' },
+            { q: 'Preventive vs corrective maintenance — which is cheaper and why?', a: 'Preventive maintenance (cleaning, oiling, planned part replacement before failure) is cheaper because corrective maintenance waits for breakdown, which causes more damage, downtime and cost.' }
           ],
           quiz: [
-            { q: 'Shadows are formed because...', options: ['light bends around objects', 'light travels in straight lines and cannot pass through opaque objects', 'light is absorbed by air', 'sound blocks light'], correct: 1,
-              exp: 'An opaque object blocks the straight rays, leaving a dark region - the shadow - behind it.' },
-            { q: 'Which surface gives the clearest reflection?', options: ['rough wood', 'a plane mirror', 'white paper', 'cloth'], correct: 1,
-              exp: 'Smooth, polished surfaces reflect light in an orderly way; rough surfaces scatter it in all directions.' },
-            { q: 'Splitting white light into colours with a prism is an example of...', options: ['reflection', 'refraction (dispersion)', 'absorption', 'echo'], correct: 1,
-              exp: 'Each colour refracts by a slightly different amount, so a prism spreads white light into a spectrum.' },
-            { q: 'The number of vibrations per second of a sound source determines its...', options: ['loudness', 'pitch', 'speed', 'echo'], correct: 1,
-              exp: 'Faster vibrations (higher frequency) give a higher pitch; bigger vibrations give a louder sound.' },
-            { q: 'Bats and dolphins locate objects using reflected sound. This is called...', options: ['dispersion', 'echo location', 'amplification', 'insulation'], correct: 1,
-              exp: 'They emit high-pitched sounds and listen for the echoes bouncing back from objects - echo location.' },
-            { q: 'Which list contains ONLY insulators?', options: ['copper, aluminium', 'rubber, dry wood, plastic', 'iron, steel', 'silver, gold'], correct: 1,
-              exp: 'Rubber, dry wood and plastic all resist the flow of electricity; every metal in the other lists conducts.' },
-            { q: 'In a simple circuit, the component that supplies the energy is the...', options: ['bulb', 'switch', 'cell', 'wire'], correct: 2,
-              exp: 'The cell converts stored chemical energy into electrical energy that pushes the current round the circuit.' },
-            { q: 'When the switch in a circuit is open...', options: ['the bulb shines brighter', 'current stops and the bulb goes out', 'the wires melt', 'the cell recharges'], correct: 1,
-              exp: 'An open switch breaks the conducting path, so no current can flow.' },
-            { q: 'Light differs from sound because light...', options: ['needs a medium', 'can travel through a vacuum', 'travels slower than sound', 'cannot be reflected'], correct: 1,
-              exp: 'Light is not a vibration of particles, so it crosses empty space - that is how sunlight reaches the Earth.' },
-            { q: 'A periscope uses two mirrors to...', options: ['bend light round corners by reflection', 'magnify sound', 'store electricity', 'refract sound'], correct: 0,
-              exp: 'Each mirror reflects the light through 90°, letting you see over or around obstacles.' }
-          ],
+            { q: 'Mechanical advantage is defined as', options: ['effort ÷ load', 'load ÷ effort', 'load × effort', 'VR × efficiency'], correct: 1, exp: 'MA = Load ÷ Effort — how many times the machine multiplies your force.' },
+            { q: 'A machine has MA = 4 and VR = 5. Its efficiency is', options: ['20%', '80%', '125%', '9%'], correct: 1, exp: 'Efficiency = MA/VR × 100 = 4/5 × 100 = 80%.' },
+            { q: 'Which simple machine is a bottle opener?', options: ['class 1 lever', 'class 2 lever', 'class 3 lever', 'pulley'], correct: 1, exp: 'The load (cap) is between the fulcrum (edge on the cap rim) and the effort (your hand) — load in the middle = class 2.' },
+            { q: 'The velocity ratio of a single fixed pulley is', options: ['0', '1', '2', 'depends on the load'], correct: 1, exp: 'Effort moves the same distance as the load, so VR = 1; it only changes the direction of the force.' },
+            { q: 'A crank and slider mechanism converts', options: ['rotation into reciprocating motion', 'rotation into electrical energy', 'linear motion into rotation only', 'heat into motion'], correct: 0, exp: 'It turns rotation into back-and-forth (reciprocating) motion — or the reverse, as in an engine where pistons turn the crankshaft.' },
+            { q: 'Servicing a generator monthly is an example of', options: ['corrective maintenance', 'preventive maintenance', 'breakdown maintenance', 'design improvement'], correct: 1, exp: 'Planned care before failure = preventive maintenance.' },
+            { q: 'Efficiency of a real machine is always', options: ['100%', 'above 100%', 'below 100%', 'equal to its VR'], correct: 2, exp: 'Friction wastes some effort as heat, so MA < VR and efficiency < 100%.' },
+            { q: 'On a bicycle, a belt or chain connects the pedal sprocket to the rear wheel sprocket in order to', options: ['increase friction', 'transmit motion between separated shafts', 'reduce the velocity ratio to zero', 'store energy'], correct: 1, exp: 'Belt and chain drives carry rotation between shafts that are some distance apart.' },
+            { q: 'Which is a class 3 lever?', options: ['wheelbarrow', 'scissors', 'broom while sweeping', 'crowbar'], correct: 2, exp: 'While sweeping, your top hand (effort) is between the fulcrum (other hand) and the load (brush end).' },
+            { q: 'Why are moving belts and gears fitted with guards?', options: ['to look neat', 'to reduce noise', 'to prevent contact injuries', 'to increase VR'], correct: 2, exp: 'Guards stop clothing, hair and hands from being caught in moving parts — the most common workshop injury cause.' }
+          ]
         }
       ],
     },
