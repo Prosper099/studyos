@@ -467,8 +467,12 @@ const state = {
   quiz: { answers: {}, submitted: false, score: 0, result: null, mode: 'list', level: '', topicIdx: 0, topicTitle: '' },
   flash: { idx: 0, flipped: false, topicFilter: '', got: 0, later: [], phase: 'main', retryDeck: [] },
   chat: [],
-  settings: { research: true, geminiApiKey: '', geminiModel: 'gemini-1.5-flash' }
+  settings: { research: true, geminiApiKey: '', geminiModel: 'gemini-2.5-flash' }
 };
+
+/* Live Gemini models (free tier). Buddy tries the chosen one first, then falls
+   back down this list if Google has retired it — so a key never "just stops working". */
+const GEMINI_MODELS = ['gemini-2.5-flash', 'gemini-2.5-flash-lite', 'gemini-3.1-flash-lite', 'gemini-3-flash-preview'];
 
 const EXAM_OPTIONS = {
   SS: [
@@ -7474,10 +7478,34 @@ async function researchOnline(question) {
 }
 
 /** Optional Gemini synthesis. Only runs if the student supplied a key. */
+async function geminiCall(model, key, body) {
+  const res = await fetch(
+    'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent?key=' + encodeURIComponent(key),
+    { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  const json = await res.json().catch(() => null);
+  if (!res.ok) {
+    const err = new Error((json && json.error && json.error.message) || ('Gemini responded ' + res.status));
+    err.status = res.status;
+    throw err;
+  }
+  const text = json.candidates && json.candidates[0] && json.candidates[0].content
+    && json.candidates[0].content.parts && json.candidates[0].content.parts.map(p => p.text || '').join('\n');
+  return text && text.trim() ? text.trim() : null;
+}
+
+function geminiModelChain() {
+  const chosen = (state.settings.geminiModel || GEMINI_MODELS[0]).trim() || GEMINI_MODELS[0];
+  return [chosen, ...GEMINI_MODELS.filter(m => m !== chosen)];
+}
+
+function geminiRetryable(err) {
+  const m = String((err && err.message) || '').toLowerCase();
+  return err.status === 404 || /not found|deprecated|retired|no longer|unsupported|has been shut/i.test(m);
+}
+
 async function geminiAnswer(question, context) {
   const key = (state.settings.geminiApiKey || '').trim();
   if (!key) return null;
-  const model = state.settings.geminiModel || 'gemini-1.5-flash';
   const prompt = [
     'You are Buddy, a friendly Nigerian secondary-school tutor preparing a student for JAMB UTME and WAEC WASSCE.',
     'Answer in clear British English. Be accurate, exam-focused and concise.',
@@ -7489,27 +7517,57 @@ async function geminiAnswer(question, context) {
     'RETRIEVED CONTEXT (cite it where useful):',
     context || '(none)'
   ].join('\n');
-  try {
-    const res = await fetch(
-      'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent?key=' + encodeURIComponent(key),
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ role: 'user', parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.4, maxOutputTokens: 900 }
-        })
-      });
-    const json = await res.json();
-    if (!res.ok) {
-      throw new Error((json && json.error && json.error.message) || ('Gemini responded ' + res.status));
+  const body = {
+    contents: [{ role: 'user', parts: [{ text: prompt }] }],
+    generationConfig: { temperature: 0.4, maxOutputTokens: 900 }
+  };
+  let lastErr = null;
+  for (const model of geminiModelChain()) {
+    try {
+      const text = await geminiCall(model, key, body);
+      if (model !== state.settings.geminiModel) {  // remember the model that actually works
+        state.settings.geminiModel = model;
+        saveSettings();
+      }
+      return text;
+    } catch (err) {
+      lastErr = err;
+      if (!geminiRetryable(err)) return { error: err.message };  // bad key, quota, etc. — don't retry
     }
-    const text = json.candidates && json.candidates[0] && json.candidates[0].content
-      && json.candidates[0].content.parts && json.candidates[0].content.parts.map(p => p.text || '').join('\n');
-    return text && text.trim() ? text.trim() : null;
-  } catch (err) {
-    return { error: (err && err.message) || String(err) };
   }
+  return { error: (lastErr && lastErr.message) || 'Gemini unavailable' };
+}
+
+function setGeminiModel(value) {
+  state.settings.geminiModel = value;
+  saveSettings();
+  toast('Buddy will use ' + value);
+}
+
+async function testGemini() {
+  const input = document.getElementById('gemini-key');
+  const key = ((input && input.value) || state.settings.geminiApiKey || '').trim();
+  if (!key) { toast('Paste your Gemini API key first 🙂'); return; }
+  toast('Testing your Gemini key…');
+  let lastErr = null;
+  for (const model of geminiModelChain()) {
+    try {
+      await geminiCall(model, key, {
+        contents: [{ role: 'user', parts: [{ text: 'Reply with the single word: ready' }] }],
+        generationConfig: { maxOutputTokens: 10 }
+      });
+      state.settings.geminiApiKey = key;
+      state.settings.geminiModel = model;
+      saveSettings();
+      renderPage();
+      toast('✅ Gemini connected! Buddy will use ' + model);
+      return;
+    } catch (err) {
+      lastErr = err;
+      if (!geminiRetryable(err)) break;
+    }
+  }
+  toast('❌ ' + ((lastErr && lastErr.message) || 'Gemini could not be reached'));
 }
 
 function sourcesHtml(sources) {
@@ -8531,6 +8589,15 @@ function renderAssistant(el) {
               class="flex-1 rounded-lg border border-slate-200 px-2.5 py-1.5 text-[11px] outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100" />
             <button type="button" onclick="saveGeminiKey()" class="rounded-lg bg-indigo-600 px-3 py-1.5 text-[11px] font-bold text-white transition hover:bg-indigo-700">Save</button>
           </div>
+          <div class="mt-2 flex flex-wrap items-center gap-2">
+            <label class="text-[10px] font-bold text-slate-500" for="gemini-model">Model</label>
+            <select id="gemini-model" onchange="setGeminiModel(this.value)"
+              class="rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-[11px] font-semibold text-slate-700 outline-none focus:border-indigo-400">
+              ${GEMINI_MODELS.map(m => `<option value="${m}" ${(state.settings.geminiModel || GEMINI_MODELS[0]) === m ? 'selected' : ''}>${m}</option>`).join('')}
+            </select>
+            <button type="button" onclick="testGemini()" class="rounded-lg bg-emerald-600 px-3 py-1.5 text-[11px] font-bold text-white transition hover:bg-emerald-700">🔌 Test key</button>
+            <span class="text-[10px] text-slate-400">If a model is ever retired, Buddy auto-switches to the next one.</span>
+          </div>
         </div>
       </div>
 
@@ -8675,7 +8742,7 @@ async function saveSettings() {
     await updateDoc(userRef(), {
       settings: {
         research: !!state.settings.research,
-        geminiModel: state.settings.geminiModel || 'gemini-1.5-flash',
+        geminiModel: state.settings.geminiModel || 'gemini-2.5-flash',
         geminiApiKey: state.settings.geminiApiKey || ''
       },
       updatedAt: serverTimestamp()
@@ -8927,7 +8994,7 @@ async function saveProfile(patch) {
       quizStats: state.quizStats || {},
       settings: {
         research: !!state.settings.research,
-        geminiModel: state.settings.geminiModel || 'gemini-1.5-flash',
+        geminiModel: state.settings.geminiModel || 'gemini-2.5-flash',
         geminiApiKey: state.settings.geminiApiKey || ''
       },
       updatedAt: serverTimestamp()
@@ -9014,7 +9081,7 @@ function hydrateFromDoc(data) {
   if (data.settings && typeof data.settings === 'object') {
     state.settings = {
       research: data.settings.research !== false,
-      geminiModel: data.settings.geminiModel || 'gemini-1.5-flash',
+      geminiModel: data.settings.geminiModel || 'gemini-2.5-flash',
       geminiApiKey: data.settings.geminiApiKey || ''
     };
   }
@@ -9117,7 +9184,7 @@ function startDemoMode() {
     if (saved.settings) {
       state.settings = {
         research: saved.settings.research !== false,
-        geminiModel: saved.settings.geminiModel || 'gemini-1.5-flash',
+        geminiModel: saved.settings.geminiModel || 'gemini-2.5-flash',
         geminiApiKey: saved.settings.geminiApiKey || ''
       };
     }
@@ -9453,7 +9520,8 @@ Object.assign(window, {
   markGot, markLater, setFlashFilter, restartFlash, dismissCelebration,
   startTopicQuiz, startMockQuiz, backToQuizList, openTopicCards,
   selectQuizAnswer, submitQuiz, retakeQuiz,
-  sendChatMessage, askBuddy, clearChat, setResearch, saveGeminiKey, toggleGeminiPanel
+  sendChatMessage, askBuddy, clearChat, setResearch, saveGeminiKey, toggleGeminiPanel,
+  setGeminiModel, testGemini,
 });
 
 /* Test hook (used by the automated checks) */
