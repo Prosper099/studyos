@@ -7500,7 +7500,9 @@ function geminiModelChain() {
 
 function geminiRetryable(err) {
   const m = String((err && err.message) || '').toLowerCase();
-  return err.status === 404 || /not found|deprecated|retired|no longer|unsupported|has been shut/i.test(m);
+  // retired model, or Google throttling ("high demand", quota, overload) → try next model
+  return err.status === 404 || err.status === 429 || err.status === 503
+    || /not found|deprecated|retired|no longer|unsupported|has been shut|high demand|resource exhausted|try again|overloaded|unavailable|capacity/i.test(m);
 }
 
 async function geminiAnswer(question, context) {
@@ -8596,7 +8598,7 @@ function renderAssistant(el) {
               ${GEMINI_MODELS.map(m => `<option value="${m}" ${(state.settings.geminiModel || GEMINI_MODELS[0]) === m ? 'selected' : ''}>${m}</option>`).join('')}
             </select>
             <button type="button" onclick="testGemini()" class="rounded-lg bg-emerald-600 px-3 py-1.5 text-[11px] font-bold text-white transition hover:bg-emerald-700">🔌 Test key</button>
-            <span class="text-[10px] text-slate-400">If a model is ever retired, Buddy auto-switches to the next one.</span>
+            <span class="text-[10px] text-slate-400">If a model is ever retired or busy, Buddy auto-switches to the next one.</span>
           </div>
         </div>
       </div>
