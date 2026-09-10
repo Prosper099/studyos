@@ -346,7 +346,7 @@ service cloud.firestore {
           <span>🎴</span><span>Flashcards</span></button>
         <button type="button" onclick="navigate('quiz')" data-page="quiz"
           class="nav-item flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-xs font-semibold transition-colors hover:bg-slate-800 hover:text-white">
-          <span>📝</span><span>Practice Quiz</span></button>
+          <span>📝</span><span>Practice Exam</span></button>
         <button type="button" onclick="navigate('assistant')" data-page="assistant"
           class="nav-item flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-xs font-semibold transition-colors hover:bg-slate-800 hover:text-white">
           <span>🤖</span><span>Buddy AI Tutor</span></button>
@@ -4240,6 +4240,26 @@ const CURRICULUM = {
               <li>Forgetting to correct for zero error on a measuring instrument.</li>
               <li>Writing weight in kilograms. Weight is a force and is measured in <b>newtons</b>.</li>
             </ul>
+            <h3>Deep dive: dimensions, instruments and errors</h3>
+            <p>Every physical quantity has a <b>dimension</b> built from mass (M), length (L) and time (T). Speed is LT⁻¹, force is MLT⁻², energy is ML²T⁻². Dimensional analysis lets you check an equation before you ever plug in numbers: if the two sides do not have the same dimensions, the equation <i>cannot</i> be right. For example, checking s = ut + ½ at²: ut is (LT⁻¹)(T) = L, and at² is (LT⁻²)(T²) = L — both terms are lengths, so the equation passes the test.</p>
+            <p>Know your instruments and their precision: a metre rule reads to 0.1 cm; vernier calipers to 0.01 cm (0.0001 m); the micrometer screw gauge to 0.01 mm — the micrometer is the most precise of the three and is used for wire diameters and sheet thickness. Always check and correct the <b>zero error</b> before measuring, and always avoid parallax by reading straight on, not from a slant.</p>
+            <div class="formula">percentage error = (error in measurement ÷ measured value) × 100</div>
+            <h3>Worked example, step by step</h3>
+            <p><b>Convert 72 km/h to m/s, and find the percentage error if a ruler graduated in cm records a true length of 2.50 m as 2.51 m.</b></p>
+            <ol>
+              <li>72 km/h = 72 × 1000 m ÷ 3600 s = 20 m/s. (Divide km/h by 3.6 — a shortcut worth memorising.)</li>
+              <li>Error = 2.51 − 2.50 = 0.01 m.</li>
+              <li>Percentage error = (0.01 ÷ 2.50) × 100 = 0.4%.</li>
+            </ol>
+            <h3>Examiner's traps</h3>
+            <ul>
+              <li>Using km/h inside v = u + at without converting to m/s first.</li>
+              <li>Quoting micrometer precision as 0.1 cm — it is 0.01 mm, a hundred times finer.</li>
+              <li>Adding vectors like ordinary numbers; perpendicular vectors must be combined with Pythagoras.</li>
+            </ul>
+            <h3>See it around you</h3>
+            <p>Fuel at the station is sold in litres (volume), your NEPA bill comes from a meter reading kilowatt-hours (energy), and the okada speedometer reads km/h while physics wants m/s. Spotting the unit tells you the quantity — that habit alone saves marks every exam.</p>
+
           `,
           cards: [
             { q: 'List the seven SI base quantities and their units.', a: 'Length (metre), mass (kilogram), time (second), electric current (ampere), temperature (kelvin), luminous intensity (candela) and amount of substance (mole).' },
@@ -4326,6 +4346,33 @@ const CURRICULUM = {
               <li>Subtracting friction in the wrong direction, or forgetting it altogether.</li>
               <li>Confusing mass (kg) with weight (N).</li>
             </ul>
+            <h3>Deep dive: reading motion from graphs</h3>
+            <p>The three equations of motion (v = u + at; s = ut + ½ at²; v² = u² + 2as) only apply when acceleration is <b>uniform</b> — examiners love hiding non-uniform cases where you must use the graph instead. On a velocity–time graph, the <b>gradient</b> is the acceleration and the <b>area under the line</b> is the distance travelled. A flat line means constant velocity (zero acceleration); a straight sloping line means uniform acceleration; a curve means changing acceleration.</p>
+            <p>Free fall is simply uniform acceleration with u = 0 and a = g ≈ 9.8 (take 10) m/s², so the distance fallen is h = ½ gt² — a mango dropped from rest falls 5 m in the first second, 20 m in two seconds. Notice the distances grow as 1 : 4 : 9 … that pattern is ½ gt² doing its work.</p>
+            <div class="diagram"><svg viewBox="0 0 320 150" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <line x1="40" y1="120" x2="300" y2="120" stroke="#94a3b8" stroke-width="1.5"/>
+              <line x1="40" y1="120" x2="40" y2="20" stroke="#94a3b8" stroke-width="1.5"/>
+              <polygon points="140,120 240,40 240,120" fill="#c7d2fe" opacity="0.6"/>
+              <line x1="40" y1="120" x2="240" y2="40" stroke="#4f46e5" stroke-width="2.5"/>
+              <text x="250" y="35" font-size="11" fill="#4f46e5">v (m/s)</text>
+              <text x="270" y="135" font-size="11" fill="#64748b">t (s)</text>
+              <text x="120" y="100" font-size="11" fill="#4338ca">area = distance</text>
+              <text x="60" y="60" font-size="11" fill="#64748b">slope = acceleration</text>
+            </svg></div>
+            <h3>Worked example, step by step</h3>
+            <p><b>A car travelling at 54 km/h sees a block on the Third Mainland Bridge and brakes with a deceleration of 5 m/s². How far does it travel before stopping?</b></p>
+            <ol>
+              <li>Convert: u = 54 ÷ 3.6 = 15 m/s; v = 0; a = −5 m/s².</li>
+              <li>Choose v² = u² + 2as (time is not given).</li>
+              <li>0 = 15² + 2(−5)s → 10s = 225 → s = 22.5 m.</li>
+            </ol>
+            <h3>Examiner's traps</h3>
+            <ul>
+              <li>Forgetting the minus sign on deceleration and getting a negative distance.</li>
+              <li>Believing a force is needed to <i>keep</i> a body moving — by Newton's first law, force is only needed to <i>change</i> motion.</li>
+              <li>Reading "area under the graph" off a distance–time graph — the area trick only works on velocity–time graphs.</li>
+            </ul>
+
           `,
           cards: [
             { q: 'State Newton’s second law.', a: 'F = ma — force equals mass times acceleration (the rate of change of momentum).' },
@@ -4383,6 +4430,25 @@ const CURRICULUM = {
               <li>Claiming a machine can be more than 100% efficient. Friction always wastes some energy.</li>
               <li>Forgetting to convert kilowatt-hours to joules: 1 kWh = 3.6 × 10⁶ J.</li>
             </ul>
+            <h3>Deep dive: energy bills, efficiency and P = Fv</h3>
+            <p>Your prepaid meter charges you in <b>kilowatt-hours (kWh)</b> — the energy a 1 kW appliance uses in one hour. Since 1 kW = 1000 J/s and 1 h = 3600 s, one kWh = 3.6 × 10⁶ J. To cost any appliance: energy (kWh) = power (kW) × time (h), then multiply by the tariff per unit.</p>
+            <p>No machine is perfect: <b>efficiency = (useful energy out ÷ energy in) × 100</b>, and it can never exceed 100% because friction and heat always steal a share. A generator that turns 5000 J of fuel energy into 1500 J of electricity is 30% efficient — the rest left as heat and noise, which is exactly why generators feel hot.</p>
+            <div class="formula">P = W/t = Fv (power equals force times velocity when the force drives the motion)</div>
+            <h3>Worked example, step by step</h3>
+            <p><b>A 1.5 kW pressing iron runs for 3 hours. If your DISCO charges ₦100 per kWh, what is the cost?</b></p>
+            <ol>
+              <li>Energy = 1.5 kW × 3 h = 4.5 kWh.</li>
+              <li>Cost = 4.5 × ₦100 = ₦450.</li>
+            </ol>
+            <h3>Examiner's traps</h3>
+            <ul>
+              <li>Saying a carrier "does work" holding a load still on his head — no distance moved along the force means zero work, however tiring it feels.</li>
+              <li>Mixing up the watt (power) with the joule (energy) in calculations.</li>
+              <li>Using P = Fv with speed in km/h — it must be m/s.</li>
+            </ul>
+            <h3>See it around you</h3>
+            <p>Compare the monthly "units" on your meter with the sum of your appliances' power × hours: a 100 W bulb left on for 10 h daily burns 1 kWh per day — 30 units a month just for one bulb. Physics literally pays your light bill.</p>
+
           `,
           cards: [
             { q: 'K.E. and P.E. formulas?', a: 'K.E. = ½mv² and P.E. = mgh.' },
@@ -4537,6 +4603,58 @@ const CURRICULUM = {
               <li>Treating centripetal force as a new "kind" of force — it is simply the <b>net inward force</b>, whatever supplies it.</li>
               <li>Forgetting ω = 2π/T when the question gives a period rather than a speed.</li>
             </ul>
+            <h3>Deep dive: couples, balance and stability</h3>
+            <p>Two equal, opposite, parallel forces that do not share a line of action form a <b>couple</b> — it turns a body without translating it. Turning a steering wheel or a tap uses a couple; its moment is force × distance between the forces. Equilibrium needs <i>both</i> conditions: forces balance (no sliding) and moments balance (no turning).</p>
+            <p>Stability explains why a loaded trailer topples more easily when the cargo is stacked high: the higher the centre of gravity and the narrower the base, the easier a tilt moves the vertical line from the C.G. outside the base — and once that line leaves the base, the body <i>must</i> topple. Racing cars and Danfo buses that "carry load for roof" teach this law the hard way.</p>
+            <div class="diagram"><svg viewBox="0 0 320 150" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <line x1="20" y1="80" x2="300" y2="80" stroke="#475569" stroke-width="4"/>
+              <polygon points="160,80 145,120 175,120" fill="#94a3b8"/>
+              <line x1="60" y1="80" x2="60" y2="30" stroke="#4f46e5" stroke-width="2"/>
+              <text x="40" y="24" font-size="11" fill="#4f46e5">20 N, 2 m</text>
+              <line x1="260" y1="80" x2="260" y2="40" stroke="#059669" stroke-width="2"/>
+              <text x="240" y="34" font-size="11" fill="#059669">10 N, 4 m</text>
+              <text x="130" y="140" font-size="11" fill="#64748b">pivot</text>
+              <text x="60" y="70" font-size="10" fill="#475569">20×2 = 40 N m</text>
+              <text x="215" y="70" font-size="10" fill="#475569">10×4 = 40 N m</text>
+            </svg></div>
+            <h3>Worked example, step by step</h3>
+            <p><b>A uniform metre rule balances at the 50 cm mark. A 20 N weight hangs at 10 cm. Where must 10 N hang to balance it?</b></p>
+            <ol>
+              <li>Distance of 20 N from pivot = 50 − 10 = 40 cm; anticlockwise moment = 20 × 40 = 800 N cm.</li>
+              <li>Let the 10 N hang at distance d on the other side: 10d = 800 → d = 80 cm — impossible, the rule is only 50 cm long on that side! So the 10 N can never balance the 20 N at 10 cm on a metre rule — a lovely "think first" twist examiners use.</li>
+              <li>Sensible variant: with 10 N at the 100 cm end (d = 50), it gives 500 N cm &lt; 800, so the rule tips toward the 20 N side.</li>
+            </ol>
+            <h3>Examiner's traps</h3>
+            <ul>
+              <li>Measuring distances from the <i>end</i> of the rule instead of from the pivot.</li>
+              <li>Forgetting the weight of a <i>non-uniform</i> rule acting at its own centre of gravity.</li>
+              <li>Applying the principle of moments to a body that is accelerating — it only holds in equilibrium.</li>
+            </ul>
+
+            <h3>Deep dive: why the force points inward</h3>
+            <p>Velocity is a vector, so even at constant <i>speed</i> a body on a circle is always changing velocity — the direction rotates. That change is an acceleration aimed at the centre, a = v²/r, and Newton's second law demands a centre-seeking force F = mv²/r. There is no mysterious outward "centrifugal force" pushing the passenger sideways in a turning car: the passenger's body simply tries to go straight (first law) while the car turns inward around it.</p>
+            <p>Useful companions: angular velocity ω = 2π/T (radians per second) and v = ωr. Engineers <b>bank</b> curved roads — tilt the outer edge up — so that part of the normal reaction supplies the centripetal force, reducing reliance on friction on rainy days.</p>
+            <div class="diagram"><svg viewBox="0 0 320 150" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <circle cx="160" cy="75" r="55" fill="none" stroke="#94a3b8" stroke-width="2"/>
+              <circle cx="215" cy="75" r="6" fill="#4f46e5"/>
+              <line x1="215" y1="75" x2="215" y2="25" stroke="#059669" stroke-width="2.5"/>
+              <text x="222" y="30" font-size="11" fill="#059669">v (tangent)</text>
+              <line x1="215" y1="75" x2="165" y2="75" stroke="#dc2626" stroke-width="2.5"/>
+              <text x="150" y="95" font-size="11" fill="#dc2626">F = mv²/r (inward)</text>
+            </svg></div>
+            <h3>Worked example, step by step</h3>
+            <p><b>A 0.5 kg stone is whirled in a horizontal circle of radius 1 m at 2 m/s. Find the tension in the string.</b></p>
+            <ol>
+              <li>F = mv²/r = 0.5 × 2² ÷ 1 = 2 N.</li>
+              <li>Double the speed to 4 m/s: F = 0.5 × 16 = 8 N — four times bigger, because force scales with v². This is why speeding around a bend quadruples the grip your tyres must supply.</li>
+            </ol>
+            <h3>Examiner's traps</h3>
+            <ul>
+              <li>Drawing "centrifugal force" on the body as if it were real.</li>
+              <li>Substituting diameter where the formula wants radius.</li>
+              <li>Saying the satellite needs fuel to keep orbiting — gravity supplies the centripetal force for free.</li>
+            </ul>
+
           `,
           cards: [
             { q: 'Formula for centripetal force?', a: 'F = mv²/r = mω²r, always directed towards the centre of the circle.' },
@@ -4591,6 +4709,25 @@ const CURRICULUM = {
               <li>Confusing <b>heat</b> (energy in joules) with <b>temperature</b> (degrees).</li>
               <li>Forgetting that a dull black surface is the best absorber <b>and</b> the best emitter of radiation.</li>
             </ul>
+            <h3>Deep dive: two capacities, one big difference</h3>
+            <p><b>Specific heat capacity</b> c tells you the energy to raise 1 kg of a substance by 1 K: Q = mcΔθ. Water's c = 4200 J/kgK is enormous — which is why a pot of soup stays hot long after the rice cools, and why coastal Lagos has milder evenings than the desert. <b>Specific latent heat</b> L is the energy to change state with <i>no</i> temperature change: Q = mL. During melting or boiling the thermometer stands still while energy quietly breaks bonds — the single most-tested fact in this topic.</p>
+            <p>Expansion follows the same particle story: hotter particles vibrate wider and need more room. That is why transmission cables sag more at noon, railway rails need expansion gaps, and a tight bottle cap opens after running hot water over it — the metal lid expands more than the glass.</p>
+            <h3>Worked example, step by step</h3>
+            <p><b>Heat 0.5 kg of water from 30 °C to boiling (100 °C), then boil half of it away. (c = 4200, L = 2.26 × 10⁶ J/kg)</b></p>
+            <ol>
+              <li>Heating: Q₁ = mcΔθ = 0.5 × 4200 × 70 = 147,000 J.</li>
+              <li>Boiling away 0.25 kg: Q₂ = mL = 0.25 × 2.26 × 10⁶ = 565,000 J.</li>
+              <li>Total = 712,000 J — notice that boiling a little water needs about four times more energy than heating it: latent heat dominates.</li>
+            </ol>
+            <h3>Examiner's traps</h3>
+            <ul>
+              <li>Using Q = mcΔθ during a change of state, where Δθ is zero.</li>
+              <li>Confusing c (J/kgK) with L (J/kg) and swapping the formulas.</li>
+              <li>Saying the temperature rises "a little" while boiling — it does not rise at all until all liquid is gone.</li>
+            </ul>
+            <h3>See it around you</h3>
+            <p>Harmattan mornings feel cold because dry air is a poor conductor and your skin loses heat fast to wind (forced convection); the suya spot fans its coals to feed convection currents; and black pots absorb radiant heat faster than shiny ones — every kitchen is a heat-transfer laboratory.</p>
+
           `,
           cards: [
             { q: 'What happens to temperature during a change of state?', a: 'It stays constant — energy goes in as latent heat (Q = mL).' },
@@ -4677,6 +4814,37 @@ const CURRICULUM = {
               <li>Ignoring internal resistance when the question gives an e.m.f. rather than a terminal voltage.</li>
               <li>Using watts where kilowatts are needed in a billing question.</li>
             </ul>
+            <h3>Deep dive: resistance, household wiring and safety</h3>
+            <p>Resistance grows with length, shrinks with thickness, and rises with temperature in metals: R = ρL/A, where ρ is the resistivity of the material. This is why long extension wires warm up and why thick cables carry cooker currents. Your house is wired in <b>parallel</b> so that every appliance gets the full 230 V and one faulty bulb cannot kill the rest — and every socket's fuse is sized just above the appliance's normal current, so a fault melts the fuse before the wiring melts.</p>
+            <div class="diagram"><svg viewBox="0 0 320 150" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <rect x="40" y="30" width="240" height="90" fill="none" stroke="#475569" stroke-width="2.5"/>
+              <line x1="40" y1="75" x2="40" y2="60" stroke="#475569" stroke-width="5"/>
+              <line x1="40" y1="80" x2="40" y2="95" stroke="#475569" stroke-width="2.5"/>
+              <text x="14" y="80" font-size="11" fill="#475569">cell</text>
+              <rect x="130" y="22" width="60" height="16" fill="#e2e8f0" stroke="#475569"/>
+              <text x="140" y="16" font-size="11" fill="#475569">R</text>
+              <circle cx="240" cy="30" r="12" fill="none" stroke="#4f46e5" stroke-width="2"/>
+              <text x="236" y="34" font-size="10" fill="#4f46e5">A</text>
+              <circle cx="160" cy="140" r="12" fill="none" stroke="#059669" stroke-width="2"/>
+              <text x="156" y="144" font-size="10" fill="#059669">V</text>
+              <line x1="148" y1="128" x2="148" y2="120" stroke="#059669" stroke-width="2"/>
+              <line x1="172" y1="128" x2="172" y2="120" stroke="#059669" stroke-width="2"/>
+              <text x="60" y="140" font-size="10" fill="#64748b">V in parallel across R; A in series</text>
+            </svg></div>
+            <h3>Worked example, step by step</h3>
+            <p><b>A 3 Ω and a 6 Ω resistor are connected in parallel across a 12 V battery. Find the total current drawn.</b></p>
+            <ol>
+              <li>1/R = 1/3 + 1/6 = 3/6 → R = 2 Ω (parallel always ends up smaller than the smallest branch).</li>
+              <li>I = V/R = 12 ÷ 2 = 6 A.</li>
+              <li>Check: branch currents 4 A + 2 A = 6 A ✓.</li>
+            </ol>
+            <h3>Examiner's traps</h3>
+            <ul>
+              <li>Connecting the ammeter in parallel — its near-zero resistance makes a short circuit.</li>
+              <li>Ignoring internal resistance r when the question says "a cell of e.m.f. 12 V and internal resistance 1 Ω" — then I = E/(R + r).</li>
+              <li>Quoting energy in watts; energy is joules (or kWh), power is watts.</li>
+            </ul>
+
           `,
           cards: [
             { q: 'Resistors 6 Ω and 3 Ω in parallel?', a: 'R = (6×3)/(6+3) = 2 Ω. Same p.d. across each branch.' },
@@ -4736,6 +4904,23 @@ const CURRICULUM = {
               <li>Using r as the height above the surface in F = Gm₁m₂/r². The distance is measured from the <b>centre</b> of the Earth.</li>
               <li>Forgetting that G is a universal constant but g varies from place to place.</li>
             </ul>
+            <h3>Deep dive: fields, orbits and Nigeria in space</h3>
+            <p>A gravitational field is a region where a mass feels a force; its strength g = F/m is "newtons per kilogram" — on Earth about 9.8 N/kg, on the Moon 1.6. The value of g is not the same everywhere on Earth: it is slightly smaller on mountains (farther from the centre) and at the equator (the spinning Earth bulges). Weight W = mg therefore changes with location, while mass never does.</p>
+            <p>An orbit is continuous free fall: the satellite falls toward Earth, but its tangential speed carries it forward fast enough that the surface curves away at the same rate. Nigeria's own satellites — NigComSat-1 and the NigeriaSat constellation — obey exactly this bookkeeping, as does the International Space Station where astronauts float not because gravity is absent (it is still about 90% as strong up there!) but because everything falls together.</p>
+            <h3>Worked example, step by step</h3>
+            <p><b>An astronaut of mass 60 kg stands on the Moon (g = 1.6 m/s²). Compare his weight there with his weight on Earth (g = 10 m/s²).</b></p>
+            <ol>
+              <li>On Earth: W = 60 × 10 = 600 N.</li>
+              <li>On the Moon: W = 60 × 1.6 = 96 N — about one-sixth.</li>
+              <li>His mass is 60 kg in both places; only the pull changes.</li>
+            </ol>
+            <h3>Examiner's traps</h3>
+            <ul>
+              <li>Answering "zero gravity" for orbiting astronauts — the correct reason is free fall.</li>
+              <li>Saying doubling the distance halves the force — the inverse-square law quarters it.</li>
+              <li>Using kilograms as the unit of weight in W = mg answers.</li>
+            </ul>
+
           `,
           cards: [
             { q: 'State Newton’s law of universal gravitation.', a: 'Every two masses attract each other with a force F = Gm₁m₂/r² - proportional to the product of the masses and inversely proportional to the square of the distance between them.' },
@@ -4795,6 +4980,32 @@ const CURRICULUM = {
               <li>Confusing pitch (frequency) with loudness (amplitude).</li>
               <li>Saying the period of a pendulum depends on the mass of the bob — it does not.</li>
             </ul>
+            <h3>Deep dive: the pendulum clock and the wave checklist</h3>
+            <p>SHM is motion where the acceleration is proportional to the displacement and directed toward the fixed point: a ∝ −x. The simple pendulum is the classic example, with period T = 2π√(L/g). Two facts examiners recycle endlessly: the period does <i>not</i> depend on the mass of the bob nor on the amplitude (for small swings) — only on length and g. That is why pendulum clocks kept time through history, and why a loaded and an unloaded swing take the same time.</p>
+            <p>Waves carry <b>energy</b> without carrying matter. The checklist of wave behaviour — reflection, refraction, diffraction and interference — proves light and sound are waves; polarisation additionally proves light is <i>transverse</i>. The electromagnetic spectrum in order of increasing frequency: radio, microwave, infrared, visible, ultraviolet, X-rays, gamma rays — all travel at 3 × 10⁸ m/s in vacuum.</p>
+            <div class="diagram"><svg viewBox="0 0 320 150" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M10 75 Q 40 15, 70 75 T 130 75 T 190 75 T 250 75 T 310 75" fill="none" stroke="#4f46e5" stroke-width="2.5"/>
+              <line x1="10" y1="75" x2="310" y2="75" stroke="#94a3b8" stroke-dasharray="4 4"/>
+              <line x1="70" y1="75" x2="70" y2="45" stroke="#dc2626" stroke-width="1.5"/>
+              <text x="76" y="50" font-size="10" fill="#dc2626">amplitude</text>
+              <line x1="70" y1="125" x2="190" y2="125" stroke="#059669" stroke-width="1.5"/>
+              <text x="100" y="140" font-size="10" fill="#059669">one wavelength λ</text>
+              <text x="230" y="40" font-size="10" fill="#64748b">crest</text>
+              <text x="150" y="105" font-size="10" fill="#64748b">trough</text>
+            </svg></div>
+            <h3>Worked example, step by step</h3>
+            <p><b>A pendulum of length 1 m swings where g = 10 m/s². Find its period. (π² ≈ 10)</b></p>
+            <ol>
+              <li>T = 2π√(L/g) = 2π√(0.1).</li>
+              <li>T² = 4π² (0.1) = 4 × 10 × 0.1 = 4 → T = 2 s. Squaring first is the clean trick.</li>
+            </ol>
+            <h3>Examiner's traps</h3>
+            <ul>
+              <li>Expecting a heavier bob to swing slower — mass is irrelevant.</li>
+              <li>Feeding L in centimetres into T = 2π√(L/g); convert to metres.</li>
+              <li>Confusing period (seconds per swing) with frequency (swings per second) — they are reciprocals.</li>
+            </ul>
+
           `,
           cards: [
             { q: 'The wave equation?', a: 'v = fλ (speed = frequency × wavelength).' },
@@ -4853,6 +5064,22 @@ const CURRICULUM = {
               <li>Confusing nuclear <b>fission</b> (splitting a heavy nucleus) with <b>fusion</b> (joining light nuclei).</li>
               <li>Thinking gamma radiation is a particle — it is an electromagnetic wave.</li>
             </ul>
+            <h3>Deep dive: balancing decays and running half-lives</h3>
+            <p>Nuclear equations must balance in <b>mass number</b> (top) and <b>atomic number</b> (bottom). Alpha emission sheds a helium nucleus: mass −4, charge −2. Beta emission turns a neutron into a proton plus an ejected electron: mass unchanged, charge +1. Example: ²³⁸U → ²³⁴Th + ⁴₂He balances 238 = 234 + 4 and 92 = 90 + 2.</p>
+            <p>Half-life chains are multiplication, not subtraction: after n half-lives, fraction left = (1/2)ⁿ. Nigeria runs this science at the Nigeria Research Reactor-1 (NIRR-1) in Zaria, used for isotope production and training — radioactive isotopes also date archaeological finds (carbon-14), trace disease in medicine, and kill cancer cells in radiotherapy.</p>
+            <h3>Worked example, step by step</h3>
+            <p><b>A sample's activity falls from 800 counts/min to 100 counts/min in 6 hours. Find the half-life.</b></p>
+            <ol>
+              <li>800 → 400 → 200 → 100: three halvings.</li>
+              <li>3 half-lives = 6 h → half-life = 2 h.</li>
+            </ol>
+            <h3>Examiner's traps</h3>
+            <ul>
+              <li>Thinking two half-lives remove all activity — the sample halves forever, never reaching zero on paper.</li>
+              <li>Writing beta decay as losing a proton — the proton number <i>increases</i>.</li>
+              <li>Confusing fission (splitting, reactors) with fusion (joining, the Sun).</li>
+            </ul>
+
           `,
           cards: [
             { q: 'Which radiation is stopped by a sheet of paper?', a: 'Alpha particles (⁴₂He nuclei) — the least penetrating.' },
@@ -4908,6 +5135,33 @@ const CURRICULUM = {
               <li>Assuming the range is greatest at 60°. It is greatest at <b>45°</b>.</li>
               <li>Confusing time of flight with time to reach maximum height — the latter is half the former.</li>
             </ul>
+            <h3>Deep dive: the three formulae, derived once</h3>
+            <p>Split the launch speed u into uₓ = u cos θ (never changes) and uᵧ = u sin θ (fights gravity). Time of flight T = 2u sin θ/g (up and back down). Maximum height H = u² sin²θ/2g (vertical speed zero at the top). Range R = u² sin 2θ/g, largest at 45° because sin 2θ peaks there. Complementary angles (30° and 60°) give the <i>same</i> range — a favourite multiple-choice sting.</p>
+            <div class="diagram"><svg viewBox="0 0 320 150" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M20 130 Q 160 -40, 300 130" fill="none" stroke="#4f46e5" stroke-width="2.5"/>
+              <line x1="20" y1="130" x2="80" y2="60" stroke="#059669" stroke-width="2"/>
+              <text x="86" y="60" font-size="10" fill="#059669">u at θ</text>
+              <line x1="160" y1="45" x2="160" y2="130" stroke="#94a3b8" stroke-dasharray="4 4"/>
+              <text x="166" y="90" font-size="10" fill="#64748b">H (vᵧ = 0 at top)</text>
+              <line x1="20" y1="138" x2="300" y2="138" stroke="#dc2626" stroke-width="1.5"/>
+              <text x="140" y="150" font-size="10" fill="#dc2626">range R</text>
+            </svg></div>
+            <h3>Worked example, step by step</h3>
+            <p><b>A ball is kicked at 20 m/s at 30° above the ground (g = 10 m/s²). Find the time of flight and maximum height.</b></p>
+            <ol>
+              <li>u sin θ = 20 × 0.5 = 10 m/s.</li>
+              <li>T = 2 × 10 ÷ 10 = 2 s.</li>
+              <li>H = 10² ÷ (2 × 10) = 100 ÷ 20 = 5 m.</li>
+            </ol>
+            <h3>Examiner's traps</h3>
+            <ul>
+              <li>Using u instead of u sin θ in the vertical formulae.</li>
+              <li>Believing velocity is zero at the top — only the <i>vertical</i> component is; the ball still moves sideways.</li>
+              <li>Forgetting the horizontal velocity stays constant, so the ball at the top is not "at rest".</li>
+            </ul>
+            <h3>See it around you</h3>
+            <p>A free-kick over the wall, water arcing from a broken pipe, a mango thrown across the compound — every arc is the same parabola. Goalkeepers who "read" the parabola are doing projectile physics at full sprint.</p>
+
           `,
           cards: [
             { q: 'At what launch angle is range maximum?', a: '45°, because R = u²sin2θ/g and sin90° = 1.' },
@@ -7385,7 +7639,7 @@ function buddyReply(rawInput) {
     }
     return {
       html: `<span class="tag">${top.subject}</span><h4>${top.title}</h4>${top.body}${extra}
-        <p><i>Ask a follow-up, or open the Practice Quiz for ${top.subject} to test yourself right away.</i></p>`,
+        <p><i>Ask a follow-up, or open the Practice Exam for ${top.subject} to test yourself right away.</i></p>`,
       chips
     };
   }
@@ -7451,6 +7705,31 @@ const RESEARCH = {
       return [{ title: json.Heading || query, text: json.AbstractText, url: json.AbstractURL || '' }].concat(related);
     }
     return related;
+  },
+  // Textbook-style wikis: same MediaWiki API as Wikipedia, CORS-open with origin=*
+  wikibooks: async (query) => {
+    const url = 'https://en.wikibooks.org/w/api.php?action=query&format=json&origin=*'
+      + '&prop=extracts&exintro=1&explaintext=1&exchars=900&redirects=1'
+      + '&generator=search&gsrsearch=' + encodeURIComponent(query) + '&gsrlimit=1';
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('Wikibooks responded ' + res.status);
+    const json = await res.json();
+    return Object.values((json.query && json.query.pages) || {})
+      .filter(pg => pg.extract && pg.title)
+      .map(pg => ({ title: pg.title, text: pg.extract.trim(),
+        url: 'https://en.wikibooks.org/wiki/' + encodeURIComponent(pg.title.replace(/ /g, '_')) }));
+  },
+  wikiversity: async (query) => {
+    const url = 'https://en.wikiversity.org/w/api.php?action=query&format=json&origin=*'
+      + '&prop=extracts&exintro=1&explaintext=1&exchars=900&redirects=1'
+      + '&generator=search&gsrsearch=' + encodeURIComponent(query) + '&gsrlimit=1';
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('Wikiversity responded ' + res.status);
+    const json = await res.json();
+    return Object.values((json.query && json.query.pages) || {})
+      .filter(pg => pg.extract && pg.title)
+      .map(pg => ({ title: pg.title, text: pg.extract.trim(),
+        url: 'https://en.wikiversity.org/wiki/' + encodeURIComponent(pg.title.replace(/ /g, '_')) }));
   }
 };
 
@@ -7463,7 +7742,11 @@ async function researchOnline(question) {
     RESEARCH.wikipedia(q).then(r => { out.sources.push(...r.map(s => ({ ...s, from: 'Wikipedia' }))); })
       .catch(e => out.errors.push('Wikipedia: ' + (e.message || e))),
     RESEARCH.duckduckgo(q).then(r => { out.sources.push(...r.map(s => ({ ...s, from: 'DuckDuckGo' }))); })
-      .catch(e => out.errors.push('DuckDuckGo: ' + (e.message || e)))
+      .catch(e => out.errors.push('DuckDuckGo: ' + (e.message || e))),
+    RESEARCH.wikibooks(q).then(r => { out.sources.push(...r.map(s => ({ ...s, from: 'Wikibooks' }))); })
+      .catch(e => out.errors.push('Wikibooks: ' + (e.message || e))),
+    RESEARCH.wikiversity(q).then(r => { out.sources.push(...r.map(s => ({ ...s, from: 'Wikiversity' }))); })
+      .catch(e => out.errors.push('Wikiversity: ' + (e.message || e)))
   ];
   await Promise.all(jobs);
   // de-duplicate by URL
@@ -7510,8 +7793,8 @@ async function geminiAnswer(question, context) {
   if (!key) return null;
   const prompt = [
     'You are Buddy, a friendly Nigerian secondary-school tutor preparing a student for JAMB UTME and WAEC WASSCE.',
-    'Answer in clear British English. Be accurate, exam-focused and concise.',
-    'Use this structure: a one-sentence definition, the key formula or rule, one worked example with numbers, and one common exam trap.',
+    'If the student is greeting you, making small talk or asking plain arithmetic, answer naturally and briefly like a friendly person — never use the definition/formula/example structure for those.',
+    'For genuine study questions, use this structure: a one-sentence definition, the key formula or rule, one worked example with numbers, and one common exam trap.',
     'If the retrieved context below is irrelevant or empty, answer from your own knowledge and say so.',
     '',
     'STUDENT QUESTION: ' + question,
@@ -7585,10 +7868,50 @@ function researchHtml(sources) {
     `<div class="box"><b>${escapeHtml(s.title)}</b><br>${escapeHtml(s.text.slice(0, 700))}${s.text.length > 700 ? '…' : ''}</div>`).join('')}`;
 }
 
+/* Safe four-operator calculator: digits and + - * / ( ) only, parsed by hand (never eval). */
+function safeMath(input) {
+  const s = String(input || '').replace(/\s+/g, '').replace(/×/g, '*').replace(/÷/g, '/').replace(/−/g, '-');
+  if (!/^[\d+\-*/().]+$/.test(s) || !/\d/.test(s) || !/[+\-*/]/.test(s)) return null;
+  try {
+    let i = 0;
+    const expr = () => { let v = term(); while (s[i] === '+' || s[i] === '-') { const op = s[i++]; const r = term(); v = op === '+' ? v + r : v - r; } return v; };
+    const term = () => { let v = factor(); while (s[i] === '*' || s[i] === '/') { const op = s[i++]; const r = factor(); v = op === '*' ? v * r : v / r; } return v; };
+    const factor = () => {
+      if (s[i] === '-') { i++; return -factor(); }
+      if (s[i] === '+') { i++; return factor(); }
+      if (s[i] === '(') { i++; const v = expr(); if (s[i] !== ')') throw new Error('bad'); i++; return v; }
+      const m = /^\d+\.?\d*|^\.\d+/.exec(s.slice(i));
+      if (!m) throw new Error('bad');
+      i += m[0].length;
+      return parseFloat(m[0]);
+    };
+    const v = expr();
+    if (i !== s.length || !isFinite(v)) return null;
+    return { expr: s, value: v };
+  } catch (e) { return null; }
+}
+
+const SMALLTALK_RE = /^(hi|hello|hey|howdy|sup|good\s+(morning|afternoon|evening)|thanks?|thank you|well done|good job|appreciate|how are you|what'?s up|whats up|good night|bye|love you)\b/;
+
 /** Build the full Buddy answer: local knowledge + optional live research. */
 async function composeAnswer(question) {
   const local = buddyReply(question);
   const chips = new Set(local.chips || []);
+  const raw = String(question || '').trim().toLowerCase();
+
+  // Small talk and plain arithmetic get a human reply — no web research, no Gemini.
+  const arith = safeMath(raw);
+  if (SMALLTALK_RE.test(raw) || arith) {
+    if (arith) {
+      const nice = Math.round(arith.value * 10000) / 10000;
+      return {
+        html: `<span class="tag">Buddy · quick maths</span><h4>${escapeHtml(arith.expr)} = <b>${nice}</b></h4>
+          <p>Want the working, or something harder? I solve quadratics like <i>x^2 - 5x + 6 = 0</i> and simultaneous equations step by step.</p>`,
+        chips: ['Solve x^2 - 5x + 6', 'Solve 2x + y = 11 and x - y = 1', 'Explain BODMAS']
+      };
+    }
+    return { html: local.html, chips: [...chips].slice(0, 4) };
+  }
 
   if (!state.settings.research) {
     return { html: local.html, chips: [...chips].slice(0, 4) };
@@ -7997,7 +8320,7 @@ function renderHome(el) {
   const cards = [
     { page: 'study', icon: '📖', title: 'Study Materials', desc: `${topics.length} structured lessons ready for ${cls}.` },
     { page: 'flashcards', icon: '🎴', title: 'Flashcards', desc: `${cardsFor(state.selectedSubject, cls).length} recall cards drawn from your ${cls} lessons.` },
-    { page: 'quiz', icon: '📝', title: 'Practice Quiz', desc: `${levelTopics(state.selectedSubject, cls).filter(t => (t.quiz || []).length).length} topic quizzes · 10 questions each.` },
+    { page: 'quiz', icon: '📝', title: 'Practice Exam', desc: `${levelTopics(state.selectedSubject, cls).filter(t => (t.quiz || []).length).length} topic quizzes · 10 questions each.` },
     { page: 'resources', icon: '🌐', title: 'Web Resources', desc: 'Videos, past questions and reference sites.' },
     { page: 'assistant', icon: '🤖', title: 'Buddy AI Tutor', desc: 'Ask anything and get a worked explanation.' },
     { page: 'profile', icon: '👤', title: 'Profile & Sync', desc: 'Check what is stored in your Firestore document.' }
@@ -8151,10 +8474,54 @@ function renderTopic(el, subject, title) {
 /* ==================================================================
    PAGE: WEB RESOURCES
    ================================================================== */
+const SHELF = {
+  _common: [
+    { cat: 'Past questions', title: 'Myschool — JAMB / WAEC / NECO past questions', url: 'https://myschool.ng/classroom', note: 'Year-by-year past questions with answers, organised by subject and topic.' },
+    { cat: 'Past questions', title: 'Pass.ng — CBT past-question practice', url: 'https://pass.ng/', note: 'Timed CBT-style practice that mimics the JAMB exam hall.' },
+    { cat: 'Official body', title: 'JAMB official site', url: 'https://www.jamb.gov.ng/', note: 'Syllabus, brochures and exam announcements straight from the source.' },
+    { cat: 'Official body', title: 'WAEC Nigeria', url: 'https://www.waecnigeria.org/', note: 'WASSCE syllabus, timetables and candidate resources.' }
+  ],
+  'Mathematics': [
+    { cat: 'Textbook', title: 'OpenStax — College Algebra (free textbook)', url: 'https://openstax.org/details/books/college-algebra-2e', note: 'A full peer-reviewed algebra textbook, free to read online.' },
+    { cat: 'Textbook', title: 'Wikibooks — Mathematics bookshelf', url: 'https://en.wikibooks.org/wiki/Wikibooks:Mathematics_bookshelf', note: 'Open textbooks from arithmetic through calculus.' },
+    { cat: 'Structured course', title: 'CK-12 — Mathematics', url: 'https://www.ck12.org/math/', note: 'Free interactive textbooks with worked examples and practice.' }
+  ],
+  'English Language': [
+    { cat: 'Textbook', title: 'Wikibooks — English bookshelf', url: 'https://en.wikibooks.org/wiki/Wikibooks:English_bookshelf', note: 'Open grammar, composition and literature study guides.' },
+    { cat: 'Structured course', title: 'British Council — LearnEnglish', url: 'https://learnenglish.britishcouncil.org/', note: 'Grammar and vocabulary lessons with exercises.' },
+    { cat: 'Reference', title: 'Purdue OWL — writing & grammar', url: 'https://owl.purdue.edu/', note: 'The classic reference for punctuation, essays and citation.' }
+  ],
+  'Basic Science': [
+    { cat: 'Textbook', title: 'Wikibooks — Science bookshelf', url: 'https://en.wikibooks.org/wiki/Wikibooks:Science_bookshelf', note: 'Open science textbooks across all the basics.' },
+    { cat: 'Simulation', title: 'PhET — interactive science sims', url: 'https://phet.colorado.edu/en/simulations/browse', note: 'University of Colorado simulations — see energy, circuits and waves move.' },
+    { cat: 'Structured course', title: 'CK-12 — Science', url: 'https://www.ck12.org/science/', note: 'Free interactive science textbooks with practice.' }
+  ],
+  'Basic Technology': [
+    { cat: 'Textbook', title: 'Wikibooks — Engineering bookshelf', url: 'https://en.wikibooks.org/wiki/Wikibooks:Engineering_bookshelf', note: 'Open texts on tools, materials, drawing and simple machines.' },
+    { cat: 'Simulation', title: 'PhET — physics & tech sims', url: 'https://phet.colorado.edu/en/simulations/browse', note: 'Hands-on simulations for machines, electricity and materials.' }
+  ],
+  'Physics': [
+    { cat: 'Textbook', title: 'OpenStax — University Physics Vol 1', url: 'https://openstax.org/details/books/university-physics-volume-1', note: 'Peer-reviewed full physics textbook — mechanics, waves, thermodynamics.' },
+    { cat: 'Structured course', title: 'The Physics Classroom', url: 'https://www.physicsclassroom.com/', note: 'Plain-English lessons with animations and check-your-understanding quizzes.' },
+    { cat: 'Textbook', title: 'Wikibooks — Physics shelf', url: 'https://en.wikibooks.org/wiki/Wikibooks:Science_bookshelf#Physics', note: 'Open physics textbooks from basics to advanced.' }
+  ],
+  'Chemistry': [
+    { cat: 'Textbook', title: 'OpenStax — Chemistry 2e', url: 'https://openstax.org/details/books/chemistry-2e', note: 'Full peer-reviewed chemistry textbook, free online.' },
+    { cat: 'Textbook', title: 'Wikibooks — Chemistry shelf', url: 'https://en.wikibooks.org/wiki/Wikibooks:Science_bookshelf#Chemistry', note: 'Open chemistry texts: general, organic and practical.' },
+    { cat: 'Simulation', title: 'PhET — chemistry sims', url: 'https://phet.colorado.edu/en/simulations/browse?filters=chemistry', note: 'Build molecules, balance equations and watch reactions.' }
+  ],
+  'Biology': [
+    { cat: 'Textbook', title: 'OpenStax — Biology 2e', url: 'https://openstax.org/details/books/biology-2e', note: 'Full peer-reviewed biology textbook with diagrams.' },
+    { cat: 'Structured course', title: 'CK-12 — Biology', url: 'https://www.ck12.org/biology/', note: 'Interactive biology textbook with practice and simulations.' },
+    { cat: 'Textbook', title: 'Wikibooks — Biology shelf', url: 'https://en.wikibooks.org/wiki/Wikibooks:Science_bookshelf#Biology', note: 'Open biology texts from cells to ecology.' }
+  ]
+};
+
 function renderResources(el) {
   const subject = state.selectedSubject;
   const links = CURRICULUM[subject].resources;
-  const iconFor = cat => ({ 'Video lesson': '▶️', 'Structured course': '🎓', 'Past questions': '🗂️', 'Reference': '📚', 'Dictionary': '🔤', 'Formula sheet': '🧾', 'Simulation': '🧪', 'Diagrams': '🧫' }[cat] || '🔗');
+  const iconFor = cat => ({ 'Video lesson': '▶️', 'Structured course': '🎓', 'Past questions': '🗂️', 'Reference': '📚', 'Dictionary': '🔤', 'Formula sheet': '🧾', 'Simulation': '🧪', 'Diagrams': '🧫', 'Textbook': '📖', 'Official body': '🏛️' }[cat] || '🔗');
+  const shelf = (SHELF[subject] || []).concat(SHELF._common);
   el.innerHTML = `
     ${pageHeader('Web Resources', 'Curated, subject-mapped links — open them in a new tab and revise along.')}
     ${subjectSelector('resources')}
@@ -8171,8 +8538,23 @@ function renderResources(el) {
           </div>
         </a>`).join('')}
     </div>
+    <h3 class="mb-3 mt-7 text-sm font-bold text-slate-900">📚 Textbook shelf & past questions</h3>
+    <p class="mb-4 -mt-1 text-xs text-slate-500">Free open textbooks and official past-question portals for ${escapeHtml(subject)} — no stones left unturned.</p>
+    <div class="grid gap-4 md:grid-cols-2">
+      ${shelf.map(r => `
+        <a href="${r.url}" target="_blank" rel="noopener noreferrer"
+          class="group flex gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-card transition-all hover:-translate-y-0.5 hover:border-emerald-300 hover:shadow-pop">
+          <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-lg transition group-hover:bg-emerald-100">${iconFor(r.cat)}</div>
+          <div class="min-w-0">
+            <span class="text-[10px] font-bold uppercase tracking-wide text-emerald-600">${r.cat}</span>
+            <h3 class="mt-0.5 text-sm font-bold text-slate-900 group-hover:text-emerald-700">${r.title}</h3>
+            <p class="mt-1 text-xs leading-relaxed text-slate-500">${r.note}</p>
+            <span class="mt-2 inline-flex items-center gap-1 text-[11px] font-semibold text-slate-400 group-hover:text-emerald-600">Open link ↗</span>
+          </div>
+        </a>`).join('')}
+    </div>
     <div class="mt-5 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-xs text-amber-800">
-      <b>Study tip:</b> use past-question portals for timed practice, and YouTube for topics you find hard after reading the lesson. Buddy can summarise any topic while you are offline.
+      <b>Study tip:</b> read the lesson first, then the open textbook for depth, then past-question portals for timed practice. Buddy can summarise any topic while you are offline.
     </div>`;
 }
 
@@ -8389,7 +8771,7 @@ function renderQuiz(el) {
   if (qz.mode === 'list') {
     const topics = levelTopics(subject, level);
     el.innerHTML = `
-      ${pageHeader('Practice Quiz', `One 10-question quiz per ${level} topic — drilled on exactly what the lesson taught.`)}
+      ${pageHeader('Practice Exam', `One 10-question quiz per ${level} topic — drilled on exactly what the lesson taught.`)}
       ${subjectSelector('quiz')}
       <div class="grid gap-3 md:grid-cols-2">
         ${topics.map(t => `
@@ -8419,7 +8801,7 @@ function renderQuiz(el) {
   const quizTitle = qz.mode === 'mock' ? `Mixed exam practice` : qz.topicTitle;
   if (!quiz.length) {
     el.innerHTML = `
-      ${pageHeader('Practice Quiz', quizTitle)}
+      ${pageHeader('Practice Exam', quizTitle)}
       ${subjectSelector('quiz')}
       <div class="rounded-2xl border border-slate-200 bg-white p-10 text-center shadow-card">
         <div class="text-4xl">✍️</div>
@@ -8431,7 +8813,7 @@ function renderQuiz(el) {
   const answered = Object.keys(state.quiz.answers).length;
 
   el.innerHTML = `
-    ${pageHeader('Practice Quiz', `${quizTitle} · ${level}`)}
+    ${pageHeader('Practice Exam', `${quizTitle} · ${level}`)}
     ${subjectSelector('quiz')}
     <div class="mb-4">
       <button type="button" onclick="backToQuizList()" class="rounded-xl bg-white px-3.5 py-2 text-xs font-bold text-slate-700 ring-1 ring-inset ring-slate-200 transition hover:bg-slate-50">← All ${level} quizzes</button>
@@ -8881,7 +9263,7 @@ const PAGE_TITLES = {
   study: ['Study Materials', 'Structured lessons by subject and class level'],
   resources: ['Web Resources', 'Videos, courses, past questions and references'],
   flashcards: ['Flashcards', 'Active-recall drills'],
-  quiz: ['Practice Quiz', 'Timed-style practice with explanations'],
+  quiz: ['Practice Exam', 'Timed-style practice with explanations'],
   assistant: ['Buddy AI Tutor', 'Your built-in academic assistant'],
   profile: ['Profile & Sync', 'Your details and Firestore sync']
 };
