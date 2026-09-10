@@ -124,6 +124,25 @@
   @keyframes flameWiggle { 0%, 100% { transform: rotate(-5deg) scale(1); } 50% { transform: rotate(5deg) scale(1.1); } }
   @keyframes floatUp { 0% { transform: translateY(14px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
   @keyframes ringPulse { 0% { box-shadow: 0 0 0 0 rgba(249, 115, 22, .45); } 100% { box-shadow: 0 0 0 26px rgba(249, 115, 22, 0); } }
+  @keyframes flameRise {
+    0%   { transform: translateY(70px) scale(.55); opacity: 0; }
+    14%  { transform: translateY(0) scale(1); opacity: 1; }
+    42%  { transform: translateY(-14px) scale(1.06); opacity: 1; }
+    72%  { transform: translateY(-52px) scale(1.02); opacity: .8; }
+    100% { transform: translateY(-140px) scale(.88); opacity: 0; }
+  }
+  @keyframes flameFlicker {
+    0%, 100% { transform: rotate(-3deg) scaleY(1); }
+    25% { transform: rotate(2deg) scaleY(1.07); }
+    50% { transform: rotate(-2deg) scaleY(.95); }
+    75% { transform: rotate(3deg) scaleY(1.05); }
+  }
+  @keyframes flameGlow {
+    0%, 100% { filter: drop-shadow(0 0 18px rgba(249, 115, 22, .55)); }
+    50% { filter: drop-shadow(0 0 38px rgba(251, 146, 60, .85)); }
+  }
+  .streak-flame-anim { animation: flameRise 3.6s ease-in-out both; }
+  .flame-flicker { animation: flameFlicker .7s ease-in-out infinite, flameGlow 1.4s ease-in-out infinite; display: inline-block; transform-origin: 50% 90%; }
   .celeb-pop { animation: celebPop .55s cubic-bezier(.2, 1.4, .4, 1) both; }
   .flame-anim { animation: flameWiggle .9s ease-in-out infinite; display: inline-block; }
   .float-up { animation: floatUp .45s ease-out both; }
@@ -309,6 +328,14 @@ service cloud.firestore {
         class="shrink-0 rounded-xl bg-slate-900 px-4 py-2 text-xs font-bold text-white transition hover:bg-slate-800">Start</button>
     </div>
     <button type="button" onclick="closeFocusModal()" class="mt-3 text-[11px] font-bold text-slate-400 transition hover:text-slate-600">Maybe later</button>
+  </div>
+</div>
+
+<div id="streak-flame" class="pointer-events-none fixed inset-0 z-[70] hidden items-center justify-center p-4">
+  <div id="streak-flame-inner" class="flex flex-col items-center">
+    <div id="streak-flame-icon" class="text-[7rem] leading-none">🔥</div>
+    <div id="streak-flame-title" class="mt-3 rounded-full bg-slate-900/85 px-4 py-1.5 text-sm font-black text-white shadow-pop">Day 1 streak!</div>
+    <div id="streak-flame-sub" class="mt-2 max-w-[17rem] text-center text-[11px] font-semibold text-slate-900/80 drop-shadow-sm">Keep the flame alive!</div>
   </div>
 </div>
 
@@ -9503,7 +9530,16 @@ const BADGES = [
   { id: 'streak-3',     icon: '🌱', name: 'Warming Up',      desc: 'Reach a 3-day study streak',                  test: s => (s.streak || 0) >= 3 },
   { id: 'streak-7',     icon: '🔥', name: 'Week Warrior',    desc: '7-day streak — a full week of study!',        test: s => (s.streak || 0) >= 7 },
   { id: 'streak-30',    icon: '🌙', name: 'Monthly Master',  desc: '30-day streak — a whole month!',              test: s => (s.streak || 0) >= 30 },
-  { id: 'streak-365',   icon: '👑', name: 'Year Legend',     desc: '365-day streak — an entire year. Unreal.',    test: s => (s.streak || 0) >= 365 }
+  { id: 'streak-365',   icon: '👑', name: 'Year Legend',     desc: '365-day streak — an entire year. Unreal.',    test: s => (s.streak || 0) >= 365 },
+  { id: 'two-weeks',    icon: '⚡', name: 'Fortnight Force', desc: 'A secret badge. Keep your streak alive to discover it.', secret: true, test: s => (s.streak || 0) >= 14 },
+  { id: 'sharpshooter', icon: '🎖️', name: 'Sharpshooter',   desc: 'A secret badge. Aim for perfection to discover it.',     secret: true, test: s => (s.tasks.perfects || 0) >= 5 },
+  { id: 'half-century', icon: '🚀', name: 'Half Century',   desc: 'A secret badge. Keep taking quizzes to discover it.',    secret: true, test: s => (s.tasks.quizzes || 0) >= 50 },
+  { id: 'centurion',    icon: '🏛️', name: 'Centurion',      desc: 'A secret badge. Only the most dedicated find this one.', secret: true, test: s => (s.tasks.quizzes || 0) >= 100 },
+  { id: 'card-legend',  icon: '🎇', name: 'Card Legend',    desc: 'A secret badge. The flashcards hold its secret.',        secret: true, test: s => (s.tasks.cards || 0) >= 500 },
+  { id: 'all-rounder',  icon: '🌍', name: 'All-Rounder',    desc: 'A secret badge. Variety is the clue.',                   secret: true, test: s => Object.keys(s.quizStats && s.quizStats.bySubject || {}).length >= 3 },
+  { id: 'weekend-warrior', icon: '📅', name: 'Weekend Warrior', desc: 'A secret badge. Some heroes study when others rest.', secret: true, test: s => !!s.tasks.weekendStudy },
+  { id: 'buddy-friend', icon: '🤖', name: 'Study Buddy',    desc: 'A secret badge. Somebody in the app knows the way.',     secret: true, test: s => (s.tasks.buddyChats || 0) >= 10 },
+  { id: 'focus-15',     icon: '🕰️', name: 'Marathon Mind',  desc: 'A secret badge. Deep work unlocks it.',                  secret: true, test: s => (s.tasks.focusSessions || 0) >= 15 }
 ];
 
 function checkBadges() {
@@ -9528,6 +9564,8 @@ function recordTask(kind, result) {
   const hr = new Date().getHours();
   if (hr >= 21 || hr < 4) t.nightOwl = true;
   if (hr >= 4 && hr < 6) t.earlyBird = true;
+  const day = new Date().getDay();
+  if (day === 0 || day === 6) t.weekendStudy = true;
   t.tasksTotal++;
   if (t.tasksTotal % FREEZE_EVERY_TASKS === 0 && state.streakFreezes < MAX_FREEZES) {
     state.streakFreezes++;
@@ -9602,14 +9640,8 @@ function nextCelebration() {
   const icon = $('#celebration-icon'), kick = $('#celebration-kicker'),
         title = $('#celebration-title'), sub = $('#celebration-sub');
   if (c.type === 'streak' || c.type === 'start') {
-    icon.textContent = '🔥'; icon.className = 'mx-auto mb-3 flex h-24 w-24 items-center justify-center rounded-full bg-orange-50 text-6xl ring-pulse';
-    kick.textContent = c.type === 'start' ? 'Your journey begins' : 'Streak extended';
-    kick.className = 'text-[11px] font-black uppercase tracking-widest text-orange-500';
-    title.textContent = `Day ${state.streak} streak!`;
-    sub.textContent = c.type === 'start'
-      ? 'Day 1 in the books. Come back tomorrow and the flame grows!'
-      : 'You showed up today — consistency is a superpower. Keep the flame alive!';
-    icon.classList.add('flame-anim');
+    showStreakFlame(c.type);
+    return;
   } else if (c.type === 'saved') {
     icon.textContent = '❄️'; icon.className = 'mx-auto mb-3 flex h-24 w-24 items-center justify-center rounded-full bg-sky-50 text-6xl ring-pulse';
     kick.textContent = 'Streak saved!';
@@ -9648,6 +9680,28 @@ function nextCelebration() {
   m.classList.remove('hidden'); m.classList.add('flex');
   clearTimeout(celebTimer);
   celebTimer = setTimeout(dismissCelebration, 3400);
+}
+
+/* Streak moments get their own treat: a friendly flame that rises and fades — no card, no blocking. */
+let flameTimer = null;
+function showStreakFlame(type) {
+  const wrap = $('#streak-flame'), inner = $('#streak-flame-inner'),
+        icon = $('#streak-flame-icon'), title = $('#streak-flame-title'), sub = $('#streak-flame-sub');
+  title.textContent = type === 'start' ? 'Day 1 — your journey begins!' : `Day ${state.streak} streak!`;
+  sub.textContent = type === 'start'
+    ? 'Come back tomorrow and watch the flame grow.'
+    : 'You showed up today — consistency is a superpower.';
+  inner.classList.remove('streak-flame-anim');
+  void inner.offsetWidth;
+  inner.classList.add('streak-flame-anim');
+  icon.classList.add('flame-flicker');
+  wrap.classList.remove('hidden'); wrap.classList.add('flex');
+  clearTimeout(flameTimer);
+  flameTimer = setTimeout(() => {
+    wrap.classList.add('hidden'); wrap.classList.remove('flex');
+    celebBusy = false;
+    nextCelebration();
+  }, 3800);
 }
 
 function dismissCelebration() {
@@ -10822,7 +10876,7 @@ const SHELF = {
     { cat: 'Official body', title: 'WAEC Nigeria', url: 'https://www.waecnigeria.org/', note: 'WASSCE syllabus, timetables and candidate resources.' },
     { cat: 'Official body', title: 'JAMB e-Syllabus (iBASS)', url: 'https://ibass.jamb.gov.ng/e-syllabus', note: 'The official UTME syllabus per subject — exactly what JAMB will test, topic by topic.' },
     { cat: 'Official body', title: 'NERDC — national curriculum', url: 'https://nerdc.org.ng/', note: 'Nigeria\u2019s official K-12 curriculum: the syllabus every textbook and exam follows.' },
-    { cat: 'Textbook', title: 'ClassNotes.ng — class notes by level', url: 'https://classnotes.ng/', note: 'Free first-term lessons for every JSS/SS subject (by Afrilearn); full terms via subscription.' }
+    { cat: 'Textbook', title: 'EduPodia — lesson notes & schemes of work', url: 'https://edupodia.com/', note: 'NERDC-aligned JSS1–SS3 lesson notes and schemes of work, term by term (editable Word downloads).' }
   ],
   'Mathematics': [
     { cat: 'Textbook', title: 'OpenStax — College Algebra (free textbook)', url: 'https://openstax.org/details/books/college-algebra-2e', note: 'A full peer-reviewed algebra textbook, free to read online.' },
@@ -11444,6 +11498,8 @@ function sendChatMessage(ev) {
   if (!input) return;
   const text = input.value.trim();
   if (!text) return;
+  state.tasks.buddyChats = (state.tasks.buddyChats || 0) + 1;
+  checkBadges();
   input.value = '';
   input.style.height = 'auto';
   askBuddy(text);
@@ -11604,14 +11660,14 @@ function renderProfile(el) {
           <div class="grid grid-cols-3 gap-2 text-center">
             <div class="rounded-xl bg-orange-50 p-3"><div class="text-xl font-black text-orange-600">🔥 ${state.streak}</div><div class="text-[10px] font-bold text-orange-500">day streak</div></div>
             <div class="rounded-xl bg-sky-50 p-3"><div class="text-xl font-black text-sky-600">❄️ ${state.streakFreezes}</div><div class="text-[10px] font-bold text-sky-500">freezes banked</div></div>
-            <div class="rounded-xl bg-indigo-50 p-3"><div class="text-xl font-black text-indigo-600">${state.badges.length}/${BADGES.length}</div><div class="text-[10px] font-bold text-indigo-500">badges earned</div></div>
+            <div class="rounded-xl bg-indigo-50 p-3"><div class="text-xl font-black text-indigo-600">${state.badges.length}</div><div class="text-[10px] font-bold text-indigo-500">badges found</div></div>
           </div>
           <p class="mt-2 rounded-xl bg-slate-50 px-3 py-2 text-[11px] leading-relaxed text-slate-500">
             ❄️ <b>Freeze progress:</b> ${state.tasks.tasksTotal % FREEZE_EVERY_TASKS}/${FREEZE_EVERY_TASKS} tasks toward your next freeze.
             Quizzes and flashcard sessions count — a banked freeze shields your streak if you miss a day.
           </p>
           <div class="mt-3 grid grid-cols-2 gap-2">
-            ${BADGES.map(b => {
+            ${BADGES.filter(b => !b.secret || state.badges.includes(b.id)).map(b => {
               const got = state.badges.includes(b.id);
               return `
               <div class="rounded-xl border p-3 text-left transition ${got ? 'border-indigo-200 bg-indigo-50/60' : 'border-slate-100 bg-slate-50 opacity-60'}">
@@ -11622,6 +11678,7 @@ function renderProfile(el) {
               </div>`;
             }).join('')}
           </div>
+          <p class="mt-3 rounded-xl bg-slate-900 px-3 py-2 text-[11px] font-semibold leading-relaxed text-slate-300">🔒 <b>Secret badges</b> are hidden somewhere in StudyOS. Nobody will tell you how to find them — keep studying, stay curious, and they will find <i>you</i>.</p>
         </section>
 
         <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-card">
@@ -11858,7 +11915,8 @@ function hydrateFromDoc(data) {
     tasksTotal: Number(t.tasksTotal) || 0,
     focusSessions: Number(t.focusSessions) || 0, focusMinutes: Number(t.focusMinutes) || 0,
     pastDrills: Number(t.pastDrills) || 0, timedAces: Number(t.timedAces) || 0,
-    nightOwl: !!t.nightOwl, earlyBird: !!t.earlyBird
+    nightOwl: !!t.nightOwl, earlyBird: !!t.earlyBird,
+    weekendStudy: !!t.weekendStudy, buddyChats: Number(t.buddyChats) || 0
   };
   const qs = (data.quizSetup && typeof data.quizSetup === 'object') ? data.quizSetup : {};
   state.quizSetup = {

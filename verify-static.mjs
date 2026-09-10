@@ -149,6 +149,14 @@ check('focus mode: header button, pill and modal present',
 check('quiz/flashcard navigation follows the subject being studied',
   /if \(activeTopic\) state\.selectedSubject = activeTopic\.subject;/.test(html));
 
+check('streak flame overlay + animations present (card-free fade)',
+  /id="streak-flame"/.test(html) && /flameRise/.test(html) && /flame-flicker/.test(html)
+  && /showStreakFlame/.test(html) && /pointer-events-none fixed inset-0 z-\[70\]/.test(html));
+check('secret badges are hidden until earned, with a curiosity teaser',
+  /BADGES\.filter\(b => !b\.secret \|\| state\.badges\.includes\(b\.id\)\)/.test(html)
+  && /Secret badges/.test(html) && /badges found/.test(html));
+check('EduPodia is on the resources shelf', /edupodia\.com/.test(html));
+
 // ---------- 5. no leftover build artifacts ----------
 check('no leftover template placeholders', !/\{\{|\}\}|TODO|FIXME|lorem ipsum/i.test(html));
 check('single self-contained file (no local src/href)',

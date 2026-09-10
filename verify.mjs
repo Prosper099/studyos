@@ -225,7 +225,7 @@ check('streak freeze: brand-new user starts at Day 1 without spending a freeze',
   const r = T.applyStreak(0, '', '2026-09-09', 2);
   return r.streak === 1 && r.freezes === 2 && r.event === 'start';
 })());
-check('badge catalog: 17 badges incl. streaks, focus family and exam badges', T.BADGES.length === 17
+check('badge catalog: 26 badges incl. streaks, focus family and exam badges', T.BADGES.length === 26
   && ['streak-7', 'streak-30', 'streak-365'].every(id => T.BADGES.some(b => b.id === id)));
 check('recordTask banks a freeze every 5 tasks (max 2) and awards badges', (() => {
   const st = T.getState();
@@ -349,6 +349,13 @@ check('buildQuiz honours the chosen question count (and All = full pool, unique 
 check('new badge catalogue includes focus, past-paper, night-owl, early-bird and timed-ace badges',
   ['focus-first', 'focus-5', 'focus-60', 'past-pro', 'timed-ace', 'night-owl', 'early-bird']
     .every(id => T.BADGES.some(b => b.id === id)));
+check('secret badges are flagged and hidden from the catalogue display', (() => {
+  const secrets = T.BADGES.filter(b => b.secret);
+  return secrets.length >= 9
+    && ['two-weeks', 'sharpshooter', 'centurion', 'weekend-warrior', 'buddy-friend', 'marathon-mind']
+      .slice(0, 5).every(id => secrets.some(b => b.id === id))
+    && secrets.every(b => typeof b.desc === 'string' && b.desc.length > 10);
+})());
 check('completing a focus session records minutes and unlocks the Focused badge', (() => {
   const st = T.getState();
   const before = st.tasks.focusSessions || 0;
