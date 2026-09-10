@@ -137,6 +137,18 @@ check('open-licence attribution footer present (OpenStax CC BY 4.0 + question ba
   /Content credits/.test(html) && /OpenStax/.test(html) && /CC BY 4\.0/.test(html)
   && /smartest\.ng/.test(html) && /exambuddy\.com\.ng/.test(html));
 
+// ---------- 4c. CBT personalisation: setup chips, timer, focus mode ----------
+check('quiz list has question-count and timer setup chips',
+  /setQuizCount\(\$\{num\}\)/.test(html) && /setQuizCount\(0\)/.test(html)
+  && /setQuizTimer\(\$\{min\}\)/.test(html) && /setQuizTimer\(0\)/.test(html) && /No timer/.test(html));
+check('quiz header renders the countdown chip when a timer is set',
+  /id="quiz-timer"/.test(html) && /fmtCountdown/.test(html));
+check('focus mode: header button, pill and modal present',
+  /id="focus-btn"/.test(html) && /id="focus-pill"/.test(html) && /id="focus-modal"/.test(html)
+  && /startFocus\(25\)/.test(html) && /stopFocus\(\)/.test(html));
+check('quiz/flashcard navigation follows the subject being studied',
+  /if \(activeTopic\) state\.selectedSubject = activeTopic\.subject;/.test(html));
+
 // ---------- 5. no leftover build artifacts ----------
 check('no leftover template placeholders', !/\{\{|\}\}|TODO|FIXME|lorem ipsum/i.test(html));
 check('single self-contained file (no local src/href)',

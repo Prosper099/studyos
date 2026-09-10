@@ -225,7 +225,7 @@ check('streak freeze: brand-new user starts at Day 1 without spending a freeze',
   const r = T.applyStreak(0, '', '2026-09-09', 2);
   return r.streak === 1 && r.freezes === 2 && r.event === 'start';
 })());
-check('badge catalog: 10 badges incl. weekly, monthly and yearly streaks', T.BADGES.length === 10
+check('badge catalog: 17 badges incl. streaks, focus family and exam badges', T.BADGES.length === 17
   && ['streak-7', 'streak-30', 'streak-365'].every(id => T.BADGES.some(b => b.id === id)));
 check('recordTask banks a freeze every 5 tasks (max 2) and awards badges', (() => {
   const st = T.getState();
@@ -327,6 +327,35 @@ check('every embedded past question is well-formed and carries exam-body + year 
   pastBad || `${Object.values(T.PASTQ).reduce((a, v) => a + v.length, 0)} questions verified`);
 check('pastFor() keeps its own id namespace and injects ids into every question',
   T.pastFor('Mathematics')[0].id === 'past-mat-0' && T.pastFor('English Language').every(q => q.id.startsWith('past-eng-')));
+check('quiz setup defaults to 10 questions with no timer', (() => {
+  const st = T.getState();
+  return st.quizSetup && st.quizSetup.count === 10 && st.quizSetup.minutes === 0 && !!st.focus;
+})());
+check('buildQuiz honours the chosen question count (and All = full pool, unique ids)', (() => {
+  const st = T.getState();
+  const lvl = st.profile.classLevel || 'SS3';
+  const saved = st.quizSetup.count;
+  st.quizSetup.count = 5;
+  const five = T.buildQuiz('Mathematics', 'topic', lvl, 0);
+  st.quizSetup.count = 0;
+  const all = T.buildQuiz('Mathematics', 'topic', lvl, 0);
+  st.quizSetup.count = 15;
+  const fifteen = T.buildQuiz('Mathematics', 'topic', lvl, 0);
+  const pastOnly = T.buildQuiz('Physics', 'past').every(q => q.id.startsWith('past-'));
+  st.quizSetup.count = saved;
+  return five.length === 5 && all.length >= 10 && fifteen.length === 15
+    && new Set(fifteen.map(q => q.id)).size === 15 && pastOnly;
+})());
+check('new badge catalogue includes focus, past-paper, night-owl, early-bird and timed-ace badges',
+  ['focus-first', 'focus-5', 'focus-60', 'past-pro', 'timed-ace', 'night-owl', 'early-bird']
+    .every(id => T.BADGES.some(b => b.id === id)));
+check('completing a focus session records minutes and unlocks the Focused badge', (() => {
+  const st = T.getState();
+  const before = st.tasks.focusSessions || 0;
+  T.recordTask('focus', { minutes: 25 });
+  return st.tasks.focusSessions === before + 1 && (st.tasks.focusMinutes || 0) >= 25
+    && st.badges.includes('focus-first');
+})());
 check('cardsFor aggregates a whole level and tags each card with its topic', (() => {
   const all = T.cardsFor('Basic Science', 'JSS1');
   const one = T.cardsFor('Basic Science', 'JSS1', 'Matter, Its Properties & Changes');
