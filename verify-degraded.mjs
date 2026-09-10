@@ -115,7 +115,7 @@ check('user is signed into the app even though Firestore is disabled',
   !byId('main-app').classList.contains('hidden'));
 check('profile shows the signed-in user', byId('sidebar-name').textContent === 'Ada Obi', byId('sidebar-name').textContent);
 check('the app explains the fix instead of showing a raw API error',
-  /Firestore is not enabled on this project/.test(readToast())
+  /Cloud storage is not connected yet/.test(readToast())
   && !/has not been used in project/.test(readToast()), readToast());
 
 // onboarding must still complete and persist locally

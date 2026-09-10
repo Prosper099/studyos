@@ -155,7 +155,15 @@ check('streak flame overlay + animations present (card-free fade)',
 check('secret badges are hidden until earned, with a curiosity teaser',
   /BADGES\.filter\(b => !b\.secret \|\| state\.badges\.includes\(b\.id\)\)/.test(html)
   && /Secret badges/.test(html) && /badges found/.test(html));
-check('EduPodia is on the resources shelf', /edupodia\.com/.test(html));
+check('Internet Archive is on the resources shelf (EduPodia removed)',
+  /archive\.org/.test(html) && !/edupodia/i.test(html));
+check('LaTeX sanitizer + prompt guard fix broken AI math text',
+  /function plainMath/.test(html) && /escapeHtml\(plainMath\(text\)\)/.test(html)
+  && /Never use LaTeX/.test(html));
+check('no Firestore wording in student-facing UI',
+  !/Cloud Firestore/.test(html) && !/Firestore sync/.test(html) && /Cloud sync: active/.test(html));
+check('rare glyphs purged from content (no vulgar fractions, sub/superscript digits)',
+  !/[⅓⅔⅕⅖⅗⅚¼½¾⅛⁄₀₁₂₃₄₅₆₇₈₉⁰¹²³⁴⁵⁶⁷⁸⁹ₙ]/.test(html));
 
 // ---------- 5. no leftover build artifacts ----------
 check('no leftover template placeholders', !/\{\{|\}\}|TODO|FIXME|lorem ipsum/i.test(html));

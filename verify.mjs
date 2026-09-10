@@ -349,6 +349,15 @@ check('buildQuiz honours the chosen question count (and All = full pool, unique 
 check('new badge catalogue includes focus, past-paper, night-owl, early-bird and timed-ace badges',
   ['focus-first', 'focus-5', 'focus-60', 'past-pro', 'timed-ace', 'night-owl', 'early-bird']
     .every(id => T.BADGES.some(b => b.id === id)));
+check('plainMath strips LaTeX so students never see raw markup', (() => {
+  const out = T.plainMath('The root is $\\frac{-b}{2a}$ and area $= \\pi r^{2}$ \\times 2');
+  return !/[$\\{}]/.test(out) && out.includes('(-b)/(2a)') && out.includes('r^2');
+})());
+check('every Biology topic has at least 15 flashcards', (() => {
+  for (const ts of Object.values(T.CURRICULUM.Biology.topics))
+    for (const t of ts) if ((t.cards || []).length < 15) return false;
+  return true;
+})());
 check('secret badges are flagged and hidden from the catalogue display', (() => {
   const secrets = T.BADGES.filter(b => b.secret);
   return secrets.length >= 9
@@ -558,7 +567,7 @@ check('Buddy always returns suggestion chips', T.buddyReply('centripetal force')
 // ---------- Buddy algebra solver ----------
 const quad = T.buddyReply('solve x^2 - 5x + 6');
 check('Buddy solves x^2 - 5x + 6 → roots 3 and 2',
-  /x = 3\s+or\s+2/.test(quad.html) && /Δ = b² − 4ac/.test(quad.html), quad.html.slice(0, 200));
+  /x = 3\s+or\s+2/.test(quad.html) && /Δ = b\^2 - 4ac/.test(quad.html), quad.html.slice(0, 200));
 const quad2 = T.solveQuadratic(1, 0, -9);
 check('solveQuadratic(1,0,-9) → ±3', JSON.stringify(quad2.roots) === JSON.stringify([3, -3]) && quad2.nature.includes('distinct'));
 const quad3 = T.solveQuadratic(1, -4, 4);
@@ -636,7 +645,7 @@ check('initials("Joseph Adeyemi") → JA', T.initials('Joseph Adeyemi') === 'JA'
 check('initials("") → S', T.initials('') === 'S');
 check('escapeHtml blocks script injection', !/<script/i.test(T.escapeHtml('<script>alert(1)</script>')));
 check('mdToHtml escapes then bolds', T.mdToHtml('**hi** <img src=x>').includes('<b>hi</b>') && !T.mdToHtml('**hi** <img src=x>').includes('<img'));
-check('fmtQuad renders 2x² + 3x − 5', T.fmtQuad(2, 3, -5) === '2x² + 3x − 5');
+check('fmtQuad renders 2x^2 + 3x - 5 (ASCII-safe math)', T.fmtQuad(2, 3, -5) === '2x^2 + 3x - 5');
 check('OPTIONS cover the brief', JSON.stringify(T.OPTIONS.classes) === JSON.stringify(['SS1','SS2','SS3','JSS1','JSS2','JSS3'])
   && T.OPTIONS.exams.map(e => e.id).join('|') === 'JAMB UTME|WAEC WASSCE|NECO|Post-UTME|General'
   && T.OPTIONS.subjects.length === 7
