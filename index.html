@@ -552,6 +552,18 @@ const CURRICULUM = {
               <li>In base-2 addition, writing "2" as a digit. 1 + 1 = 10₂, never 2₂.</li>
             </ul>
             <div class="tip"><b>Speed trick:</b> memorise the powers of two — 1, 2, 4, 8, 16, 32, 64, 128, 256. Half of all base-2 questions then become simple addition.</div>
+            <h3>Deep dive: converting and calculating in any base</h3>
+            <p><b>Denary → base n:</b> divide repeatedly by n, collecting remainders, then read them <b>bottom-up</b>. <b>Base n → denary:</b> expand in powers of n. Example: 11001₂ = 16 + 8 + 0 + 0 + 1 = <b>25₁₀</b>; and 25₁₀ in base 2: 25 = 12 r1, 12 = 6 r0, 6 = 3 r0, 3 = 1 r1, 1 = 0 r1 → reading remainders bottom-up: <b>11001₂</b>.</p>
+            <p><b>Arithmetic in base n</b> works exactly like denary arithmetic except you carry whenever a column reaches <b>n</b> (not 10). Adding 1101₂ + 1011₂: units 1+1 = 10₂ (write 0, carry 1), next 0+1+1 = 10₂ (write 0, carry 1), next 1+0+1 = 10₂ (write 0, carry 1), last 1+1+1 = 11₂ → answer <b>11000₂</b> = 24₁₀. Check: 13 + 11 = 24 ✓ — always sanity-check in denary.</p>
+            <h3>Modular arithmetic — clock mathematics</h3>
+            <p>a ≡ b (mod n) means a and b leave the same remainder on division by n: 17 ≡ 5 (mod 12), like a clock hand returning to 5 after 17 hours. To reduce: divide and keep the remainder. <b>43 mod 7</b>: 43 = 6×7 + 1 → <b>1</b>. Weekdays are mod 7, clocks are mod 12, and computer checksums (ISBN, bank codes) are modular arithmetic protecting your data.</p>
+            <h3>Examiner's traps</h3>
+            <ul>
+              <li>A digit must be <b>smaller than the base</b> — there is no "2" in base 2, no "8" in base 8.</li>
+              <li>Reading remainders <b>top-down</b> instead of bottom-up flips the answer completely.</li>
+              <li>In mod n, answers run 0 to n−1; "7 mod 7" is 0, not 7.</li>
+            </ul>
+
           `,
           cards: [
             { q: 'Convert 1101₂ to base 10.', a: '1×8 + 1×4 + 0×2 + 1×1 = 13.' },
@@ -620,6 +632,23 @@ const CURRICULUM = {
               <li>Forgetting that log 1 = 0 and log 10 = 1. These are free marks.</li>
             </ul>
             <div class="warn"><b>Domain check:</b> log x only exists for x &gt; 0. If a log equation gives a negative or zero value, reject that root — examiners award a mark for stating the rejection.</div>
+            <h3>Deep dive: the five index laws</h3>
+            <div class="formula">aᵐ × aⁿ = aᵐ⁺ⁿ &nbsp;·&nbsp; aᵐ ÷ aⁿ = aᵐ⁻ⁿ &nbsp;·&nbsp; (aᵐ)ⁿ = aᵐⁿ &nbsp;·&nbsp; a⁰ = 1 &nbsp;·&nbsp; a⁻ⁿ = 1/aⁿ</div>
+            <p>Fractional indices mean roots: a^(1/n) = ⁿ√a and a^(m/n) = (ⁿ√a)ᵐ — so 27^(2/3) = (³√27)² = 3² = <b>9</b>. Logarithms ask the opposite question of indices: log_a x = n means aⁿ = x. The three laws mirror the index laws: <b>log(xy) = log x + log y</b>, <b>log(x/y) = log x − log y</b>, <b>log(xⁿ) = n log x</b>.</p>
+            <h3>Worked examples</h3>
+            <ol>
+              <li><b>Evaluate log₁₀ 8 given log₁₀ 2 = 0.3010.</b> log 8 = log 2³ = 3 × 0.3010 = <b>0.9030</b>.</li>
+              <li><b>Solve 2ˣ = 32.</b> 32 = 2⁵, so x = <b>5</b>. For 3^(x+1) = 81: 3^(x+1) = 3⁴ → x + 1 = 4 → x = 3.</li>
+              <li><b>Simplify √50 + √18.</b> √50 = 5√2, √18 = 3√2, sum = <b>8√2</b>.</li>
+              <li><b>Rationalise 1/(√3 − √2).</b> Multiply by (√3 + √2)/(√3 + √2): (√3 + √2)/(3 − 2) = <b>√3 + √2</b>.</li>
+            </ol>
+            <h3>Examiner's traps</h3>
+            <ul>
+              <li><b>log(a + b) ≠ log a + log b</b> — the product law applies to multiplication only. This single error sinks more WAEC questions than any other.</li>
+              <li>a⁰ = 1 for any non-zero a; x⁻² is 1/x², not −x².</li>
+              <li>√(a + b) ≠ √a + √b — check with a = 9, b = 16: √25 = 5 but 3 + 4 = 7.</li>
+            </ul>
+
           `,
           cards: [
             { q: 'Simplify (2³)² ÷ 2⁴.', a: '(2³)² = 2⁶; 2⁶ ÷ 2⁴ = 2² = 4.' },
@@ -680,6 +709,29 @@ const CURRICULUM = {
               <li>Stopping a factorisation too early — always check whether the brackets can be factorised again.</li>
               <li>Forgetting to multiply <b>every</b> term inside a bracket: 3(2x − 1) is 6x − 3, not 6x − 1.</li>
             </ul>
+            <h3>Deep dive: expansion and the four factorisations</h3>
+            <p>Expansion is the distributive law: a(b + c) = ab + ac, and (x + 2)(x + 3) = x² + 3x + 2x + 6 = x² + 5x + 6 — every term in the first bracket multiplies every term in the second. Factorisation reverses it, in four patterns you must recognise on sight:</p>
+            <ol>
+              <li><b>Common factor</b>: 6x² + 9x = 3x(2x + 3).</li>
+              <li><b>Difference of two squares</b>: x² − 25 = (x + 5)(x − 5).</li>
+              <li><b>Simple trinomial</b>: x² + 7x + 12 = (x + 3)(x + 4) — find two numbers that <b>multiply to 12</b> and <b>add to 7</b>.</li>
+              <li><b>Grouping</b>: ax + ay + bx + by = a(x + y) + b(x + y) = (a + b)(x + y).</li>
+            </ol>
+            <h3>Worked example, step by step</h3>
+            <p><b>Solve (2x − 1)/3 + (x + 2)/4 = 1.</b></p>
+            <ol>
+              <li>Clear denominators with the LCM 12: 4(2x − 1) + 3(x + 2) = 12.</li>
+              <li>Expand: 8x − 4 + 3x + 6 = 12 → 11x + 2 = 12.</li>
+              <li>11x = 10 → x = 10/11. <b>Check</b> by substituting back — always.</li>
+            </ol>
+            <p><b>Word problem:</b> 3 bags of rice and 2 bags of beans cost ₦46,000; 2 bags of rice and 3 bags of beans cost ₦44,000. Let r and b be the prices: 3r + 2b = 46000 and 2r + 3b = 44000. Eliminating r (×2 and ×3): 5b = 40000 → b = ₦8,000, r = ₦10,000. Every simultaneous-equation story follows this template: define letters, translate sentences, eliminate.</p>
+            <h3>Examiner's traps</h3>
+            <ul>
+              <li>−(a − b) = −a + b — the minus sign hits <b>every</b> term inside.</li>
+              <li>(x + 3)² = x² + 6x + 9, NOT x² + 9 — the middle term is the classic casualty.</li>
+              <li>Dividing both sides by something containing x can destroy a solution; factorise instead.</li>
+            </ul>
+
           `,
           cards: [
             { q: 'How do you factorise a quadratic of the form x² + bx + c?', a: 'Find two numbers whose product is c and whose sum is b, then write (x + first)(x + second). Example: x² + 7x + 12 = (x + 3)(x + 4).' },
@@ -761,6 +813,25 @@ const CURRICULUM = {
               <li>Confusing A′ (everything in ξ outside A) with the empty set ∅.</li>
               <li>Forgetting that n(A ∪ B) can never exceed n(ξ).</li>
             </ul>
+            <h3>Deep dive: the counting formula and how to use it</h3>
+            <div class="formula">n(A ∪ B) = n(A) + n(B) − n(A ∩ B) &nbsp;&nbsp;·&nbsp;&nbsp; n(A′) = n(U) − n(A)</div>
+            <p>The intersection is subtracted because it was counted twice. For three sets: n(A∪B∪C) = n(A)+n(B)+n(C) − n(A∩B) − n(A∩C) − n(B∩C) + n(A∩B∩C). In every WAEC Venn problem, <b>fill the innermost region first</b> and work outwards — the diagram then does the arithmetic for you.</p>
+            <h3>Worked example, step by step</h3>
+            <p><b>In a class of 40, 25 offer Mathematics, 20 offer English, and 8 offer both. How many offer neither?</b></p>
+            <ol>
+              <li>n(M ∪ E) = 25 + 20 − 8 = 37.</li>
+              <li>Neither = 40 − 37 = <b>3</b>.</li>
+              <li>Diagram check: Maths only = 25 − 8 = 17; English only = 20 − 8 = 12; both = 8; neither = 3. Total = 17 + 12 + 8 + 3 = 40 ✓.</li>
+            </ol>
+            <h3>Logic in one breath</h3>
+            <p>A <b>statement</b> is either true or false. <b>p ∧ q</b> (AND) is true only when both are; <b>p ∨ q</b> (OR — in maths, <b>inclusive</b>: "or both") is false only when both are false; <b>~p</b> (NOT) flips the truth value; <b>p → q</b> (if p then q) is false only when p is true and q is false.</p>
+            <h3>Examiner's traps</h3>
+            <ul>
+              <li>"25 offer Maths" <b>includes</b> those who also offer English — don't treat it as "Maths only".</li>
+              <li>Mathematical OR is inclusive; everyday "either...or" often isn't.</li>
+              <li>The empty set ∅ has no elements but is a subset of every set — n(∅) = 0.</li>
+            </ul>
+
           `,
           cards: [
             { q: 'State the inclusion–exclusion formula.', a: 'n(A∪B) = n(A) + n(B) − n(A∩B).' },
@@ -827,6 +898,20 @@ const CURRICULUM = {
               <li>Confusing the condition for <b>real</b> roots (Δ ≥ 0) with <b>distinct real</b> roots (Δ &gt; 0).</li>
               <li>Forgetting that a quadratic can have <b>no</b> real solution — state this rather than forcing an answer.</li>
             </ul>
+            <h3>Deep dive: three solution methods, one discriminant</h3>
+            <p><b>1. Factorisation</b> — fastest when the roots are tidy: x² − 5x + 6 = 0 → (x − 2)(x − 3) = 0 → x = 2 or 3. <b>2. Completing the square</b> — x² + 6x + 5 = (x + 3)² − 4, so (x + 3)² = 4 → x = −1 or −5; this form also hands you the <b>vertex</b> of the parabola. <b>3. The formula</b> — works always:</p>
+            <div class="formula">x = (−b ± √(b² − 4ac)) ÷ 2a &nbsp;&nbsp; for ax² + bx + c = 0</div>
+            <h3>Worked example, step by step</h3>
+            <p><b>Solve 2x² + 3x − 5 = 0.</b> a = 2, b = 3, c = −5. Discriminant: b² − 4ac = 9 + 40 = 49 (a perfect square — it would have factorised as (2x + 5)(x − 1)). x = (−3 ± 7)/4 → x = <b>1</b> or x = <b>−5/2</b>.</p>
+            <p><b>Nature of roots from the discriminant:</b> b² − 4ac &gt; 0 → two distinct real roots; = 0 → one repeated root (the graph kisses the x-axis); &lt; 0 → no real roots (the parabola floats above or below the axis).</p>
+            <p><b>Forming an equation from roots</b> α and β: x² − (α + β)x + αβ = 0. Roots 3 and −4 → x² − (−1)x + (−12) = x² + x − 12 = 0.</p>
+            <h3>Examiner's traps</h3>
+            <ul>
+              <li>Sign errors with negative b or c inside the formula — write a, b, c down explicitly first.</li>
+              <li>Forgetting the ± : √ gives two roots, one on each side of the axis of symmetry.</li>
+              <li>x² = 9 has roots +3 <b>and</b> −3; answering only 3 loses half the marks.</li>
+            </ul>
+
           `,
           cards: [
             { q: 'State the discriminant and what Δ &lt; 0 means.', a: 'Δ = b² − 4ac. Δ &lt; 0 means the equation has no real roots.' },
@@ -883,6 +968,24 @@ const CURRICULUM = {
               <li>Applying the A.P. sum formula to a G.P. — check which series you have first.</li>
               <li>Using S∞ when |r| ≥ 1; the sum to infinity only exists for |r| &lt; 1.</li>
             </ul>
+            <h3>Deep dive: the four formulas that solve everything</h3>
+            <div class="formula">A.P.: Uₙ = a + (n−1)d &nbsp;·&nbsp; Sₙ = n/2 [2a + (n−1)d] = n/2 (a + l)<br/>G.P.: Uₙ = arⁿ⁻¹ &nbsp;·&nbsp; Sₙ = a(rⁿ − 1)/(r − 1) &nbsp;·&nbsp; S∞ = a/(1 − r), only when |r| &lt; 1</div>
+            <p>In an A.P. each term <b>adds</b> a constant difference d; in a G.P. each term <b>multiplies</b> by a constant ratio r. Find d by subtracting neighbours; find r by dividing.</p>
+            <h3>Worked examples</h3>
+            <ol>
+              <li><b>A.P. 2, 5, 8, …: find the 12th term and the sum of the first 12 terms.</b> a = 2, d = 3. U₁₂ = 2 + 11×3 = 35. S₁₂ = 12/2 (2 + 35) = 6 × 37 = <b>222</b>.</li>
+              <li><b>G.P. 3, 6, 12, …: find the 6th term.</b> a = 3, r = 2. U₆ = 3 × 2⁵ = <b>96</b>. (No S∞ here — r = 2 grows without limit.)</li>
+              <li><b>Sum to infinity of 8 + 4 + 2 + …</b> a = 8, r = ½. S∞ = 8/(1 − ½) = <b>16</b>.</li>
+            </ol>
+            <h3>Examiner's traps</h3>
+            <ul>
+              <li>S∞ exists <b>only</b> when |r| &lt; 1; a G.P. with r = 2 has no sum to infinity.</li>
+              <li>Uₙ uses (n−1), not n — the first term is already the a.</li>
+              <li>The arithmetic mean of a and b is (a+b)/2; the geometric mean is √(ab) — different questions, different answers.</li>
+            </ul>
+            <h3>See it around you</h3>
+            <p>A ₦500 monthly increment is an A.P.; a savings plan doubling every week is a G.P.; instalment plans and population growth are the two sequences you will meet for life.</p>
+
           `,
           cards: [
             { q: 'Formula for the nth term and sum of an A.P.?', a: 'Tₙ = a + (n−1)d; Sₙ = n/2[2a + (n−1)d].' },
@@ -954,6 +1057,33 @@ const CURRICULUM = {
               <li>Leaving the calculator in radians when the question expects degrees.</li>
               <li>Writing bearings with two figures (65° instead of 065°).</li>
             </ul>
+            <h3>Deep dive: SOH CAH TOA and the special angles</h3>
+            <div class="formula">sin θ = Opp/Hyp &nbsp;·&nbsp; cos θ = Adj/Hyp &nbsp;·&nbsp; tan θ = Opp/Adj</div>
+            <table class="mb-3 w-full border-collapse text-left text-xs">
+              <thead><tr class="bg-slate-100"><th class="border border-slate-200 p-1.5">θ</th><th class="border border-slate-200 p-1.5">sin</th><th class="border border-slate-200 p-1.5">cos</th><th class="border border-slate-200 p-1.5">tan</th></tr></thead>
+              <tbody>
+                <tr><td class="border border-slate-200 p-1.5">30°</td><td class="border border-slate-200 p-1.5">0.5000</td><td class="border border-slate-200 p-1.5">0.8660</td><td class="border border-slate-200 p-1.5">0.5774</td></tr>
+                <tr><td class="border border-slate-200 p-1.5">45°</td><td class="border border-slate-200 p-1.5">0.7071</td><td class="border border-slate-200 p-1.5">0.7071</td><td class="border border-slate-200 p-1.5">1.0000</td></tr>
+                <tr><td class="border border-slate-200 p-1.5">60°</td><td class="border border-slate-200 p-1.5">0.8660</td><td class="border border-slate-200 p-1.5">0.5000</td><td class="border border-slate-200 p-1.5">1.7321</td></tr>
+              </tbody>
+            </table>
+            <p><b>Angle of elevation</b>: measured <b>up from the horizontal</b> to the line of sight; <b>depression</b> is the mirror image, measured down — and the two are equal as alternate angles. Every elevation problem is a right-angled triangle: draw it, label the given side and angle, pick the ratio that uses them.</p>
+            <h3>Worked example, step by step</h3>
+            <p><b>From a point 50 m from a tower's foot, the angle of elevation of the top is 30°. Find the height.</b></p>
+            <ol>
+              <li>tan 30° = h/50 (opposite over adjacent).</li>
+              <li>h = 50 × 0.5774 ≈ <b>28.9 m</b>.</li>
+              <li>If asked for the distance to the top as well: cos 30° = 50/d → d = 50/0.866 ≈ 57.7 m.</li>
+            </ol>
+            <h3>Bearings in one line</h3>
+            <p>Three-figure bearings are measured <b>clockwise from North</b>: East is 090°, South 180°, West 270°. "N30°E" converts to 030°. Draw north first, always.</p>
+            <h3>Examiner's traps</h3>
+            <ul>
+              <li>Calculator in the wrong mode — set <b>DEG</b>, not RAD, for WAEC trigonometry.</li>
+              <li>Measuring elevation from the ground line at the wrong corner — it is always from the horizontal at the observer's eye.</li>
+              <li>Confusing sin with cos: opposite goes with sin, adjacent with cos ("SOH CAH").</li>
+            </ul>
+
           `,
           cards: [
             { q: 'What does SOH CAH TOA stand for?', a: 'sin = Opp/Hyp, cos = Adj/Hyp, tan = Opp/Adj.' },
@@ -1011,6 +1141,24 @@ const CURRICULUM = {
               <li>Thinking parallel lines have gradients whose product is −1. That is the rule for <b>perpendicular</b> lines.</li>
               <li>Forgetting the negative sign when taking the negative reciprocal.</li>
             </ul>
+            <h3>Deep dive: three formulas, every question</h3>
+            <div class="formula">Midpoint = ((x₁+x₂)/2, (y₁+y₂)/2) &nbsp;·&nbsp; Distance = √[(x₂−x₁)² + (y₂−y₁)²] &nbsp;·&nbsp; Gradient m = (y₂−y₁)/(x₂−x₁)</div>
+            <p>Parallel lines share gradients (m₁ = m₂); perpendicular lines have gradients whose product is −1 (m₁ × m₂ = −1, i.e. flip and negate: m → −1/m). The equation of a line is y = mx + c, or through a known point: <b>y − y₁ = m(x − x₁)</b>.</p>
+            <h3>Worked examples</h3>
+            <ol>
+              <li><b>Midpoint and distance of A(2, 3), B(6, 7):</b> midpoint = (4, 5); distance = √(4² + 4²) = √32 = <b>4√2</b> ≈ 5.66.</li>
+              <li><b>Gradient of the line through (1, 2) and (4, 11):</b> m = (11 − 2)/(4 − 1) = 9/3 = <b>3</b>. Equation: y − 2 = 3(x − 1) → y = 3x − 1.</li>
+              <li><b>Line perpendicular to y = 2x + 5 through (0, 4):</b> m = −½ → y = −½x + 4.</li>
+            </ol>
+            <h3>Examiner's traps</h3>
+            <ul>
+              <li>In the gradient formula, pair the coordinates in the <b>same order</b> — mixing (x₂−x₁) with (y₁−y₂) flips the sign.</li>
+              <li>Perpendicular gradient of 2 is <b>−½</b>, not −2.</li>
+              <li>A vertical line has undefined gradient; a horizontal line has gradient 0 — they are perpendicular to each other.</li>
+            </ul>
+            <h3>See it around you</h3>
+            <p>Every GPS coordinate, plot allocation on a survey plan, and the graph of your phone bill against usage is coordinate geometry — the (x, y) pair is the universal address.</p>
+
           `,
           cards: [
             { q: 'State the gradient formula and the forms of a straight line.', a: 'Gradient m = (y₂ - y₁)/(x₂ - x₁). Forms: y = mx + c (gradient-intercept), y - y₁ = m(x - x₁) (point-gradient), and ax + by + c = 0 (general form).' },
@@ -1133,6 +1281,35 @@ const CURRICULUM = {
               <li>Using the second-derivative test backwards: d²y/dx² &gt; 0 is a <b>minimum</b>.</li>
               <li>Integrating 1/x as x⁰/0. The correct result is ln x.</li>
             </ul>
+            <h3>Worked example: partial variation, the full method</h3>
+            <p><b>y is partly constant and partly varies directly as x. When x = 2, y = 11; when x = 5, y = 20. Find y when x = 8.</b></p>
+            <ol>
+              <li>"Partly constant, partly direct" means <b>y = a + bx</b>.</li>
+              <li>Two simultaneous equations: 11 = a + 2b and 20 = a + 5b.</li>
+              <li>Subtract: 9 = 3b → b = 3; substitute: a = 11 − 6 = 5.</li>
+              <li>So y = 5 + 3x; when x = 8: y = 5 + 24 = <b>29</b>.</li>
+            </ol>
+            <p>The same skeleton solves every variation story: <b>translate the words into y = k(...)</b>, use the given data to pin down the constant(s), then evaluate. Direct: y = kx; inverse: y = k/x; joint: y = kxz; partial: y = a + bx.</p>
+
+            <h3>Deep dive: the two engine rules</h3>
+            <div class="formula">d/dx (xⁿ) = nxⁿ⁻¹ &nbsp;&nbsp;·&nbsp;&nbsp; ∫ xⁿ dx = xⁿ⁺¹/(n+1) + c (n ≠ −1)</div>
+            <p>Differentiation gives the <b>gradient</b> of a curve at any point; integration reverses it and gives <b>area</b>. Both work term by term; a constant differentiates to 0 and integrates to cx.</p>
+            <h3>Worked examples, step by step</h3>
+            <ol>
+              <li><b>Differentiate y = 3x³ − 2x² + 5x − 7:</b> dy/dx = <b>9x² − 4x + 5</b>. At x = 1 the gradient is 9 − 4 + 5 = 10.</li>
+              <li><b>Max/min of y = x² − 4x + 3:</b> dy/dx = 2x − 4 = 0 → x = 2; y = 4 − 8 + 3 = <b>−1</b>. Second derivative = 2 &gt; 0, so (2, −1) is a <b>minimum</b>.</li>
+              <li><b>∫ (6x² − 4x) dx</b> = 2x³ − 2x² + c.</li>
+              <li><b>Definite: ∫₀² 2x dx</b> = [x²]₀² = 4 − 0 = <b>4</b> — the area under the line y = 2x from 0 to 2.</li>
+            </ol>
+            <h3>Applications WAEC loves</h3>
+            <p>Maximum area of a fenced enclosure, minimum cost of a box, velocity from a distance–time relation (v = ds/dt) and acceleration (a = dv/dt): s = t² + 3t → v = 2t + 3 → a = 2. Set dy/dx = 0 for stationary points; the sign of d²y/dx² classifies them (+ minimum, − maximum).</p>
+            <h3>Examiner's traps</h3>
+            <ul>
+              <li>Omitting the <b>+ c</b> on indefinite integrals — it is a mark, every time.</li>
+              <li>Confusing minimum with maximum: check the second derivative or sketch.</li>
+              <li>Definite integrals: substitute the <b>upper limit first</b>, then subtract the lower — order matters when signs mix.</li>
+            </ul>
+
           `,
           cards: [
             { q: 'Differentiate y = 4x³ + 2x.', a: "dy/dx = 12x² + 2 using the power rule d/dx(xⁿ) = n·xⁿ⁻¹." },
@@ -1194,6 +1371,24 @@ const CURRICULUM = {
               <li>Reading the median without putting the data in order first.</li>
               <li>Reporting the variance when the question asks for the <b>standard deviation</b> — take the square root.</li>
             </ul>
+            <h3>Deep dive: counting the chances</h3>
+            <div class="formula">P(event) = favourable outcomes ÷ total outcomes &nbsp;·&nbsp; P(not A) = 1 − P(A)</div>
+            <p><b>Mutually exclusive</b> events (cannot both happen) add: P(A or B) = P(A) + P(B). <b>Independent</b> events (one doesn't affect the other) multiply: P(A and B) = P(A) × P(B). <b>Without replacement</b> changes the denominator after each pick — tree diagrams keep this honest.</p>
+            <h3>Worked examples</h3>
+            <ol>
+              <li><b>Fair die: P(even)</b> = 3/6 = <b>½</b>; <b>P(greater than 4)</b> = 2/6 = ⅓; both cannot overlap? 5 is odd, so P(even or &gt;4) = ½ + ⅓ = 5/6.</li>
+              <li><b>Two dice, sum of 7:</b> outcomes (1,6)(2,5)(3,4)(4,3)(5,2)(6,1) → 6/36 = <b>1/6</b>.</li>
+              <li><b>Bag: 3 red, 2 blue. Two drawn without replacement, P(both red)</b> = 3/5 × 2/4 = 6/20 = <b>3/10</b>.</li>
+              <li><b>Data 2, 3, 3, 5, 7:</b> mean = 20/5 = <b>4</b>; median (middle when ordered) = <b>3</b>; mode (most frequent) = <b>3</b>; range = 7 − 2 = 5.</li>
+            </ol>
+            <p>For grouped/frequency data: mean = Σfx ÷ Σf — multiply each value by its frequency first.</p>
+            <h3>Examiner's traps</h3>
+            <ul>
+              <li><b>With</b> vs <b>without</b> replacement: the second fraction changes only in the second case.</li>
+              <li>Median requires the data <b>sorted first</b>; with an even count it is the average of the two middle values.</li>
+              <li>Probabilities never exceed 1 or fall below 0 — an answer like 7/5 means the counting went wrong.</li>
+            </ul>
+
           `,
           cards: [
             { q: 'P(A and B) for independent events?', a: 'P(A and B) = P(A) × P(B) — when two events are independent (one does not affect the other), multiply their probabilities: e.g. two heads in a row = ½ × ½ = ¼.' },
@@ -1251,6 +1446,26 @@ const CURRICULUM = {
               <li>Forgetting the base of a hemisphere or the two circular faces of a cylinder in a total surface area.</li>
               <li>Mixing units: convert cm to m <b>before</b> cubing, not after.</li>
             </ul>
+            <h3>Deep dive: the formulas that must be automatic</h3>
+            <div class="formula">Circle: C = 2πr, A = πr² &nbsp;·&nbsp; Sector (angle θ): arc = θ/360 × 2πr, area = θ/360 × πr²<br/>Cylinder: V = πr²h, total surface = 2πr(r + h) &nbsp;·&nbsp; Cone: V = ⅓πr²h, curved surface = πrl<br/>Sphere: V = 4/3 πr³, A = 4πr²</div>
+            <p>The cone's ⅓ and its <b>slant height l = √(r² + h²)</b> are where marks are won and lost. A frustum (a cone with its tip cut off, like a bucket or a funnel) = big cone minus small cone.</p>
+            <h3>Worked examples</h3>
+            <ol>
+              <li><b>Cylinder r = 7 cm, h = 10 cm (π = 22/7):</b> V = (22/7) × 49 × 10 = <b>1540 cm³</b>.</li>
+              <li><b>Sector of a circle, r = 7 cm, θ = 60°:</b> area = 60/360 × (22/7) × 49 = (1/6)(154) = <b>25.67 cm²</b>.</li>
+              <li><b>Cone r = 3, h = 4:</b> l = √(9+16) = 5; curved surface = π × 3 × 5 = <b>15π</b>; V = ⅓ π × 9 × 4 = <b>12π</b>.</li>
+            </ol>
+            <h3>Similar solids</h3>
+            <p>If the linear scale factor is k, then <b>areas scale by k²</b> and <b>volumes by k³</b>: a model car at 1/10 scale has 1/100 of the paint area and 1/1000 of the metal volume.</p>
+            <h3>Examiner's traps</h3>
+            <ul>
+              <li>Using height h where slant height l belongs in the cone's curved surface.</li>
+              <li>Forgetting the ⅓ in cone and pyramid volumes — a cone is exactly one-third of its cylinder.</li>
+              <li>"Total surface area" includes <b>every</b> face — the closed tin, not the open bucket, unless the question says so.</li>
+            </ul>
+            <h3>See it around you</h3>
+            <p>A 1000-litre poly tank is a cylinder (V = πr²h tells you its height), a funnel is a cone, paint estimates for a room are total surface area minus doors and windows.</p>
+
           `,
           cards: [
             { q: 'Volume of a cone?', a: 'V = ⅓πr²h — one third of the cylinder with the same base and height. Total surface area = πr² + πrl, where l is the slant height.' },
@@ -1307,6 +1522,28 @@ const CURRICULUM = {
               <li>Writing BA when the equation AX = B requires A⁻¹B — matrix multiplication is not commutative.</li>
               <li>Assuming a singular matrix has an inverse; it does not.</li>
             </ul>
+            <h3>Deep dive: operations, determinant, inverse</h3>
+            <p>Matrices add only when the <b>orders match</b>; they multiply when the <b>inner orders agree</b> (2×3 times 3×2 gives 2×2), row into column. Multiplication is <b>not commutative</b>: AB ≠ BA in general.</p>
+            <p>For a 2×2 matrix A = [[a, b], [c, d]]: <b>determinant |A| = ad − bc</b>. If |A| = 0 the matrix is <b>singular</b> — no inverse exists. Otherwise:</p>
+            <div class="formula">A⁻¹ = 1/(ad − bc) × [[d, −b], [−c, a]] — swap a and d, negate b and c</div>
+            <h3>Worked example, step by step</h3>
+            <p><b>Solve 2x + 3y = 8 and x − y = 1 by the matrix method.</b></p>
+            <ol>
+              <li>Matrix form: [[2, 3], [1, −1]] [x, y]ᵀ = [8, 1]ᵀ.</li>
+              <li>|A| = (2)(−1) − (3)(1) = −5 (non-singular ✓).</li>
+              <li>A⁻¹ = (1/−5)[[−1, −3], [−1, 2]] = [[1/5, 3/5], [1/5, −2/5]].</li>
+              <li>[x, y]ᵀ = A⁻¹[8, 1]ᵀ → x = 8/5 + 3/5 = <b>11/5</b>, y = 8/5 − 2/5 = <b>6/5</b>.</li>
+              <li>Check: 2(11/5) + 3(6/5) = 40/5 = 8 ✓ and 11/5 − 6/5 = 1 ✓.</li>
+            </ol>
+            <h3>Examiner's traps</h3>
+            <ul>
+              <li>AB and BA are different matrices — order is everything.</li>
+              <li>A singular matrix (det = 0) has no inverse; spotting that early earns the mark for "explain why".</li>
+              <li>In the inverse formula, it is <b>−b and −c</b> that change sign, not the whole matrix.</li>
+            </ul>
+            <h3>See it around you</h3>
+            <p>Matrix multiplication powers the graphics in games and phone screens (rotation and scaling are matrices), and every simultaneous-equation balance sheet in business is a matrix in disguise.</p>
+
           `,
           cards: [
             { q: 'How do you find the determinant of a 2 x 2 matrix?', a: 'For rows (a, b) and (c, d), the determinant is ad - bc: multiply the leading diagonal, then subtract the product of the other diagonal.' },
