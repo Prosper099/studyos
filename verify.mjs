@@ -353,10 +353,38 @@ check('plainMath strips LaTeX so students never see raw markup', (() => {
   const out = T.plainMath('The root is $\\frac{-b}{2a}$ and area $= \\pi r^{2}$ \\times 2');
   return !/[$\\{}]/.test(out) && out.includes('(-b)/(2a)') && out.includes('r^2');
 })());
-check('every Biology topic has at least 15 flashcards', (() => {
-  for (const ts of Object.values(T.CURRICULUM.Biology.topics))
-    for (const t of ts) if ((t.cards || []).length < 15) return false;
+check('every topic in every subject has at least 15 flashcards', (() => {
+  for (const sv of Object.values(T.CURRICULUM))
+    for (const ts of Object.values(sv.topics))
+      for (const t of ts) if ((t.cards || []).length < 15) return false;
   return true;
+})());
+check('past questions open the CBT exam interface (one question at a time)', (() => {
+  const st = T.getState();
+  st.selectedSubject = 'Mathematics';
+  st.profile.subjects = ['Mathematics'];
+  T.startPastQuiz();
+  if (st.quiz.mode !== 'past' || st.quiz.examIdx !== 0) return false;
+  if (!st.quiz.questions.length) return false;
+  const before = st.quiz.examIdx;
+  T.examNext();
+  if (st.quiz.examIdx !== before + 1) return false;
+  T.examJump(9999);
+  if (st.quiz.examIdx !== st.quiz.questions.length - 1) return false;
+  T.examJump(-5);
+  if (st.quiz.examIdx !== 0) return false;
+  return true;
+})());
+check('submitExam submits the paper and records the past-drill feat', (() => {
+  const st = T.getState();
+  const qs = st.quiz.questions;
+  const first = qs[0];
+  st.quiz.answers[first.id] = first.correct;
+  const drillsBefore = st.tasks.pastDrills || 0;
+  T.submitExam();
+  return st.quiz.submitted === true
+    && st.quiz.result.total === qs.length
+    && (st.tasks.pastDrills || 0) === drillsBefore + 1;
 })());
 check('secret badges are flagged and hidden from the catalogue display', (() => {
   const secrets = T.BADGES.filter(b => b.secret);
@@ -761,10 +789,12 @@ check('quiz list offers the real past-question drill for banked subjects',
   && byId('page-content').innerHTML.includes('Real WAEC/JAMB past questions'));
 w.startPastQuiz();
 const pastQuiz = T.pastFor('Physics');
-check('past drill opens the embedded bank with per-question source badges', (() => {
+check('past drill opens the CBT exam hall with palette and source badge', (() => {
   const h = byId('page-content').innerHTML;
+  const first = T.getState().quiz.questions[0];
   return pastQuiz.length >= 7 && h.includes('Real past questions (WAEC/JAMB/NECO)')
-    && h.includes('JAMB 2025') && h.includes('Submit Answers');
+    && h.includes('Real exam simulation') && h.includes('Question palette')
+    && h.includes('Submit exam') && !!first && h.includes(first.src);
 })());
 pastQuiz.forEach(q => w.selectQuizAnswer(q.id, q.correct));
 await w.submitQuiz();

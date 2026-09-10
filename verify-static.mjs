@@ -155,6 +155,11 @@ check('streak flame overlay + animations present (card-free fade)',
 check('secret badges are hidden until earned, with a curiosity teaser',
   /BADGES\.filter\(b => !b\.secret \|\| state\.badges\.includes\(b\.id\)\)/.test(html)
   && /Secret badges/.test(html) && /badges found/.test(html));
+check('past questions run in a JAMB-style exam interface',
+  /function examJump/.test(html) && /function submitExam/.test(html)
+  && /Question palette/.test(html) && /Real exam simulation/.test(html)
+  && /examIdx: 0/.test(html)
+  && /examJump, examPrev, examNext, submitExam/.test(html));
 check('Internet Archive is on the resources shelf (EduPodia removed)',
   /archive\.org/.test(html) && !/edupodia/i.test(html));
 check('LaTeX sanitizer + prompt guard fix broken AI math text',
