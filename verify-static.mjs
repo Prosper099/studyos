@@ -112,7 +112,7 @@ const feature = [
   ['mobile drawer sidebar', /id="sidebar"[\s\S]*drawer[\s\S]*md:translate|id="sidebar"/],
   ['3D flip flashcard CSS', /\.flashcard\.flipped \.flashcard-inner \{ transform: rotateY\(180deg\); \}/],
   ['flashcard next/prev controls', /nextFlashcard\(\)[\s\S]*prevFlashcard\(\)|prevFlashcard\(\)[\s\S]*nextFlashcard\(\)/],
-  ['quiz explanations rendered', /Explanation<\/div>/],
+  ['quiz explanations rendered (with past-paper attribution badge)', /tracking-wide[^"]*">Explanation\$\{q\.src/],
   ['retake quiz option', /Retake Quiz|Retake \$\{subject\} Quiz|Retake/],
   ['Buddy chat interface', /id="chat-box"[\s\S]*id="chat-input"/],
   ['Buddy knowledge base entries', /const BUDDY_KB = \[/],
@@ -128,6 +128,14 @@ const feature = [
   ['profile badges section', /Badges &amp; streaks|Badges & streaks/]
 ];
 for (const [name, re] of feature) check(name, typeof re === 'boolean' ? re : re.test(html));
+
+// ---------- 4b. real past-question bank + content attribution ----------
+check('real past-question bank embedded with exam-body + year attribution',
+  /const PASTQ = \{/.test(html) && /src"?: "(WAEC|NECO|JAMB) (19|20)\d\d"/.test(html)
+  && /Open past question drill/.test(html) && /startPastQuiz\(\)/.test(html));
+check('open-licence attribution footer present (OpenStax CC BY 4.0 + question banks)',
+  /Content credits/.test(html) && /OpenStax/.test(html) && /CC BY 4\.0/.test(html)
+  && /smartest\.ng/.test(html) && /exambuddy\.com\.ng/.test(html));
 
 // ---------- 5. no leftover build artifacts ----------
 check('no leftover template placeholders', !/\{\{|\}\}|TODO|FIXME|lorem ipsum/i.test(html));

@@ -309,6 +309,24 @@ check('topicQuiz returns [] for topics without a quiz yet (mutated empty slot)',
   return empty && T.topicQuiz('Physics', 'SS3', 0).length === 10;
 })());
 check('mock exam bank keeps its own id namespace', T.quizFor('Mathematics')[0].id === 'mock-mat-0');
+check('real past-question bank covers the 5 core subjects with >= 7 questions each',
+  ['Mathematics', 'English Language', 'Physics', 'Chemistry', 'Biology'].every(s => (T.PASTQ[s] || []).length >= 7),
+  Object.entries(T.PASTQ).map(([k, v]) => `${k}=${v.length}`).join(', '));
+const pastBad = (() => {
+  for (const [subj, qs] of Object.entries(T.PASTQ)) {
+    for (const q of qs) {
+      if (q.options.length !== 4) return `${subj}: "${q.q.slice(0, 36)}" has ${q.options.length} options`;
+      if (!(q.correct >= 0 && q.correct <= 3)) return `${subj}: "${q.q.slice(0, 36)}" has bad key ${q.correct}`;
+      if (!/^(WAEC|NECO|JAMB) (19|20)\d\d$/.test(q.src || '')) return `${subj}: bad attribution "${q.src}"`;
+      if (!q.exp || q.exp.length < 25) return `${subj}: "${q.q.slice(0, 36)}" explanation too thin`;
+    }
+  }
+  return null;
+})();
+check('every embedded past question is well-formed and carries exam-body + year attribution', !pastBad,
+  pastBad || `${Object.values(T.PASTQ).reduce((a, v) => a + v.length, 0)} questions verified`);
+check('pastFor() keeps its own id namespace and injects ids into every question',
+  T.pastFor('Mathematics')[0].id === 'past-mat-0' && T.pastFor('English Language').every(q => q.id.startsWith('past-eng-')));
 check('cardsFor aggregates a whole level and tags each card with its topic', (() => {
   const all = T.cardsFor('Basic Science', 'JSS1');
   const one = T.cardsFor('Basic Science', 'JSS1', 'Matter, Its Properties & Changes');
@@ -690,6 +708,27 @@ check('header shows the chosen target exam', byId('header-exam-badge').textConte
 w.retakeQuiz();
 check('retake clears the submitted state', byId('page-content').innerHTML.includes('Submit Answers')
   && !byId('page-content').innerHTML.includes('Retake Quiz'));
+
+// real past-question drill (embedded WAEC/NECO/JAMB papers, fully offline)
+w.backToQuizList();
+check('quiz list offers the real past-question drill for banked subjects',
+  byId('page-content').innerHTML.includes('startPastQuiz()')
+  && byId('page-content').innerHTML.includes('Real WAEC/JAMB past questions'));
+w.startPastQuiz();
+const pastQuiz = T.pastFor('Physics');
+check('past drill opens the embedded bank with per-question source badges', (() => {
+  const h = byId('page-content').innerHTML;
+  return pastQuiz.length >= 7 && h.includes('Real past questions (WAEC/JAMB/NECO)')
+    && h.includes('JAMB 2025') && h.includes('Submit Answers');
+})());
+pastQuiz.forEach(q => w.selectQuizAnswer(q.id, q.correct));
+await w.submitQuiz();
+check('past drill grades and reveals official answers with paper attribution', (() => {
+  const h = byId('page-content').innerHTML;
+  return h.includes('Retake Quiz') && h.includes('WAEC 2016') && h.includes('Explanation');
+})());
+w.retakeQuiz();
+w.backToQuizList();
 
 // ---------- every page renders real markup ----------
 const page = () => byId('page-content').innerHTML;
