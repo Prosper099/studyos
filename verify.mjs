@@ -209,6 +209,36 @@ check('streak: 3-day gap → reset to 1', T.applyStreak(5, '2026-09-05', '2026-0
 check('streak: month boundary', T.applyStreak(4, '2026-08-31', '2026-09-01').streak === 5);
 check('streak: future/garbage date → 1', T.applyStreak(9, '2027-01-01', '2026-09-09').streak === 1
   && T.applyStreak(9, 'nonsense', '2026-09-09').streak === 1);
+check('streak freeze: gap consumes one freeze and keeps the streak', (() => {
+  const r = T.applyStreak(6, '2026-09-05', '2026-09-09', 1);
+  return r.streak === 6 && r.freezes === 0 && r.changed && r.event === 'saved';
+})());
+check('streak freeze: gap with no freeze resets to 1', (() => {
+  const r = T.applyStreak(6, '2026-09-05', '2026-09-09', 0);
+  return r.streak === 1 && r.freezes === 0 && r.event === 'reset';
+})());
+check('streak freeze: consecutive day leaves the freeze bank untouched', (() => {
+  const r = T.applyStreak(6, '2026-09-08', '2026-09-09', 2);
+  return r.streak === 7 && r.freezes === 2 && r.event === 'extend';
+})());
+check('streak freeze: brand-new user starts at Day 1 without spending a freeze', (() => {
+  const r = T.applyStreak(0, '', '2026-09-09', 2);
+  return r.streak === 1 && r.freezes === 2 && r.event === 'start';
+})());
+check('badge catalog: 10 badges incl. weekly, monthly and yearly streaks', T.BADGES.length === 10
+  && ['streak-7', 'streak-30', 'streak-365'].every(id => T.BADGES.some(b => b.id === id)));
+check('recordTask banks a freeze every 5 tasks (max 2) and awards badges', (() => {
+  const st = T.getState();
+  const snap = JSON.stringify([st.tasks, st.streakFreezes, st.badges]);
+  st.tasks = { quizzes: 0, perfects: 0, cards: 0, sessions: 0, tasksTotal: 4 };
+  st.streakFreezes = 0; st.badges = [];
+  T.recordTask('quiz', { percent: 100 });
+  const gotFreeze = st.streakFreezes === 1 && st.tasks.tasksTotal === 5;
+  const gotBadge = st.badges.includes('first-steps') && st.badges.includes('perfectionist');
+  const restored = JSON.parse(snap);
+  [st.tasks, st.streakFreezes, st.badges] = restored;
+  return gotFreeze && gotBadge;
+})());
 
 // ---------- quiz grading ----------
 const mathQuiz = T.quizFor('Mathematics');

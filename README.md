@@ -20,6 +20,10 @@ required. Open it in a browser and it runs.
 - **Flashcards with self-grading** — 302 topic-scoped recall cards with long explanatory
   answers, “✅ Got it!” / “🔁 Get it next time”, pass/fail animations, confetti on
   success, and an automatic retry pile for missed cards.
+- **Duolingo-style streaks** — a flame celebration on every new streak day, ❄️ streak
+  freezes earned from tasks (every 5 quizzes/flashcard sessions banks one, max 2; a
+  freeze shields a missed day, otherwise the streak resets), and a badge shelf with
+  task badges plus weekly (7), monthly (30) and yearly (365) streak badges.
 - **Study Buddy** — an on-device tutor with a built-in knowledge engine that can also
   research live on the internet (Wikipedia + DuckDuckGo APIs) when it doesn’t know
   something. Optional Gemini API key for deeper answers.
@@ -68,9 +72,9 @@ Without valid config the app still runs in Demo Mode with a banner.
 Three automated suites verify the build (Node 18+, no dependencies):
 
 ```bash
-node verify-static.mjs                  # markup/handler integrity (59 checks)
-node verify.mjs                         # full runtime harness, placeholder config (109)
-STUDYOS_REAL_CONFIG=1 node verify.mjs   # full runtime harness, real config (145)
+node verify-static.mjs                  # markup/handler integrity (63 checks)
+node verify.mjs                         # full runtime harness, placeholder config (115)
+STUDYOS_REAL_CONFIG=1 node verify.mjs   # full runtime harness, real config (151)
 node verify-degraded.mjs                # offline / no-Firestore behaviour (11)
 ```
 
