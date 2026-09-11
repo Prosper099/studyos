@@ -1,4 +1,4 @@
-STUDYOS — WHATSAPP COPY (honest preview edition)
+STUDYOS — WHATSAPP COPY (human edition)
 ==================================================
 Send these two messages, in this order. Link first, always.
 
@@ -7,17 +7,13 @@ MESSAGE 1 — link first + hook
 --------------------------------------------------
 https://studyos-academic.vercel.app/preview.html
 
-🧠 StudyOS Brain Check just landed — 10 questions, 10 minutes, instant score, and the confetti at 80% is real. It's a free preview project we're still building, so take it, flex it, and forward it to your rival. Every share helps the full app grow. 😌
+Look, I just took this 10-question brain check and I'm still thinking about my score 😂 10 minutes, it marks you instantly, and it's free. It's a small project some guys are building, so try it and send me your score. Winner buys nothing, it's just for bragging rights.
 
 --------------------------------------------------
-MESSAGE 2 — what is StudyOS + help us advertise
+MESSAGE 2 — what is StudyOS + help it grow
 --------------------------------------------------
-WHAT IS STUDYOS? 🚀
+For those asking what StudyOS is:
 
-A free Nigerian study companion, still in preview — and already loaded:
-✔ 83 topics with textbook-depth lessons & diagrams
-✔ 1,000+ exam-style questions + 1,200+ flashcards
-✔ Full CBT exam hall for JAMB, WAEC, NECO, Post-UTME & BECE practice
-✔ Streaks, badges & study plans that follow your weak areas
+It's a free study app for Nigerian students, still being built. The stuff already inside is actually crazy — full lessons with diagrams from JSS1 to SS3, over 1,000 exam questions, flashcards, and a mock exam hall that looks like the real JAMB CBT screen.
 
-100% free while we build. Take the Brain Check, share the link in every group you belong to, and help us advertise — every single share makes the full version arrive faster. 🙏
+It's free while they build it, and the only thing they ask is that if you like it, you share it. So I'm sharing it to you 😌 Drop it in one group chat — that's how it grows.
