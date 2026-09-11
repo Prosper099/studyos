@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>StudyOS — Free JAMB Readiness Check (10 questions, 10 minutes)</title>
-<meta name="description" content="Take the free 10-minute StudyOS readiness check: real JAMB/WAEC-style questions, instant score, subject breakdown. No sign-up needed." />
+<title>StudyOS Brain Check — 10 quick questions, 10 minutes</title>
+<meta name="description" content="The StudyOS Brain Check: 10 quick friendly questions, 10 minutes, instant score and subject breakdown. No sign-up needed." />
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="StudyOS" />
-<meta property="og:title" content="Free JAMB Readiness Check — 10 questions, 10 minutes" />
-<meta property="og:description" content="Take the free StudyOS readiness check: instant score, subject breakdown and a WhatsApp share button. No sign-up. 100% free." />
+<meta property="og:title" content="StudyOS Brain Check — 10 quick questions, 10 minutes" />
+<meta property="og:description" content="10 quick questions, 10 minutes, instant score with confetti if you smash it. No sign-up. 100% free. Beat your friends." />
 <meta property="og:url" content="https://studyos-academic.vercel.app/preview.html" />
 <meta property="og:image" content="https://studyos-academic.vercel.app/og.png" />
 <style>
@@ -90,8 +90,8 @@ function landing() {
   $('app').innerHTML =
     '<div class="brand"><div class="logo">📚</div><div><b>StudyOS</b><span>Nigeria&apos;s study companion</span></div></div>' +
     '<div class="hero">' +
-      '<span class="pill">🖥️ FREE CBT READINESS CHECK</span>' +
-      '<h1 style="margin-top:12px">How ready are you for JAMB?</h1>' +
+      '<span class="pill">🧠 FREE BRAIN CHECK</span>' +
+      '<h1 style="margin-top:12px">How sharp is your brain today?</h1>' +
       '<p>10 quick, friendly questions across six subjects. 10 easy minutes. Instant score with a subject-by-subject breakdown — no sign-up, no stress.</p>' +
       '<div class="stats">' +
         '<div class="stat"><b>10</b><span>easy questions</span></div>' +
@@ -114,7 +114,11 @@ function landing() {
 }
 
 function startExam() {
-  paper = shuffle(QS.slice()).slice(0, PICK);
+  paper = shuffle(QS.slice()).slice(0, PICK).map(function (q) {
+    var idx = [0, 1, 2, 3];
+    shuffle(idx);
+    return { s: q.s, q: q.q, e: q.e, o: idx.map(function (i) { return q.o[i]; }), c: idx.indexOf(q.c) };
+  });
   answers = {}; idx = 0; done = false; timeUp = false;
   startedAt = Date.now();
   deadline = Date.now() + MINUTES * 60000;
@@ -138,7 +142,7 @@ function prev() { if (idx > 0) { idx--; render(); } }
 function render() {
   var q = paper[idx];
   var html =
-    '<div class="hall"><span class="t">STUDYOS EXAM</span><span class="q">JAMB Readiness · Question ' + (idx + 1) + ' / ' + paper.length + '</span><span class="timer" id="tm">⏱ ' + fmt(deadline - Date.now()) + '</span></div>' +
+    '<div class="hall"><span class="t">STUDYOS BRAIN CHECK</span><span class="q">Round ' + (idx + 1) + ' / ' + paper.length + '</span><span class="timer" id="tm">⏱ ' + fmt(deadline - Date.now()) + '</span></div>' +
     '<div class="card">' +
       '<div><span class="subj-tag">' + esc(q.s) + '</span></div>' +
       '<p class="qtitle">' + esc(q.q) + '</p>' +
@@ -191,7 +195,7 @@ function finish() {
   var html =
     (timeUp ? '<div class="banner">⏰ Time&apos;s up! Your paper was submitted automatically.</div>' : '') +
     '<div class="card" style="text-align:center">' +
-      '<div style="font-size:11px;font-weight:900;letter-spacing:.1em;color:var(--ind)">🎯 YOUR READINESS SCORE</div>' +
+      '<div style="font-size:11px;font-weight:900;letter-spacing:.1em;color:var(--ind)">🎯 YOUR BRAIN SCORE</div>' +
       '<div class="big" style="color:' + (pct >= 60 ? 'var(--grn)' : 'var(--amb)') + '">' + pct + '%</div>' +
       '<p style="font-size:13px;font-weight:700;color:#334155">' + verdict + '</p>' +
       '<div class="kpis">' +
@@ -267,7 +271,7 @@ function shareWhatsApp() {
   var st = lastStats; if (!st) return;
   var link = location.href.split('#')[0];
   var msg =
-    '🖥️ *StudyOS Readiness Check*\n\n' +
+    '🧠 *StudyOS Brain Check*\n\n' +
     'I just scored *' + st.pct + '%* 🎉\n' +
     '✅ ' + st.correct + ' correct · ❌ ' + st.wrong + ' wrong · ➖ ' + st.blank + ' blank\n' +
     '💪 Strongest: ' + st.strong + '\n' +

@@ -36,13 +36,18 @@ ok('landing offers the easy check', store.app.innerHTML.includes('Start the chec
 
 mod.startExam();
 ok('paper is 10 questions', mod.paper.length === 10, 'got ' + mod.paper.length);
-ok('exam hall header renders', store.app.innerHTML.includes('STUDYOS EXAM') && store.app.innerHTML.includes('Question 1 / 10'));
+ok('exam hall header renders', store.app.innerHTML.includes('STUDYOS BRAIN CHECK') && store.app.innerHTML.includes('Round 1 / 10'));
+{
+  const tally = [0, 0, 0, 0];
+  for (let r = 0; r < 300; r++) { mod.startExam(); mod.paper.forEach(q => tally[q.c]++); }
+  ok('correct answers spread across A-D, not stuck at A/B', tally.every(n => n > 600), JSON.stringify(tally));
+}
 
 // 6 correct, 1 wrong, 3 blank => 60%
 for (let i = 0; i < 6; i++) { mod.pick(mod.paper[i].c); mod.next(); }
 mod.pick((mod.paper[6].c + 1) % 4);
 mod.go(2); mod.go(6);
-ok('navigator jump works', store.app.innerHTML.includes('Question 7 / 10'));
+ok('navigator jump works', store.app.innerHTML.includes('Round 7 / 10'));
 mod.confirmFinish();
 
 const html = store.app.innerHTML;
@@ -60,7 +65,7 @@ mod.shareWhatsApp();
 const wa = global.location.href;
 ok('share opens WhatsApp', wa.startsWith('https://wa.me/?text='), wa.slice(0, 40));
 const decoded = decodeURIComponent(wa.slice('https://wa.me/?text='.length));
-for (const needle of ['*StudyOS Readiness Check*', '*60%*', '✅ 6 correct', '❌ 1 wrong', '➖ 3 blank', 'Strongest:', 'To improve:', 'preview.html']) {
+for (const needle of ['*StudyOS Brain Check*', '*60%*', '✅ 6 correct', '❌ 1 wrong', '➖ 3 blank', 'Strongest:', 'To improve:', 'preview.html']) {
   ok('wa template includes: ' + needle, decoded.includes(needle));
 }
 ok('wa template has emoji + line breaks', decoded.includes('\n') && decoded.includes('🎉'));
