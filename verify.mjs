@@ -225,9 +225,10 @@ check('streak freeze: brand-new user starts at Day 1 without spending a freeze',
   const r = T.applyStreak(0, '', '2026-09-09', 2);
   return r.streak === 1 && r.freezes === 2 && r.event === 'start';
 })());
-check('badge catalog: 26 badges incl. streaks, focus family and exam badges', T.BADGES.length === 26
+check('badge catalog: 76 badges (59 secret) incl. streaks, focus family and exam badges', T.BADGES.length === 76
+  && T.BADGES.filter(b => b.secret).length === 59
   && ['streak-7', 'streak-30', 'streak-365'].every(id => T.BADGES.some(b => b.id === id)));
-check('recordTask banks a freeze every 5 tasks (max 2) and awards badges', (() => {
+check('recordTask banks a freeze every 5 tasks (max 10) and awards badges', (() => {
   const st = T.getState();
   const snap = JSON.stringify([st.tasks, st.streakFreezes, st.badges]);
   st.tasks = { quizzes: 0, perfects: 0, cards: 0, sessions: 0, tasksTotal: 4 };

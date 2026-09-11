@@ -153,8 +153,8 @@ check('streak flame overlay + animations present (card-free fade)',
   /id="streak-flame"/.test(html) && /flameRise/.test(html) && /flame-flicker/.test(html)
   && /showStreakFlame/.test(html) && /pointer-events-none fixed inset-0 z-\[70\]/.test(html));
 check('secret badges are hidden until earned, with a curiosity teaser',
-  /BADGES\.filter\(b => !b\.secret \|\| state\.badges\.includes\(b\.id\)\)/.test(html)
-  && /Secret badges/.test(html) && /badges found/.test(html));
+  /b\.secret && !earned\.includes\(b\.id\)/.test(html)
+  && /A secret badge\. Keep exploring/.test(html) && /badges found/.test(html));
 check('past questions run in a JAMB-style exam interface',
   /function examJump/.test(html) && /function submitExam/.test(html)
   && /Question palette/.test(html) && /Real exam simulation/.test(html)
