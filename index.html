@@ -12899,10 +12899,24 @@ function startPastQuiz() {
   state.quiz = { answers: {}, submitted: false, score: 0, result: null, mode: 'past', level: '', topicIdx: 0, topicTitle: '',
     questions: buildQuiz(state.selectedSubject, 'past'), deadline: quizDeadline(), examIdx: 0 };
   state.page = 'quiz';
+  armBackGuard();
   renderPage();
 }
 
 /** Mixed subject-wide exam practice (the revision bank). */
+/** How many questions the bank actually holds for one subject at one class level. */
+function examPoolSize(sub, classLevel) {
+  const s = CURRICULUM[sub];
+  if (!s) return 0;
+  let n = (quizFor(sub) || []).length + (pastFor(sub) || []).length;
+  ((s.topics || {})[classLevel] || []).forEach(t => { n += (t.quiz || []).length; });
+  return n;
+}
+/** The real per-subject paper size: wanted count, capped by the bank. */
+function examSubjectCount(sub, p) {
+  const avail = examPoolSize(sub, p.classLevel);
+  return Math.min(Math.max(5, (p.counts || {})[sub] || p.count), Math.max(avail, 1));
+}
 /** Effective CBT preferences: saved prefs topped up from the student's profile. */
 function effectiveExamPrefs() {
   const p = state.examPrefs || {};
@@ -12941,7 +12955,8 @@ function toggleExamSubject(sub) {
 function setExamCount(sub, n) {
   const p = state.examPrefs;
   p.counts = p.counts || {};
-  p.counts[sub] = Math.max(5, Math.min(40, Number(n) || 20));
+  const avail = examPoolSize(sub, effectiveExamPrefs().classLevel);
+  p.counts[sub] = Math.min(Math.max(5, Number(n) || 20), Math.max(avail, 1));
   persistProgress(); renderPage();
 }
 function setExamDefaultCount(n) { state.examPrefs.count = Math.max(5, Math.min(40, Number(n) || 20)); persistProgress(); renderPage(); }
@@ -12951,7 +12966,7 @@ function toggleCustomExam() { state.examCustomOpen = !state.examCustomOpen; rend
 function cbtSetupHtml() {
   const p = effectiveExamPrefs();
   const saved = state.examPrefs || {};
-  const totalQ = p.subjects.reduce((a, sub) => a + Math.max(5, Math.min(40, (p.counts || {})[sub] || p.count)), 0);
+  const totalQ = p.subjects.reduce((a, sub) => a + examSubjectCount(sub, p), 0);
   const summary = `${p.classLevel} · ${p.examType} · ${p.subjects.length} subject${p.subjects.length === 1 ? '' : 's'} · ${totalQ} questions · ${p.minutes > 0 ? p.minutes + ' min' : 'no timer'}`;
   if (!state.examCustomOpen) {
     return `
@@ -12993,13 +13008,13 @@ function cbtSetupHtml() {
       </div>
       <div>
         <div class="text-[11px] font-black uppercase tracking-wide text-slate-500">4 · Questions per subject</div>
-        <div class="mt-1.5 grid gap-2 sm:grid-cols-2">${p.subjects.map(sub => { const n = (p.counts || {})[sub] || p.count; return `
+        <div class="mt-1.5 grid gap-2 sm:grid-cols-2">${p.subjects.map(sub => { const avail = examPoolSize(sub, p.classLevel); const max = Math.max(5, avail); const n = Math.min((p.counts || {})[sub] || p.count, max); return `
           <div class="flex items-center justify-between rounded-xl bg-slate-50 px-3 py-2">
-            <span class="text-xs font-bold text-slate-700">${sub}</span>
+            <span class="text-xs font-bold text-slate-700">${sub} <span class="text-[9px] font-bold text-slate-400">(${avail} in bank)</span></span>
             <span class="flex items-center gap-2">
-              <button type="button" onclick="setExamCount('${sub}', ${n - 5})" class="h-6 w-6 rounded-lg bg-white text-xs font-black text-slate-600 ring-1 ring-inset ring-slate-200 transition hover:bg-slate-100">−</button>
+              <button type="button" onclick="setExamCount('${sub}', ${n - 5})" ${n <= 5 ? 'disabled' : ''} class="h-6 w-6 rounded-lg bg-white text-xs font-black text-slate-600 ring-1 ring-inset ring-slate-200 transition hover:bg-slate-100 disabled:opacity-30">−</button>
               <span class="w-7 text-center text-xs font-black text-indigo-700">${n}</span>
-              <button type="button" onclick="setExamCount('${sub}', ${n + 5})" class="h-6 w-6 rounded-lg bg-white text-xs font-black text-slate-600 ring-1 ring-inset ring-slate-200 transition hover:bg-slate-100">+</button>
+              <button type="button" onclick="setExamCount('${sub}', ${n + 5})" ${n >= max ? 'disabled' : ''} class="h-6 w-6 rounded-lg bg-white text-xs font-black text-slate-600 ring-1 ring-inset ring-slate-200 transition hover:bg-slate-100 disabled:opacity-30">+</button>
             </span>
           </div>`; }).join('') || '<p class="text-[11px] text-slate-400">Pick at least one subject above.</p>'}</div>
       </div>
@@ -13049,6 +13064,7 @@ function startCbtExam() {
     meta: { classLevel: p.classLevel, examType: p.examType, subjects: p.subjects.slice(), minutes: p.minutes }
   };
   state.page = 'quiz';
+  armBackGuard();
   renderPage();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -13205,6 +13221,7 @@ function startTopicQuiz(subject, title) {
   state.quiz = { answers: {}, submitted: false, score: 0, result: null, mode: 'topic', level, topicIdx: ti, topicTitle: title,
     questions: buildQuiz(subject, 'topic', level, ti), deadline: quizDeadline() };
   state.page = 'quiz';
+  armBackGuard();
   renderPage();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -13212,7 +13229,25 @@ function startMockQuiz() {
   state.quiz = { answers: {}, submitted: false, score: 0, result: null, mode: 'mock', level: '', topicIdx: 0, topicTitle: '',
     questions: buildQuiz(state.selectedSubject, 'mock'), deadline: quizDeadline() };
   state.page = 'quiz';
+  armBackGuard();
   renderPage();
+}
+function exitCbtExam() {
+  const qz = state.quiz;
+  if (qz && qz.mode === 'cbt' && !qz.submitted && !confirm('Leave this exam? Your progress on this paper will be lost.')) return;
+  stopQuizTimer();
+  backToQuizList();
+}
+/* Phone/browser Back button: leave the open quiz first, then the page — it used to do nothing. */
+function armBackGuard() {
+  try { if (window.history && window.history.pushState) window.history.pushState({ studyosQuiz: 1 }, ''); } catch (e) { /* no history API */ }
+}
+if (typeof window !== 'undefined' && window.addEventListener) {
+  window.addEventListener('popstate', () => {
+    const qz = state.quiz;
+    if (state.page === 'quiz' && qz && qz.mode !== 'list' && !qz.submitted) { stopQuizTimer(); backToQuizList(); return; }
+    if (state.page !== 'home') { state.page = 'home'; closeDrawer(); renderPage(); }
+  });
 }
 function backToQuizList() {
   state.quiz = { answers: {}, submitted: false, score: 0, result: null, mode: 'list', level: '', topicIdx: 0, topicTitle: '' };
@@ -13880,6 +13915,7 @@ function renderQuiz(el) {
     el.innerHTML = `
       <div class="mb-4 rounded-2xl bg-slate-900 p-4 text-white shadow-card animate-fadeUp">
         <div class="flex flex-wrap items-center gap-x-6 gap-y-2">
+          <button type="button" onclick="exitCbtExam()" class="rounded-lg bg-white/10 px-2.5 py-1 text-[10px] font-bold text-slate-200 transition hover:bg-white/20" title="Leave the exam">✕ Exit</button>
           <div class="text-sm font-black tracking-widest">STUDYOS EXAM</div>
           <div class="text-[11px] font-bold text-slate-300">${(qz.meta || {}).examType || 'Practice'} · ${(qz.meta || {}).classLevel || level}</div>
           <div class="ml-auto flex items-center gap-3">
@@ -15401,7 +15437,7 @@ Object.assign(window, {
   handleGoogleSignIn, handleLogout, startDemoMode,
   openOnboarding, reopenOnboarding, pickOnboardOption, toggleOnboardSubject,
   onboardBack, onboardNext, markLessonDone, openSetup, closeSetup, copyRules,
-  startCbtExam, toggleCustomExam, setExamClass, setExamType, toggleExamSubject, setExamCount, setExamDefaultCount,
+  startCbtExam, toggleCustomExam, setExamClass, setExamType, toggleExamSubject, setExamCount, setExamDefaultCount, exitCbtExam,
   setExamMinutes, toggleMarkReview, reviewMistakesScroll, planFromExam, quizTimerTick,
   flipFlashcard, nextFlashcard, prevFlashcard, gotoFlashcard,
   markGot, markLater, setFlashFilter, restartFlash, dismissCelebration,

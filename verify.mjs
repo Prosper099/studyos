@@ -48,6 +48,7 @@ check('onboarding steps 1-3 in DOM', ['step-1', 'step-2', 'step-3'].every(id => 
 check('all 7 nav pages present', ['home', 'study', 'resources', 'flashcards', 'quiz', 'assistant', 'profile']
   .every(p => html.includes(`data-page="${p}"`)));
 check('sidebar drawer markup', html.includes('id="sidebar"') && html.includes('id="sidebar-overlay"'));
+check('browser Back (popstate) handler registered', /addEventListener\('popstate'/.test(code));
 
 // --- stub out only the network imports, keep ALL app code -------------------
 const stubDir = path.join(root, '.verify');
@@ -936,8 +937,20 @@ w.setExamClass('SS3');
 w.setExamType('JAMB UTME');
 w.toggleExamSubject('Physics');
 w.toggleExamSubject('Chemistry');
+w.setExamCount('Physics', 40);
+{
+  const shown = (T.getState().examPrefs.counts || {}).Physics;
+  const bank = page().match(/Physics <span[^>]*>\((\d+) in bank\)/);
+  check('questions-per-subject caps at the real question bank', bank && shown <= Number(bank[1]),
+    'shown=' + shown + ' bank=' + (bank ? bank[1] : '?'));
+}
 w.setExamCount('Physics', 10);
 w.setExamMinutes(30);
+w.startCbtExam();
+check('exam hall has an Exit button', page().includes('exitCbtExam()'));
+w.exitCbtExam();
+check('Exit returns to the exam setup page', T.getState().quiz.mode === 'list'
+    && (page().includes('Quick Start') || page().includes('Configure your exam')));
 w.startCbtExam();
 {
   const qz = T.getState().quiz;
