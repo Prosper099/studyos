@@ -380,7 +380,7 @@ check('deep-lesson batches: all deepened lessons reach textbook depth', (() => {
       JSS3: ['Business Mathematics: Profit, Loss, Discount & Interest']
     },
     'English Language': {
-      JSS1: ['Sentence Structure & Composition', 'Oral English: Vowels, Consonants & Stress']
+      JSS1: ['Sentence Structure & Composition', 'Oral English: Vowels, Consonants & Stress', 'Comprehension & Summary Basics', 'Parts of Speech']
     }
   };
   for (const [subj, levels] of Object.entries(spec))
