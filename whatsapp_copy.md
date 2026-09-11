@@ -7,7 +7,7 @@ MESSAGE 1 — link first + hook
 --------------------------------------------------
 https://studyos-academic.vercel.app/preview.html
 
-I have been quietly building something and it is finally ready to show 😅 It is called StudyOS, and this is the Brain Check — 10 questions, 10 minutes, instant score, totally free. Take it and chat me up with your reviews: what you liked, what to fix, what to add next. I read every single message.
+Try my brain check 😌 10 questions, 10 minutes, instant score, totally free. When you are done, chat me up with your review — what you liked, what to fix, what to add next. I read every single message. And if your score is bad, do not worry, I will pretend I did not see it 😂
 
 --------------------------------------------------
 MESSAGE 2 — what is StudyOS + chat me up
