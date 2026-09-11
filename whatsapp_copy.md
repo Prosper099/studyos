@@ -7,7 +7,7 @@ MESSAGE 1 — link first + hook
 --------------------------------------------------
 https://studyos-academic.vercel.app/preview.html
 
-Try my brain check 😌 10 questions, 10 minutes, instant score, totally free. And if your score is bad, do not worry, I will pretend I did not see it 😂
+Try my brain check 😌 10 questions, 10 minutes, instant score, totally free.
 
 --------------------------------------------------
 MESSAGE 2 — what is StudyOS + chat me up
