@@ -47,7 +47,7 @@
 <style>
   /* ---------- Inline CSS tweaks that Tailwind CDN cannot express ---------- */
   html, body { height: 100%; }
-  body { overscroll-behavior-y: none; }
+  body { overscroll-behavior-y: none; overflow-x: hidden; }
 
   /* Mobile drawer: off-canvas below md, static rail from md up */
   .drawer { transform: translateX(-100%); }
@@ -385,7 +385,7 @@ service cloud.firestore {
   <!-- Sidebar / mobile drawer -->
   <aside id="sidebar"
     class="drawer fixed inset-y-0 left-0 z-30 flex w-[17rem] flex-col justify-between bg-slate-900 p-4 text-slate-300 transition-transform duration-300 ease-in-out">
-    <div class="min-h-0">
+    <div class="min-h-0 flex-1 overflow-y-auto pr-1">
       <div class="mb-7 flex items-center justify-between px-2">
         <span class="flex items-center gap-2 text-xl font-bold tracking-tight text-white">
           <span class="inline-flex h-8 w-8 shrink-0"><svg class="h-8 w-8" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect x="3" y="3" width="42" height="42" rx="12" fill="url(#lg-book3)"/><path d="M24 15.4c-2.6-2.1-6-3.2-9.6-3.2-1.3 0-2.4 1.1-2.4 2.4v16.6c0 1.3 1.1 2.4 2.4 2.4 3.6 0 7 1.1 9.6 3.2 2.6-2.1 6-3.2 9.6-3.2 1.3 0 2.4-1.1 2.4-2.4V14.6c0-1.3-1.1-2.4-2.4-2.4-3.6 0-7 1.1-9.6 3.2Z" fill="#fff" fill-opacity=".95"/><path d="M24 15.4v21.4" stroke="#6366f1" stroke-width="1.6" stroke-linecap="round"/><path d="M33.5 8.5v11l-2.6-2-2.6 2v-11h5.2Z" fill="#f59e0b"/><defs><linearGradient id="lg-book3" x1="3" y1="3" x2="45" y2="45" gradientUnits="userSpaceOnUse"><stop stop-color="#4f46e5"/><stop offset="1" stop-color="#312e81"/></linearGradient></defs></svg></span>
@@ -431,7 +431,7 @@ service cloud.firestore {
       </nav>
     </div>
 
-    <div class="mt-4 space-y-2">
+    <div class="mt-4 shrink-0 space-y-2">
       <div class="flex items-center justify-between rounded-xl bg-slate-800/60 p-3">
         <span class="text-xs text-slate-400">🔥 Study streak</span>
         <span id="streak-count" class="text-xs font-bold text-orange-400">0 days</span>
@@ -7112,75 +7112,115 @@ Ada eventually saved enough to buy her mother a gift and returned home proud." (
           tags: ['Drawing instruments', 'Line conventions', 'Title block'],
           summary: 'The tools of the drawing board, the standard line types, and how to lay out a sheet properly.',
           content: `
-            <h3>1. Why technical drawing matters</h3>
-            <p>A technical drawing is the <b>universal language of the workshop</b>. A carpenter, an engineer and an architect in different countries can read the same drawing without speaking the same language, because the conventions are standardised.</p>
-            <h3>2. Common drawing instruments</h3>
+            <h3>1. Technical drawing: the engineer&apos;s language</h3>
+            <p><b>Technical drawing</b> is the neat, accurate drawing engineers, architects and craftsmen use to describe objects so exactly that a stranger can build the object from the drawing alone. That is why it is called the <b>universal language of engineers</b> — a drawing made in Lagos can be read in Tokyo without a single spoken word. Unlike artistic drawing (which expresses feelings and allows personal style), technical drawing obeys strict rules: true proportions, standard lines, standard lettering and standard sheet layouts.</p>
+            <ul>
+              <li>Artistic drawing = expression; technical drawing = <b>exact information</b>.</li>
+              <li>Every line on a technical drawing means something specific — that is the grammar of the language.</li>
+              <li>Exams test three blocks here: <b>instruments and their uses</b>, <b>types of lines</b>, and <b>lettering/sheet layout</b>.</li>
+            </ul>
+
+            <h3>2. The instruments and exactly what each one does</h3>
             <table>
               <tr><th>Instrument</th><th>Use</th></tr>
-              <tr><td>T-square</td><td>Drawing horizontal lines and supporting set squares</td></tr>
-              <tr><td>Set squares (45° and 30°/60°)</td><td>Vertical and inclined lines</td></tr>
-              <tr><td>Compass</td><td>Circles and arcs</td></tr>
-              <tr><td>Dividers</td><td>Stepping off and transferring equal distances</td></tr>
-              <tr><td>Protractor</td><td>Measuring and setting angles</td></tr>
-              <tr><td>Scale rule</td><td>Measuring to a reduced or enlarged scale</td></tr>
-              <tr><td>French curve</td><td>Irregular curves that a compass cannot draw</td></tr>
+              <tr><td>Drawing board</td><td>smooth flat surface; paper is taped to it</td></tr>
+              <tr><td>T-square</td><td>draws horizontal lines; guides the set squares</td></tr>
+              <tr><td>Set squares (45° and 30°/60°)</td><td>draw vertical and inclined lines at exact angles</td></tr>
+              <tr><td>Compass</td><td>draws circles and arcs; steps off equal distances</td></tr>
+              <tr><td>Dividers</td><td>transfers and divides distances (no pencil leg)</td></tr>
+              <tr><td>Protractor</td><td>measures and sets angles in degrees</td></tr>
+              <tr><td>Scale rule</td><td>measures and draws to reduced/enlarged ratios</td></tr>
+              <tr><td>French curves</td><td>draws smooth non-circular curves</td></tr>
+              <tr><td>Pencils (H, HB)</td><td>H (hard) for light construction lines; HB for finishing outlines</td></tr>
+              <tr><td>Drawing paper + tape/clips</td><td>the sheet itself, held flat at the corners</td></tr>
             </table>
-            <h3>3. Standard line conventions</h3>
+            <div class="formula">TRAP: horizontal lines come from the T-square; vertical lines come from a set square resting ON the T-square. "Which instrument draws horizontal lines?" → T-square, not set square.</div>
+
+            <h3>3. Caring for drawing instruments</h3>
+            <ul>
+              <li>Keep the T-square and set squares flat — never bend them or hang them on nails.</li>
+              <li>Do not cut or score paper on the board with a blade against the T-square&apos;s working edge.</li>
+              <li>Keep the compass joint firm but smooth; a wobbling compass draws drunken circles.</li>
+              <li>Sharpen pencils to a chisel or conical point and keep them away from the clean sheet.</li>
+              <li>Clean instruments after use and return them to the box or case — lost dividers are a rite of passage nobody wants.</li>
+            </ul>
+
+            <h3>4. Types of lines and what each one says</h3>
             <table>
-              <tr><th>Line type</th><th>Meaning</th></tr>
-              <tr><td>Continuous thick</td><td>Visible outline or edge</td></tr>
-              <tr><td>Continuous thin</td><td>Dimension, extension and hatch lines</td></tr>
-              <tr><td>Short dashed</td><td>Hidden detail</td></tr>
-              <tr><td>Long-short-long (chain)</td><td>Centre line or axis of symmetry</td></tr>
-              <tr><td>Long-short-long with thick ends</td><td>Cutting plane</td></tr>
+              <tr><th>Line</th><th>Look</th><th>Meaning</th></tr>
+              <tr><td>Outline (object line)</td><td>thick continuous</td><td>the visible edges of the object</td></tr>
+              <tr><td>Hidden line</td><td>short dashes, medium</td><td>edges you cannot see from this view</td></tr>
+              <tr><td>Centre line</td><td>long-short-long chain, thin</td><td>axes of circles and symmetry</td></tr>
+              <tr><td>Dimension line</td><td>thin, arrows at ends</td><td>carries the measurement number</td></tr>
+              <tr><td>Extension (projection) line</td><td>thin, sticks out from the object</td><td>shows what the dimension line measures</td></tr>
+              <tr><td>Leader line</td><td>thin, slanted with arrow + note</td><td>points a note at a feature</td></tr>
+              <tr><td>Hatching</td><td>thin 45° parallel lines</td><td>cut surfaces in sections</td></tr>
+              <tr><td>Border line</td><td>thick continuous frame</td><td>frames the working area of the sheet</td></tr>
             </table>
-            <div class="warn"><b>Exam trap:</b> students lose marks by drawing hidden edges with a continuous line, or by drawing centre lines with a dashed line. Learn the five conventions above by heart.</div>
-            <h3>4. Lettering and the title block</h3>
-            <p>Lettering must be <b>single-stroke, upright or inclined at 60° to 75°, and of consistent height</b>. Never use cursive writing.</p>
-            <p>The <b>title block</b> sits in the bottom right corner and records the title of the drawing, the draughtsman, the date, the scale used and the projection method.</p>
-            <h3>5. Scales</h3>
-            <div class="formula">Scale = drawing length ÷ actual length<br>
-            Reducing scale 1:50  →  1 cm on paper = 50 cm in real life<br>
-            Enlarging scale 5:1  →  5 cm on paper = 1 cm in real life</div>
-            <div class="worked"><b>Worked example:</b> A room 6 m long is drawn to a scale of 1:100.<br>
-            Drawing length = 600 cm ÷ 100 = <b>6 cm</b>.</div>
-            <h3>6. Care of instruments</h3>
+            <div class="diagram"><svg viewBox="0 0 460 190" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Line specimen chart: outline thick solid, hidden dashed, centre chain, dimension with arrows, hatching at 45 degrees, each labelled">
+              <rect x="8" y="8" width="444" height="174" rx="10" fill="#f8fafc" stroke="#0f172a" stroke-width="3"/>
+              <line x1="30" y1="40" x2="200" y2="40" stroke="#0f172a" stroke-width="4"/><text x="215" y="44" font-size="10" fill="#0f172a" font-weight="700">OUTLINE — visible edges</text>
+              <line x1="30" y1="70" x2="200" y2="70" stroke="#334155" stroke-width="2.5" stroke-dasharray="8 5"/><text x="215" y="74" font-size="10" fill="#0f172a" font-weight="700">HIDDEN — unseen edges</text>
+              <line x1="30" y1="100" x2="200" y2="100" stroke="#334155" stroke-width="1.5" stroke-dasharray="14 4 3 4"/><text x="215" y="104" font-size="10" fill="#0f172a" font-weight="700">CENTRE — axes &amp; symmetry</text>
+              <line x1="30" y1="130" x2="200" y2="130" stroke="#334155" stroke-width="1.2"/><path d="M30 130 l8 -4 v8 z M200 130 l-8 -4 v8 z" fill="#334155"/><text x="215" y="134" font-size="10" fill="#0f172a" font-weight="700">DIMENSION — carries the size</text>
+              <g stroke="#64748b" stroke-width="1.2"><line x1="30" y1="168" x2="52" y2="148"/><line x1="44" y1="168" x2="66" y2="148"/><line x1="58" y1="168" x2="80" y2="148"/><line x1="72" y1="168" x2="94" y2="148"/><line x1="86" y1="168" x2="108" y2="148"/><line x1="100" y1="168" x2="122" y2="148"/></g><text x="215" y="162" font-size="10" fill="#0f172a" font-weight="700">HATCHING — cut surfaces at 45°</text>
+            </svg></div>
+
+            <h3>5. Lettering: the handwriting of engineers</h3>
             <ul>
-              <li>Keep pencils sharp with a blade or a proper sharpener, and wipe the point on a cloth.</li>
-              <li>Never use the compass point to prick the paper beyond what is needed.</li>
-              <li>Store instruments in their case; a bent T-square ruins every line on the sheet.</li>
+              <li>Technical lettering is <b>single-stroke Gothic</b> — each letter is drawn in one even weight of line, upright or sloped at about 75°.</li>
+              <li>Letters must be <b>uniform in height and spacing</b>; guide lines are drawn lightly first and erased after.</li>
+              <li>Common heights: 3.5 mm to 5 mm for notes; bigger for titles. Capitals are preferred for labels.</li>
+              <li>Why it matters: a drawing is a legal-ish document — a misread 3 as an 8 can change a size by millimetres and ruin a part.</li>
+              <li>Practise rule: draw letters with single confident strokes; never &apos;paint&apos; them in with repeated rubbing.</li>
+              <li>Space check: the gaps between words should be about the width of one letter; crowded words read like one long word.</li>
             </ul>
-            <h3>Common mistakes</h3>
+            <div class="worked"><b>Worked example (exam style):</b> "State two qualities of good lettering." → uniform height, uniform spacing, clean single strokes, consistent slope. Any two score.</div>
+
+            <h3>6. Sheet layout: borders and the title block</h3>
             <ul>
-              <li>Using a ruler instead of a T-square for horizontal lines, so lines are not parallel.</li>
-              <li>Pressing too hard and scoring the paper.</li>
-              <li>Leaving construction lines dark instead of erasing or leaving them faint.</li>
+              <li>Every sheet gets a <b>border line</b> leaving a margin (about 10 mm; wider on the binding edge).</li>
+              <li>The <b>title block</b> sits at the bottom-right corner and carries: drawing title, designer&apos;s name, sheet number, scale, date, and sometimes the institution or company.</li>
+              <li><b>Scale</b> states the ratio of drawing to reality: 1:1 full size, 1:2 reduced, 2:1 enlarged. A 600 mm desk drawn 1:10 becomes 60 mm on paper.</li>
             </ul>
-            <h3>Deep dive: drawing is the language of engineers</h3>
-            <p>A technical drawing communicates shape, size and assembly exactly — no words needed, anywhere in the world. The essential kit:</p>
+            <div class="formula">TRAP: scale 1:50 means 1 unit on paper = 50 units in real life — the SMALLER number belongs to the paper. Reading it backwards makes buildings fit in shoeboxes.</div>
+
+            <h3>7. Keeping drawings clean and accurate</h3>
             <ul>
-              <li><b>Drawing board &amp; T-square</b> — the board gives a flat surface; the T-square draws all <b>horizontal</b> lines.</li>
-              <li><b>Set squares</b> — 45° and 30°/60°; resting on the T-square they give verticals and angled lines.</li>
-              <li><b>Compass</b> — circles and arcs; <b>divider</b> — stepping off equal distances.</li>
-              <li><b>Protractor</b> — measuring and setting angles.</li>
-              <li><b>Pencils</b> — H (hard, for light construction lines), HB (general), 2B (dark final outlines).</li>
+              <li>Work from the centre outwards and from top to left-to-right so your hand never drags over fresh lines.</li>
+              <li>Construction lines stay LIGHT (2H/H); only final outlines get darkened (HB).</li>
+              <li>One clean erasure beats five smudged corrections; shield the rest of the sheet while erasing.</li>
+              <li>Check twice: every circle has its centre line, every hidden edge its dashes, every size its dimension.</li>
             </ul>
-            <h3>Standard line types and what they mean</h3>
+
+            <h3>8. Three constructions you can do right now</h3>
             <ul>
-              <li><b>Thick continuous</b> — visible outlines and edges.</li>
-              <li><b>Thin continuous</b> — construction and dimension lines.</li>
-              <li><b>Short dashes</b> — <b>hidden</b> edges (features you cannot see from that side).</li>
-              <li><b>Chain line (long-short-long)</b> — centre lines and axes of symmetry.</li>
+              <li><b>Parallel horizontal lines:</b> slide the T-square up the board&apos;s left edge, lock it, and draw along its top edge at each height. Every line is parallel to the last — the board&apos;s edge is the reference.</li>
+              <li><b>Vertical and 45° lines:</b> rest a set square on the T-square&apos;s blade; draw along the set square&apos;s vertical edge for 90°, or along the hypotenuse of the 45° square for 45°. Sliding the set square along a locked T-square gives evenly spaced verticals.</li>
+              <li><b>A circle with centre lines:</b> mark the centre, draw a light horizontal and vertical centre line through it (chain thin), set the compass radius, place the needle exactly on the centre, and sweep once with a slight forward lean. Darken only the circle.</li>
             </ul>
-            <h3>Lettering and the title block</h3>
-            <p>Lettering is <b>single-stroke, upright (or 60° inclined), uppercase</b>, evenly spaced — free-hand wobble has no place on a drawing. Every drawing carries a <b>title block</b> (bottom corner): title of the drawing, scale used, date, draughtsman's name and class. Scale (e.g. 1:50) tells the reader how the drawing size relates to the real object.</p>
-            <h3>Exam watch</h3>
+            <div class="worked"><b>Worked example:</b> "Draw two horizontal lines 20 mm apart and join them with a vertical." → lock T-square, draw line 1; slide up 20 mm using the scale on the square or rule; draw line 2; rest the 45°/60° square&apos;s vertical edge on the T-square and connect. Three instruments, one neat rectangle. Notice the order again: light construction first, check the size, then darken the final lines — neatness is not decoration, it is information.</div>
+
+            <h3>9. Try these (with answers)</h3>
             <ul>
-              <li>Hidden edges use <b>dashed</b> lines; centre lines use the <b>chain</b> line — mixing them is the commonest fault.</li>
-              <li>Keep construction lines light (H pencil); only final outlines go dark.</li>
-              <li>A drawing without a title block is incomplete — it is marked.</li>
+              <li><b>Q1.</b> Why is technical drawing called the universal language of engineers? <i>Ans: any trained person anywhere can read the same drawing without spoken words.</i></li>
+              <li><b>Q2.</b> Instrument for horizontal lines? <i>Ans: T-square.</i></li>
+              <li><b>Q3.</b> Instrument for vertical and inclined lines? <i>Ans: set squares.</i></li>
+              <li><b>Q4.</b> Which pencil for construction lines? <i>Ans: H (hard), e.g. 2H.</i></li>
+              <li><b>Q5.</b> Line that shows unseen edges? <i>Ans: hidden line (short dashes).</i></li>
+              <li><b>Q6.</b> Line that marks the axis of a circle? <i>Ans: centre line.</i></li>
+              <li><b>Q7.</b> Where is the title block placed? <i>Ans: bottom-right corner of the sheet.</i></li>
+              <li><b>Q8.</b> Name three things in a title block. <i>Ans: any three — title, name, scale, date, sheet number.</i></li>
+              <li><b>Q9.</b> Scale 1:5 means? <i>Ans: 1 unit on paper represents 5 units on the real object.</i></li>
+              <li><b>Q10.</b> State two qualities of good lettering. <i>Ans: uniform height and spacing; single-stroke; consistent slope.</i></li>
+              <li><b>Q11.</b> Instrument that measures angles? <i>Ans: protractor.</i></li>
+              <li><b>Q12.</b> Two ways to care for set squares. <i>Ans: keep flat, do not cut against them, wipe clean, store safely.</i></li>
+              <li><b>Q13.</b> Which line is drawn first, construction or outline? <i>Ans: light construction lines first; outlines darkened last.</i></li>
+              <li><b>Q14.</b> A 900 mm board drawn at 1:20 is how long on paper? <i>Ans: 45 mm.</i></li>
             </ul>
-            `,
+            <div class="formula">SUMMARY: technical drawing is the exact, standardised language of engineers; its toolkit is the board, T-square, set squares, compass, dividers, protractor, scale, French curves and graded pencils; its grammar is the line types — outline, hidden, centre, dimension, extension, leader, hatching, border; its handwriting is single-stroke lettering on guide lines; and every sheet is framed by a border and signed off in a bottom-right title block carrying title, name, scale, date and sheet number.</div>
+
+`,
           cards: [
             { q: 'Name five drawing instruments and one use of each.', a: 'T-square (horizontal lines), set squares (vertical and inclined lines), compass (circles and arcs), divider (transferring measurements), protractor (angles), and pencils for lines.' },
             { q: 'What is the T-square used for, and how is it held?', a: 'Drawing horizontal lines and supporting set squares — its head slides along the left edge of the board; always draw from left to right along the top edge of the blade.' },
@@ -7231,72 +7271,127 @@ Ada eventually saved enough to buy her mother a gift and returned home proud." (
           tags: ['Personal safety', 'Tool safety', 'First aid'],
           summary: 'The rules that prevent accidents, and what to do when one happens.',
           content: `
-            <h3>1. Causes of workshop accidents</h3>
+            <h3>1. What safety means and why it is non-negotiable</h3>
+            <p><b>Safety</b> in the workshop is the set of habits, rules and protections that prevent accidents, injuries and damage while we work. An <b>accident</b> is an unplanned event that causes harm — and the hard truth of workshops is that almost every accident is traceable to a broken rule: a floor left wet, a guard removed, a tool used wrongly, a machine left running. Safety is therefore not a subject you pass; it is a habit you practise every single time you enter the workshop.</p>
             <ul>
-              <li>Using the <b>wrong tool</b> for a job, or a damaged tool.</li>
-              <li>Wearing loose clothing, rings or long untied hair near machines.</li>
-              <li>Leaving tools on the floor or on top of a machine.</li>
-              <li>Horseplay and distraction.</li>
-              <li>Poor lighting and a cluttered workspace.</li>
+              <li>A safe workshop is a productive workshop: one injured hand stops a whole week of work.</li>
+              <li>The law and your school both require it — but the real reason is people: machines can be replaced, fingers cannot.</li>
+              <li>Exam language: <b>hazard</b> = anything that can cause harm; <b>risk</b> = the chance that the harm actually happens.</li>
             </ul>
-            <h3>2. Personal protective equipment</h3>
+
+            <h3>2. Common workshop hazards, one by one</h3>
             <table>
-              <tr><th>Item</th><th>Protects against</th></tr>
-              <tr><td>Safety goggles</td><td>Flying chips, dust and splashes</td></tr>
-              <tr><td>Overalls / apron</td><td>Cuts, sparks and staining of clothes</td></tr>
-              <tr><td>Safety boots</td><td>Falling objects and sharp debris</td></tr>
-              <tr><td>Ear defenders</td><td>Prolonged loud noise</td></tr>
-              <tr><td>Dust mask</td><td>Sawdust, fumes and fine particles</td></tr>
-              <tr><td>Gloves</td><td>Cuts and heat — but never near rotating machines, where they can be caught</td></tr>
+              <tr><th>Hazard</th><th>Where it lives</th><th>What it does</th></tr>
+              <tr><td>Slippery floors</td><td>oil, water, grease spills</td><td>falls onto machines and edges</td></tr>
+              <tr><td>Moving machine parts</td><td>gears, belts, chucks, blades</td><td>catches loose cloth, hair, fingers</td></tr>
+              <tr><td>Sharp edges &amp; flying chips</td><td>cutting tools, grinding</td><td>cuts and eye injuries</td></tr>
+              <tr><td>Electricity</td><td>frayed cords, wet hands, open sockets</td><td>shock and burns</td></tr>
+              <tr><td>Fire</td><td>fuel, paint, gas, sparks</td><td>burns and destruction</td></tr>
+              <tr><td>Dust and fumes</td><td>sawdust, paint spray, welding</td><td>lung and eye damage over time</td></tr>
+              <tr><td>Noise</td><td>grinders, hammers, machines</td><td>gradual hearing loss</td></tr>
+              <tr><td>Falling objects</td><td>poorly stacked stock, loose hammer heads</td><td>crushes feet and heads</td></tr>
             </table>
-            <h3>3. Safe use of hand tools</h3>
+            <div class="formula">TRAP: a hazard is the THING (a spinning blade); a risk is the CHANCE it hurts you (high if unguarded, low if guarded). Exams love asking the difference.</div>
+
+            <h3>3. Personal Protective Equipment (PPE) — your personal armour</h3>
             <ul>
-              <li>Carry sharp tools with the point down and the edge away from your body.</li>
-              <li>Always cut <b>away</b> from yourself with a chisel or knife.</li>
-              <li>Clamp the work — never hold it with your free hand.</li>
-              <li>Replace a cracked hammer handle or a loose head before use.</li>
+              <li><b>Safety goggles:</b> eyes vs flying chips, dust and sparks — the most-used PPE in any workshop.</li>
+              <li><b>Overalls/apron:</b> keeps loose clothing in; cotton overalls resist sparks better than flappy sleeves.</li>
+              <li><b>Boots (steel-toe where heavy):</b> feet vs falling tools and sharp offcuts.</li>
+              <li><b>Gloves:</b> for handling rough or hot material — but NEVER near rotating machine parts that can grab them.</li>
+              <li><b>Helmet/hard hat:</b> heads vs falling objects on sites.</li>
+              <li><b>Ear muffs/plugs:</b> ears vs continuous loud noise.</li>
+              <li><b>Nose mask/respirator:</b> lungs vs dust and fumes.</li>
             </ul>
-            <h3>4. First aid essentials</h3>
+            <div class="diagram"><svg viewBox="0 0 460 210" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A workshop worker wearing labelled protective equipment: helmet, goggles, mask, overalls, gloves, boots">
+              <rect x="8" y="8" width="444" height="194" rx="10" fill="#f0fdf4" stroke="#166534" stroke-width="2"/>
+              <circle cx="230" cy="52" r="20" fill="#fde68a" stroke="#92400e" stroke-width="2"/>
+              <path d="M208 46 a22 22 0 0 1 44 0 l0 -8 a22 14 0 0 0 -44 0 z" fill="#f59e0b" stroke="#92400e" stroke-width="2"/>
+              <rect x="214" y="46" width="32" height="8" rx="4" fill="#38bdf8" stroke="#075985" stroke-width="1.5"/>
+              <rect x="222" y="60" width="16" height="8" rx="3" fill="#e2e8f0" stroke="#475569" stroke-width="1.5"/>
+              <rect x="206" y="74" width="48" height="66" rx="10" fill="#3b82f6" stroke="#1e3a8a" stroke-width="2"/>
+              <rect x="192" y="78" width="12" height="48" rx="6" fill="#3b82f6" stroke="#1e3a8a" stroke-width="2"/>
+              <rect x="256" y="78" width="12" height="48" rx="6" fill="#3b82f6" stroke="#1e3a8a" stroke-width="2"/>
+              <rect x="190" y="124" width="16" height="12" rx="4" fill="#fbbf24" stroke="#92400e" stroke-width="1.5"/>
+              <rect x="254" y="124" width="16" height="12" rx="4" fill="#fbbf24" stroke="#92400e" stroke-width="1.5"/>
+              <rect x="212" y="140" width="14" height="40" rx="5" fill="#1e293b"/>
+              <rect x="234" y="140" width="14" height="40" rx="5" fill="#1e293b"/>
+              <rect x="208" y="178" width="22" height="10" rx="3" fill="#78350f"/>
+              <rect x="232" y="178" width="22" height="10" rx="3" fill="#78350f"/>
+              <g font-size="9.5" fill="#14532a" font-weight="700">
+                <line x1="252" y1="34" x2="320" y2="30" stroke="#166534"/><text x="324" y="33">helmet — falling objects</text>
+                <line x1="248" y1="50" x2="320" y2="52" stroke="#166534"/><text x="324" y="55">goggles — flying chips</text>
+                <line x1="240" y1="64" x2="320" y2="74" stroke="#166534"/><text x="324" y="77">mask — dust &amp; fumes</text>
+                <line x1="254" y1="100" x2="320" y2="100" stroke="#166534"/><text x="324" y="103">overalls — no loose cloth</text>
+                <line x1="270" y1="130" x2="320" y2="126" stroke="#166534"/><text x="324" y="129">gloves — rough &amp; hot work</text>
+                <line x1="256" y1="182" x2="320" y2="170" stroke="#166534"/><text x="324" y="173">boots — falling tools</text>
+                <text x="24" y="40">Dress like this and the</text>
+                <text x="24" y="54">workshop loses most of</text>
+                <text x="24" y="68">its ways to hurt you.</text>
+              </g>
+            </svg></div>
+
+            <h3>4. The general rules — do and do-not</h3>
+            <table>
+              <tr><th>DO</th><th>DO NOT</th></tr>
+              <tr><td>wear the right PPE before starting</td><td>run, push or play inside the workshop</td></tr>
+              <tr><td>keep floors dry and walkways clear</td><td>leave oil, water or tools on the floor</td></tr>
+              <tr><td>use each tool only for its job</td><td>use a screwdriver as a chisel, a spanner as a hammer</td></tr>
+              <tr><td>clamp small work before cutting</td><td>hold tiny pieces by hand near a blade</td></tr>
+              <tr><td>switch off and wait for stillness before adjusting</td><td>touch a machine that is still spinning</td></tr>
+              <tr><td>report faults, sparks and frayed cords at once</td><td>attempt repairs you are not trained for</td></tr>
+              <tr><td>return tools to their rack after use</td><td>leave tools on machine beds or bench edges</td></tr>
+            </table>
+
+            <h3>5. Machine and electrical safety</h3>
             <ul>
-              <li><b>Cuts:</b> wash, apply pressure, dress with a clean bandage.</li>
-              <li><b>Burns:</b> cool under running water for at least ten minutes; never apply butter or oil.</li>
-              <li><b>Electric shock:</b> switch off the supply <b>first</b>, then treat the person.</li>
-              <li>Report every accident, however small, to the teacher.</li>
+              <li>Guards stay ON: a guard removed &apos;just for one cut&apos; is how fingers meet blades.</li>
+              <li>No loose sleeves, no dangling jewellery, tie long hair back — rotating parts grab loose things first.</li>
+              <li>One person per machine; others stand clear of the operating zone.</li>
+              <li>Electrical: dry hands only; pull plugs by the plug, not the cord; never use a machine with a frayed cord; earthing exists so that fault current goes into the ground, not through you.</li>
+              <li>If someone is in contact with live electricity, do NOT touch them — switch off at the source or push them free with dry wood.</li>
             </ul>
-            <div class="worked"><b>Worked example:</b> A pupil is chiselling a piece of wood held loosely in one hand. Name two faults and correct them.<br>
-            (1) The work is not clamped — it should be held in a <b>bench vice</b>. (2) No eye protection — <b>goggles</b> should be worn because chips fly.</div>
-            <h3>Common mistakes</h3>
+            <div class="worked"><b>Worked example:</b> "Give three safety precautions when using a bench grinder." → wear goggles, stand to the side, check the guard is fitted, let it reach full speed before grinding, never force the work, switch off and wait for the wheel to stop before leaving.</div>
+
+            <h3>6. Fire safety: the triangle and the extinguishers</h3>
             <ul>
-              <li>Thinking gloves are always safer — near a rotating drill or lathe they can be pulled in.</li>
-              <li>Blowing sawdust off a machine with your mouth instead of using a brush.</li>
-              <li>Assuming a machine is switched off without checking and unplugging it.</li>
+              <li>Fire needs three things at once: <b>fuel + heat + oxygen</b> — the fire triangle. Remove any one and the fire dies; every extinguisher works by removing one side of the triangle.</li>
+              <li><b>Water:</b> cools ordinary fires (wood, paper) — but NEVER on oil or electrical fires.</li>
+              <li><b>Foam:</b> blankets liquid fuel fires.</li>
+              <li><b>Dry powder:</b> versatile; good for liquids, gases and electrical fires.</li>
+              <li><b>CO2:</b> displaces oxygen; the choice for electrical and fuel fires, leaves no mess.</li>
+              <li>Prevention beats fighting: store fuels away from sparks, no open flames near paint and thinners, keep exits clear, know where the extinguisher and sand bucket live.</li>
             </ul>
-            <h3>Deep dive: accidents have causes, so they have cures</h3>
-            <p>Workshop accidents are rarely "bad luck" — they follow <b>carelessness</b> (rushing, playing), <b>faulty tools</b> (blunt, cracked handles), <b>unsafe conditions</b> (oily floors, poor light, blocked exits), <b>no protective clothing</b>, and <b>ignorance</b> of the right method.</p>
-            <h3>Personal protective equipment (PPE)</h3>
+            <div class="formula">TRAP: water on an oil fire spreads burning oil; water on live electricity conducts the shock to YOU. If electricity or oil is involved, water is the wrong answer.</div>
+
+            <h3>7. First aid basics every student should know</h3>
             <ul>
-              <li><b>Overalls/apron</b> — protects skin and clothing; no loose sleeves near machines.</li>
-              <li><b>Safety boots</b> — crushed toes are the classic workshop injury.</li>
-              <li><b>Goggles</b> — for chiselling, grinding, soldering.</li>
-              <li><b>Gloves</b> — for hot, sharp or rough materials (but NEVER near rotating machines — they can be pulled in).</li>
-              <li><b>Face mask</b> — for dust and fumes.</li>
+              <li>The <b>first aid box</b> holds: sterile gauze and bandages, cotton wool, antiseptic solution, adhesive plasters, scissors, burns ointment and a pair of gloves.</li>
+              <li><b>Cut:</b> wash/antiseptic, press clean gauze to stop bleeding, bandage; deep or dirty cuts go to the nurse.</li>
+              <li><b>Burn:</b> cool with clean running water for several minutes; do not burst blisters; cover loosely; no toothpaste, no oil — those are home myths that infect burns.</li>
+              <li><b>Electric shock:</b> isolate the power first; then check breathing and get help.</li>
+              <li><b>Eye particle:</b> do not rub; rinse with clean water; stubborn particles see the nurse.</li>
+              <li>Always report every injury, however small — &apos;it is nothing&apos; wounds are how infections start.</li>
             </ul>
-            <h3>Standing rules</h3>
+
+            <h3>8. Try these (with answers)</h3>
             <ul>
-              <li>Keep floors clean and dry; wipe spills at once; keep walkways clear.</li>
-              <li>Carry sharp tools point-down; pass handles first, never blades.</li>
-              <li>No running or playing in the workshop; concentrate on the job.</li>
-              <li>Report every accident, however small, to the teacher/supervisor.</li>
+              <li><b>Q1.</b> Define a hazard and a risk. <i>Ans: hazard = something that can cause harm; risk = the chance that it does.</i></li>
+              <li><b>Q2.</b> PPE for the eyes? <i>Ans: safety goggles.</i></li>
+              <li><b>Q3.</b> When must gloves NOT be worn? <i>Ans: near rotating machine parts that can grab them.</i></li>
+              <li><b>Q4.</b> Name the three sides of the fire triangle. <i>Ans: fuel, heat, oxygen.</i></li>
+              <li><b>Q5.</b> Best extinguisher for an electrical fire? <i>Ans: CO2 (or dry powder) — never water.</i></li>
+              <li><b>Q6.</b> First action for a person touching live wire? <i>Ans: switch off/isolate the supply; do not touch them directly.</i></li>
+              <li><b>Q7.</b> Three contents of a first aid box. <i>Ans: bandages, antiseptic, cotton wool, plasters, scissors, gloves.</i></li>
+              <li><b>Q8.</b> Why tie hair and avoid loose sleeves at machines? <i>Ans: rotating parts catch loose things and pull the person in.</i></li>
+              <li><b>Q9.</b> Two reasons for keeping floors dry. <i>Ans: prevent slips/falls; prevent electrical accidents.</i></li>
+              <li><b>Q10.</b> Correct first treatment of a burn? <i>Ans: cool with running water, cover loosely, no oils or paste.</i></li>
+              <li><b>Q11.</b> Why report small injuries? <i>Ans: infection and worsening are prevented; records keep the workshop safer.</i></li>
+              <li><b>Q12.</b> State the order for leaving a machine safely. <i>Ans: switch off, wait for full stop, clean up, return tools.</i></li>
             </ul>
-            <h3>First aid and fire basics</h3>
-            <p>The <b>first-aid box</b> must be stocked and known to everyone: treat cuts (clean, press, bandage), burns (cool running water — no ointment), and get help for anything serious. For fire: know the exits and extinguisher location; never use water on electrical or petrol fires (use a CO2/dry-powder extinguisher or sand).</p>
-            <h3>Exam watch</h3>
-            <ul>
-              <li>Give <b>causes AND preventions</b> when asked about accidents — they are usually paired marks.</li>
-              <li>Gloves near rotating machines are a trap: protection must match the hazard.</li>
-              <li>"Report small injuries" counts as a safety practice — infection prevention.</li>
-            </ul>
-            `,
+            <div class="formula">SUMMARY: workshop safety is habit, not luck — know the hazards (slips, moving parts, sharp edges, electricity, fire, dust, noise, falling objects); wear the right PPE (goggles, overalls, boots, gloves with care, helmet, ear and lung protection); obey the do/do-not rules; respect machine guards and electricity; remember the fire triangle (fuel + heat + oxygen) and match extinguishers to fire types — water never on oil or live electricity; and treat every injury with first aid and reporting. A craftsman&apos;s first skill is coming home with all ten fingers.</div>
+
+`,
           cards: [
             { q: 'What is workshop safety?', a: 'All the rules, habits and equipment that prevent accidents and injuries while working — safety is everybody\'s responsibility, every time.' },
             { q: 'Name four items of personal protective equipment (PPE).', a: 'Safety goggles (eyes), apron/overalls (body), safety boots (feet), gloves (hands), and a nose mask where there is dust or fumes.' },
@@ -7349,64 +7444,129 @@ Ada eventually saved enough to buy her mother a gift and returned home proud." (
           tags: ['Bisection', 'Angles', 'Triangles & polygons'],
           summary: 'Constructing angles, bisectors, triangles and regular polygons with compass and straight edge only.',
           content: `
-            <h3>1. Bisecting a line and an angle</h3>
-            <p><b>To bisect a line AB:</b> open the compass to more than half of AB. With A as centre draw arcs above and below the line; repeat from B. The line through the two intersections is the <b>perpendicular bisector</b>.</p>
-            <p><b>To bisect an angle:</b> with the vertex as centre draw an arc cutting both arms. From each cutting, draw equal arcs that cross. Join the vertex to that crossing.</p>
-            <h3>2. Constructing standard angles</h3>
+            <h3>1. What geometrical construction is</h3>
+            <p><b>Geometrical construction</b> is drawing exact shapes using only the classic instruments — compass, straight edge (rule), set squares and protractor — following proven steps instead of guessing by eye. A construction is a recipe: same steps, same perfect result, every time. In Basic Technology it matters because every designed object begins as geometry: a bracket is a triangle, a plate is a circle with holes, a gasket is a polygon.</p>
             <ul>
-              <li><b>60°</b> — draw an arc from the vertex, then step the same radius along the arc.</li>
-              <li><b>30°</b> — construct 60°, then bisect it.</li>
-              <li><b>90°</b> — erect a perpendicular, then bisect for 45°.</li>
-              <li><b>15° and 75°</b> — bisect 30°, or add 45° and 30°.</li>
+              <li>Construction lines are drawn <b>light</b> (hard pencil); final answers are darkened at the end.</li>
+              <li>The compass point must stay exactly on its mark; a wandering point ruins the whole figure.</li>
+              <li>Accuracy is graded: a bisector that misses by 2 mm is wrong, even if it &apos;looks fine&apos;.</li>
             </ul>
-            <h3>3. Constructing triangles</h3>
+
+            <h3>2. Bisecting a line (cutting it into two equal halves)</h3>
+            <ul>
+              <li>Draw line AB. Open the compass to more than half of AB.</li>
+              <li>With the point on A, draw arcs above and below the line; with the point on B and the SAME radius, draw arcs crossing the first pair at P and Q.</li>
+              <li>Draw line PQ. It cuts AB at its midpoint M at 90° — PQ is the <b>perpendicular bisector</b>.</li>
+              <li>Check: AM must equal MB. Measuring is part of the method, not an afterthought.</li>
+            </ul>
+
+            <h3>3. Perpendiculars and standard angles</h3>
+            <ul>
+              <li><b>Perpendicular at a point on a line:</b> from point P on the line, mark equal distances each side (X and Y); from X and Y with a larger equal radius, arc above; join the crossing to P.</li>
+              <li><b>Perpendicular from a point above a line:</b> from P arc across the line at two points; from those two points small arcs below; join to P.</li>
+              <li><b>60°:</b> draw an arc from vertex O crossing one arm at C; same radius from C cuts the arc at D; ray OD makes 60°.</li>
+              <li><b>30°:</b> bisect the 60°. <b>90°:</b> add 60° + 30°, or use the perpendicular method. <b>45°:</b> bisect the 90°.</li>
+              <li><b>Bisecting any angle:</b> arc from the vertex crosses both arms; from those crossings equal arcs inside; ray from vertex through the crossing splits the angle in half.</li>
+            </ul>
+            <div class="formula">TRAP: bisection means TWO EQUAL halves — if your two result angles do not match on the protractor, the compass radius changed mid-work. Keep one radius until the step says change it.</div>
+
+            <h3>4. Dividing a line into equal parts</h3>
+            <ul>
+              <li>To split AB into, say, 5 equal parts: draw a light ray from A at any easy angle; step off 5 equal compass marks on it; join the last mark to B; draw lines parallel to that join through each mark (use two set squares sliding against each other).</li>
+              <li>The parallels cut AB into 5 exact equal parts — no ruler guessing.</li>
+              <li>This trick also transfers ratios: it is how scales and dividers earned their keep before calculators.</li>
+            </ul>
+
+            <h3>5. Plane figures: the family album</h3>
             <table>
-              <tr><th>Given</th><th>Method</th></tr>
-              <tr><td>Three sides (SSS)</td><td>Draw the base, then swing arcs of the other two lengths from each end</td></tr>
-              <tr><td>Two sides and the included angle (SAS)</td><td>Draw one side, set the angle, mark the second side, then join</td></tr>
-              <tr><td>Two angles and a side (ASA)</td><td>Draw the side and set both angles at its ends</td></tr>
+              <tr><th>Figure</th><th>Definition</th></tr>
+              <tr><td>Equilateral triangle</td><td>3 equal sides, all angles 60°</td></tr>
+              <tr><td>Isosceles triangle</td><td>2 equal sides and 2 equal base angles</td></tr>
+              <tr><td>Right-angled triangle</td><td>one 90° angle; hypotenuse is the longest side</td></tr>
+              <tr><td>Square</td><td>4 equal sides, 4 right angles</td></tr>
+              <tr><td>Rectangle</td><td>opposite sides equal, 4 right angles</td></tr>
+              <tr><td>Parallelogram</td><td>opposite sides parallel and equal</td></tr>
+              <tr><td>Rhombus</td><td>4 equal sides, angles not 90°</td></tr>
+              <tr><td>Trapezium</td><td>exactly one pair of parallel sides</td></tr>
+              <tr><td>Regular polygon</td><td>all sides and all angles equal (pentagon, hexagon...)</td></tr>
             </table>
-            <div class="worked"><b>Worked example:</b> Construct triangle ABC with AB = 7 cm, angle A = 60° and angle B = 45°.<br>
-            Draw AB = 7 cm. At A construct 60°; at B construct 45°. Extend the two rays until they meet at C. Angle C must be 180 - 60 - 45 = <b>75°</b> — check it with a protractor.</div>
-            <h3>4. Regular polygons</h3>
-            <div class="formula">Each interior angle of a regular n-gon = (n - 2) × 180° ÷ n<br>
-            Each exterior angle = 360° ÷ n</div>
-            <div class="worked"><b>Worked example:</b> Find each interior angle of a regular hexagon.<br>
-            (6 - 2) × 180 ÷ 6 = 720/6 = <b>120°</b>. The exterior angle is 360/6 = 60°, and 120 + 60 = 180 ✓</div>
-            <h3>5. Circles</h3>
+            <div class="formula">Interior angle sum of any polygon = (n − 2) × 180°, where n = number of sides. Triangle: 180°; quadrilateral: 360°; hexagon: 720°. Each interior angle of a REGULAR polygon = (n − 2) × 180° ÷ n.</div>
+
+            <h3>6. Constructing triangles from given data</h3>
             <ul>
-              <li><b>Tangent</b> — touches the circle at one point and is perpendicular to the radius there.</li>
-              <li><b>Chord</b> — a line joining two points on the circumference; the longest chord is the diameter.</li>
-              <li><b>Circumference</b> = 2πr; <b>area</b> = πr^2.</li>
+              <li><b>SSS (three sides):</b> draw the base with the rule; compass set to the second side from one end, third side from the other end; the arcs&apos; crossing is the top vertex.</li>
+              <li><b>SAS (two sides + included angle):</b> draw one side; set the given angle at its end with protractor/compass; mark the second side&apos;s length along the new ray; join.</li>
+              <li><b>ASA (two angles + included side):</b> draw the side; set both angles at its two ends; the rays cross at the third vertex.</li>
+              <li>A triangle is rigid: once three correct facts are fixed, the shape cannot change — which is why bridges are full of triangles.</li>
             </ul>
-            <h3>Common mistakes</h3>
+            <div class="diagram"><svg viewBox="0 0 460 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="SSS triangle construction: base AB drawn solid, two dashed compass arcs from A and B crossing at C, triangle completed">
+              <rect x="8" y="8" width="444" height="184" rx="10" fill="#eff6ff" stroke="#1e40af" stroke-width="2"/>
+              <line x1="90" y1="150" x2="300" y2="150" stroke="#0f172a" stroke-width="3"/>
+              <path d="M90 150 m118 -96 a118 118 0 0 1 30 40" fill="none" stroke="#64748b" stroke-width="1.5" stroke-dasharray="6 4"/>
+              <path d="M300 150 m-96 -112 a130 130 0 0 0 -44 26" fill="none" stroke="#64748b" stroke-width="1.5" stroke-dasharray="6 4"/>
+              <line x1="90" y1="150" x2="205" y2="52" stroke="#0f172a" stroke-width="3"/>
+              <line x1="300" y1="150" x2="205" y2="52" stroke="#0f172a" stroke-width="3"/>
+              <circle cx="90" cy="150" r="3.5" fill="#b91c1c"/><circle cx="300" cy="150" r="3.5" fill="#b91c1c"/><circle cx="205" cy="52" r="3.5" fill="#b91c1c"/>
+              <text x="82" y="166" font-size="11" font-weight="800" fill="#0f172a">A</text>
+              <text x="306" y="166" font-size="11" font-weight="800" fill="#0f172a">B</text>
+              <text x="199" y="42" font-size="11" font-weight="800" fill="#0f172a">C</text>
+              <text x="330" y="60" font-size="10" fill="#1e40af" font-weight="700">Step 1: draw base AB.</text>
+              <text x="330" y="78" font-size="10" fill="#1e40af" font-weight="700">Step 2: arc radius b from A,</text>
+              <text x="330" y="94" font-size="10" fill="#1e40af" font-weight="700">arc radius a from B.</text>
+              <text x="330" y="110" font-size="10" fill="#1e40af" font-weight="700">Step 3: arcs cross at C —</text>
+              <text x="330" y="126" font-size="10" fill="#1e40af" font-weight="700">join AC and BC. Done.</text>
+              <text x="330" y="150" font-size="9.5" fill="#475569">Same steps, same perfect</text>
+              <text x="330" y="164" font-size="9.5" fill="#475569">triangle, every single time.</text>
+            </svg></div>
+
+            <h3>7. Circles and their parts</h3>
             <ul>
-              <li>Changing the compass width part-way through a construction — the arcs will not meet correctly.</li>
-              <li>Measuring with a protractor when the question says <b>construct</b>; construction means compass and ruler only.</li>
-              <li>Confusing the interior and exterior angle formulas.</li>
+              <li><b>Radius</b> (centre to edge), <b>diameter</b> (through centre, = 2r), <b>chord</b> (any line joining two points on the circle), <b>arc</b> (a piece of the edge), <b>sector</b> (slice between two radii), <b>segment</b> (region between chord and arc), <b>tangent</b> (line touching at exactly one point, perpendicular to the radius at that point).</li>
+              <li><b>Finding a circle&apos;s centre:</b> draw any two chords, construct each one&apos;s perpendicular bisector; the bisectors cross at the centre.</li>
+              <li>Circumference = πd = 2πr; area = πr^2. Take π as 22/7 or 3.14 as the question directs.</li>
             </ul>
-            <h3>Deep dive: constructions with ruler and compasses only</h3>
-            <p>Classical constructions use a <b>pair of compasses</b> and an unmarked <b>straightedge</b> — no protractor, no measuring. The two foundation skills are bisecting a line and bisecting an angle:</p>
+            <div class="worked"><b>Worked example:</b> a circular plate has radius 7 cm. Circumference = 2 × 22/7 × 7 = 44 cm; area = 22/7 × 7 × 7 = 154 cm^2. The 7s cancel cleanly — examiners LOVE radius 7 with 22/7.</div>
+
+            <h3>8. Perimeter and area of the common plane figures</h3>
+            <table>
+              <tr><th>Figure</th><th>Perimeter</th><th>Area</th></tr>
+              <tr><td>Rectangle</td><td>2(l + b)</td><td>l × b</td></tr>
+              <tr><td>Square</td><td>4s</td><td>s^2</td></tr>
+              <tr><td>Triangle</td><td>a + b + c</td><td>1/2 × base × height</td></tr>
+              <tr><td>Parallelogram</td><td>2(a + b)</td><td>base × vertical height</td></tr>
+              <tr><td>Trapezium</td><td>sum of sides</td><td>1/2(a + b) × h, a,b = parallel sides</td></tr>
+              <tr><td>Circle</td><td>2πr</td><td>πr^2</td></tr>
+            </table>
+            <div class="formula">TRAP: parallelogram and triangle areas use the VERTICAL height, not the slant side. The slant is for perimeter; the straight-down height is for area.</div>
+
+            <h3>9. The hexagon trick every JSS student should own</h3>
             <ul>
-              <li><b>Bisect a line AB</b>: compass opened more than half of AB, draw arcs above and below from A, then the same from B; the line through the two crossings cuts AB exactly in half <b>at 90°</b>.</li>
-              <li><b>Bisect an angle</b>: arc from the vertex to cut both arms; equal arcs from those two points; join the vertex to the crossing — the angle is halved.</li>
-              <li>Everything else builds on these: perpendiculars, 60°, 45° and 30° angles, and triangles from given sides.</li>
+              <li>A regular hexagon has a beautiful secret: its side equals the radius of its circumscribed circle.</li>
+              <li>Construction: draw a circle of radius r; keep the SAME compass opening; starting anywhere on the circle, step the point round the edge six times — the six marks are exactly the hexagon&apos;s corners; join them with the straight edge.</li>
+              <li>Why it works: each step cuts off a 60° arc (six of them make 360°), and a 60° central angle with two radii gives an equilateral triangle, so chord = radius.</li>
+              <li>Nuts and bolts use hexagons for this reason — the shape tiles, grips spanners, and is trivially laid out with one compass setting.</li>
             </ul>
-            <h3>Plane figures you must know cold</h3>
+            <div class="worked"><b>Worked example:</b> "Construct a regular hexagon of side 4 cm." → circle of radius 4 cm, same 4 cm opening stepped six times round, join the marks. No protractor touched.</div>
+
+            <h3>10. Try these (with answers)</h3>
             <ul>
-              <li><b>Triangles</b> by sides: equilateral (3 equal, angles 60° each), isosceles (2 equal), scalene (none). By angles: acute, right-angled, obtuse. Angles always sum to <b>180°</b>.</li>
-              <li><b>Quadrilaterals</b>: square, rectangle, parallelogram, rhombus, trapezium, kite — angles sum to <b>360°</b>.</li>
-              <li><b>Circle parts</b>: radius, diameter (2 × radius), circumference, chord, sector, segment.</li>
+              <li><b>Q1.</b> Instrument pair for bisecting a line? <i>Ans: compass and straight edge (rule).</i></li>
+              <li><b>Q2.</b> Angle sum of a quadrilateral? <i>Ans: 360°.</i></li>
+              <li><b>Q3.</b> Each interior angle of a regular hexagon? <i>Ans: 720° ÷ 6 = 120°.</i></li>
+              <li><b>Q4.</b> Construct 30° without a protractor. <i>Ans: construct 60° then bisect it.</i></li>
+              <li><b>Q5.</b> Triangle with sides 5, 5, 8? <i>Ans: isosceles.</i></li>
+              <li><b>Q6.</b> Which data set fixes a triangle rigidly, SSS or AAA? <i>Ans: SSS (AAA only fixes shape, not size).</i></li>
+              <li><b>Q7.</b> Line touching a circle at one point? <i>Ans: tangent.</i></li>
+              <li><b>Q8.</b> How to find a circle&apos;s centre with compass? <i>Ans: perpendicular bisectors of two chords; they meet at the centre.</i></li>
+              <li><b>Q9.</b> Area of triangle base 10 cm height 6 cm? <i>Ans: 30 cm^2.</i></li>
+              <li><b>Q10.</b> Trapezium parallel sides 8 and 12, height 5: area? <i>Ans: 1/2(8 + 12) × 5 = 50 square units.</i></li>
+              <li><b>Q11.</b> Circumference of circle diameter 14 cm (π = 22/7)? <i>Ans: 44 cm.</i></li>
+              <li><b>Q12.</b> Why are triangles used in bridges and roofs? <i>Ans: a triangle is rigid — it cannot change shape without changing a side.</i></li>
+              <li><b>Q13.</b> Side of a hexagon inscribed in a circle of radius 5 cm? <i>Ans: 5 cm — side equals radius.</i></li>
             </ul>
-            <h3>Worked example</h3>
-            <p><b>Construct triangle PQR with PQ = 6 cm, QR = 5 cm, PR = 4 cm.</b> Draw PQ = 6 cm; compass 5 cm from Q; compass 4 cm from P; the arcs cross at R; join RQ and RP. Check the angles add to 180°.</p>
-            <h3>Exam watch</h3>
-            <ul>
-              <li>Leave construction arcs visible — they are part of the marking.</li>
-              <li>A sharp pencil and a tight compass pivot make the difference between a pass and a blob.</li>
-              <li>"Construct" means ruler-and-compasses; "draw/measure" allows the protractor — read the verb.</li>
-            </ul>
-            `,
+            <div class="formula">SUMMARY: geometrical construction turns compass-and-rule recipes into perfect shapes: bisect lines and angles, erect perpendiculars, build 30/45/60/90°, divide lines equally, and construct triangles from SSS, SAS or ASA; plane figures are catalogued by sides and angles with interior-angle sum (n − 2) × 180°; circles are named by radius, diameter, chord, arc, sector, segment and tangent, with the centre found where two chord bisectors meet; and perimeter/area formulas (rectangle, square, triangle, parallelogram, trapezium, circle) finish the toolkit — always with vertical height for area, never the slant.</div>
+
+`,
           cards: [
             { q: 'How do you bisect a line segment with compasses?', a: 'With the compass opened more than half the line, draw arcs above and below from each end; join the two arc crossings — the line cuts the segment into two equal halves at 90 deg.' },
             { q: 'How do you bisect an angle?', a: 'From the vertex, strike an arc cutting both arms; from those two points, strike equal arcs that cross inside the angle; join the vertex to the crossing point.' },
@@ -7457,66 +7617,119 @@ Ada eventually saved enough to buy her mother a gift and returned home proud." (
           tags: ['Wood & metals', 'Frames', 'Forces in structures'],
           summary: 'The materials used in construction, and why triangles make structures rigid.',
           content: `
-            <h3>1. Wood</h3>
-            <p><b>Hardwoods</b> come from broad-leaved trees (iroko, mahogany, teak) and are dense and durable. <b>Softwoods</b> come from conifers (pine, cedar) and are lighter and easier to work.</p>
-            <p><b>Seasoning</b> is drying the wood to reduce moisture. It prevents warping, splitting and fungal attack. Methods include air seasoning (slow and cheap) and kiln seasoning (fast and controlled).</p>
-            <p><b>Defects</b> to reject: knots, shakes, splits, warping and insect damage.</p>
-            <h3>2. Metals</h3>
+            <h3>1. What makes a material a BUILDING material</h3>
+            <p>A <b>building material</b> is any material used to construct buildings and other structures — from the mud walls of traditional homes to the reinforced concrete of bridges. Engineers judge materials by their <b>properties</b>: strength (can it carry load?), durability (does it last in sun and rain?), hardness, workability (how easy is it to shape?), weight, cost and availability. The best material for a job is the one whose properties match the job at a price the project can afford — that balancing act is called <b>material selection</b>.</p>
+            <ul>
+              <li>Natural materials come from nature almost ready: sand, stone, clay, timber, water.</li>
+              <li>Manufactured (processed) materials are made by man: cement, bricks, steel, glass, aluminium, plastics.</li>
+              <li>Local matters: a material that travels 1,000 km costs more than one dug from the next village — Nigerian builders have always been smart about this.</li>
+            </ul>
+
+            <h3>2. The big seven, one by one</h3>
             <table>
-              <tr><th>Type</th><th>Examples</th><th>Notes</th></tr>
-              <tr><td>Ferrous (contain iron)</td><td>Mild steel, cast iron, wrought iron</td><td>Magnetic, will rust, strong</td></tr>
-              <tr><td>Non-ferrous</td><td>Copper, aluminium, zinc, lead</td><td>Do not rust, lighter, more expensive</td></tr>
+              <tr><th>Material</th><th>Key facts</th><th>Typical uses</th></tr>
+              <tr><td>Sand</td><td>clean sharp sand, free of dirt and organic matter</td><td>mortar, concrete, block moulding</td></tr>
+              <tr><td>Stones/aggregates</td><td>granite and gravel give concrete its backbone</td><td>concrete, foundations, road base</td></tr>
+              <tr><td>Cement</td><td>grey powder; binder that sets hard with water; keep dry in bags off the floor</td><td>mortar, concrete, plaster</td></tr>
+              <tr><td>Clay</td><td>mouldable when wet, hard when burnt</td><td>bricks, tiles, pots</td></tr>
+              <tr><td>Timber</td><td>light, strong for its weight, workable; must be seasoned (dried)</td><td>roofing, doors, formwork, furniture</td></tr>
+              <tr><td>Steel</td><td>very strong in tension; does not crack like concrete does</td><td>reinforcement bars, roofing sheets, gates</td></tr>
+              <tr><td>Water</td><td>clean, free of oil and dirt — dirty water ruins concrete</td><td>mixing mortar and concrete, curing</td></tr>
             </table>
-            <p><b>Alloys</b> combine metals for better properties: brass (copper + zinc), bronze (copper + tin), stainless steel (iron + chromium + nickel).</p>
-            <h3>3. Other building materials</h3>
+            <div class="formula">TRAP: cement and concrete are NOT the same thing. Cement is the powder binder; concrete is the finished stone-like mix of cement + sand + aggregate + water. Calling concrete &apos;cement&apos; is the classic exam trap.</div>
+
+            <h3>3. Mortar, concrete and the magic ratio</h3>
             <ul>
-              <li><b>Cement, sand and gravel</b> — mixed with water to make concrete.</li>
-              <li><b>Plastics</b> — light, cheap and corrosion resistant, but many soften with heat.</li>
-              <li><b>Ceramics and glass</b> — hard and brittle; good insulators.</li>
-              <li><b>Rubber</b> — elastic; used for seals and vibration damping.</li>
+              <li><b>Mortar</b> = cement + sand + water; it is the glue that bonds bricks and blocks together and plasters walls.</li>
+              <li><b>Concrete</b> = cement + sand + granite (aggregate) + water; it is a structural material that can carry loads.</li>
+              <li>A common general-purpose mix ratio is <b>1:2:4</b> — one part cement, two parts sand, four parts granite, measured in the same head pan or bucket, never by guesswork.</li>
+              <li><b>Curing</b>: fresh concrete must be kept moist (sprinkled or covered) for several days while it gains strength; concrete that dries too fast cracks and stays weak.</li>
+              <li>Concrete is strong in <b>compression</b> (squeezing) but weak in <b>tension</b> (stretching) — which is exactly why steel bars are buried inside it.</li>
             </ul>
-            <h3>4. Forces in structures</h3>
+
+            <h3>4. Bricks and blocks: the walls of Nigeria</h3>
             <ul>
-              <li><b>Tension</b> — a pulling force that stretches (a cable in a suspension bridge).</li>
-              <li><b>Compression</b> — a pushing force that squeezes (a pillar supporting a roof).</li>
-              <li><b>Shear</b> — forces sliding past each other (at a bolt or a beam support).</li>
-              <li><b>Torsion</b> — a twisting force (a drive shaft).</li>
+              <li><b>Sandcrete blocks</b> (cement + sand, machine or hand moulded) are the commonest wall unit in Nigerian towns; <b>burnt clay bricks</b> dominate in many rural and northern builds.</li>
+              <li>Qualities of a good brick/block: uniform shape and size, well burnt or well cured, hard (no crumbling), makes a ringing sound when struck, does not absorb too much water, no cracks.</li>
+              <li>Simple site tests: drop a good block flat from hand height — it should not shatter; scratch its surface — no deep powdering; soak one — it should not swell like bread.</li>
             </ul>
-            <h3>5. Why triangles?</h3>
-            <p>A triangle is the only polygon that <b>cannot change shape</b> without changing the length of a side, so it is inherently rigid. A rectangle collapses into a parallelogram unless it is braced. That is why roof trusses, bridges, cranes and bicycle frames are built from triangles.</p>
-            <div class="worked"><b>Worked example:</b> A garden gate sags over time. Explain why and how to fix it.<br>
-            The rectangular frame is not rigid and deforms into a parallelogram under its own weight. Fix it by nailing a <b>diagonal brace</b> from the bottom hinge corner to the top latch corner, creating two triangles.</div>
-            <h3>Common mistakes</h3>
+
+            <h3>5. Timber and metals: choosing the right one</h3>
             <ul>
-              <li>Saying all metals rust — only <b>ferrous</b> metals do.</li>
-              <li>Confusing seasoning (drying) with curing (the chemical hardening of concrete).</li>
-              <li>Thinking a thicker material is always stronger; the <b>shape</b> often matters more.</li>
+              <li><b>Timber</b> must be seasoned (dried) or it warps, shrinks and invites termites; hardwoods (iroko, mahogany) for structure and floors, softwoods for lighter work.</li>
+              <li>Timber defects to reject: knots in the wrong place, cracks (checks and shakes), warping, rot and insect holes.</li>
+              <li><b>Ferrous metals</b> contain iron (steel, cast iron) — strong but rust-prone; <b>non-ferrous</b> (aluminium, copper, zinc) resist rust and are lighter — aluminium for roofing and windows, copper for wiring.</li>
+              <li>Protecting steel: paint, galvanising (zinc coating) or grease keep water and oxygen off the metal — rust needs both.</li>
             </ul>
-            <h3>Deep dive: the materials and their properties</h3>
+            <div class="diagram"><svg viewBox="0 0 460 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Cut-away house showing labelled parts: foundation below ground, wall, lintel above window, beam, columns, floor, roof">
+              <rect x="8" y="8" width="444" height="204" rx="10" fill="#fff7ed" stroke="#9a3412" stroke-width="2"/>
+              <rect x="60" y="170" width="340" height="14" fill="#a8a29e"/>
+              <rect x="80" y="184" width="300" height="20" fill="#57534e"/>
+              <rect x="100" y="70" width="12" height="100" fill="#b45309"/>
+              <rect x="348" y="70" width="12" height="100" fill="#b45309"/>
+              <rect x="100" y="60" width="260" height="12" fill="#7c2d12"/>
+              <path d="M90 62 L230 18 L370 62 Z" fill="#dc2626" opacity="0.85"/>
+              <rect x="150" y="110" width="52" height="60" fill="#fef3c7" stroke="#92400e" stroke-width="2"/>
+              <rect x="146" y="100" width="60" height="10" fill="#16a34a"/>
+              <rect x="250" y="120" width="44" height="50" fill="#bae6fd" stroke="#075985" stroke-width="2"/>
+              <g font-size="9.5" font-weight="700" fill="#7c2d12">
+                <line x1="230" y1="196" x2="230" y2="206" stroke="#9a3412"/><text x="236" y="209">foundation — carries everything to the ground</text>
+                <line x1="106" y1="140" x2="40" y2="140" stroke="#9a3412"/><text x="14" y="132" >wall</text>
+                <line x1="176" y1="105" x2="176" y2="88" stroke="#9a3412"/><text x="150" y="84">lintel</text>
+                <line x1="300" y1="66" x2="300" y2="52" stroke="#9a3412"/><text x="282" y="48">beam</text>
+                <line x1="230" y1="40" x2="230" y2="30" stroke="#9a3412"/><text x="214" y="26">roof</text>
+                <line x1="272" y1="145" x2="320" y2="145" stroke="#9a3412"/><text x="300" y="138">window</text>
+                <line x1="176" y1="140" x2="230" y2="150" stroke="#9a3412"/><text x="214" y="158">door</text>
+              </g>
+            </svg></div>
+
+            <h3>6. Simple structures: who carries what</h3>
             <ul>
-              <li><b>Concrete</b> = cement + sand + granite (gravel) + water. The classic mix ratio is <b>1 : 2 : 4</b> (cement : sand : granite) for general work; more cement = stronger and dearer.</li>
-              <li><b>Blocks/bricks</b> — sand-cement blocks or burnt clay bricks form the walls.</li>
-              <li><b>Wood</b> — doors, frames, roofing members; must be seasoned (dried) to stop warping.</li>
-              <li><b>Steel/iron</b> — rods inside concrete make <b>reinforced concrete</b>: concrete resists squeezing (compression), steel resists pulling (tension) — together they carry big loads.</li>
-              <li><b>Roofing sheets</b> (aluminium/zinc), <b>glass</b> (windows), <b>paint</b> (protection and finish).</li>
+              <li><b>Foundation:</b> the buried feet of the building; spreads the whole weight into the ground so the soil is never overloaded.</li>
+              <li><b>Columns:</b> vertical members that carry loads from above down to the foundation.</li>
+              <li><b>Beams:</b> horizontal members that span openings and carry floors/roofs; they bend, so steel sits where the bending stretches them.</li>
+              <li><b>Lintel:</b> a small beam over a door or window that carries the wall above the opening.</li>
+              <li><b>Walls:</b> enclose, divide and (in some buildings) carry loads; <b>floor</b> gives the working surface; <b>roof</b> shields from rain and sun.</li>
+              <li>Load path, top to bottom: roof → beams/walls → columns → foundation → ground. Every kilogram of rain on the roof ends up in the soil.</li>
             </ul>
-            <p>Choose materials by <b>properties</b>: strength, durability (weather resistance), workability, cost and appearance. A roof must shed water; a floor must resist wear; a door frame must not rot.</p>
-            <h3>How a simple building goes up</h3>
-            <ol>
-              <li><b>Foundation</b> — trenches dug and filled with concrete; it spreads the building's weight into the ground.</li>
-              <li><b>Walls</b> — blocks laid in courses with mortar, checked plumb and level.</li>
-              <li><b>Roof</b> — wooden or steel frame, then sheets; it keeps out sun and rain.</li>
-              <li><b>Finishing</b> — plastering, wiring, plumbing, painting.</li>
-            </ol>
-            <h3>Simple structures everywhere</h3>
-            <p>A <b>structure</b> holds loads: bridges, masts, tanks, even a bird's nest. Members carry loads as <b>compression</b> (squashed — columns), <b>tension</b> (pulled — cables), or <b>bending</b> (beams). The triangle is the strongest frame shape — that is why bridges and roof trusses are full of triangles.</p>
-            <h3>Exam watch</h3>
+            <div class="worked"><b>Worked example (exam style):</b> "Why is a lintel placed above a window?" → window and door openings are empty — they cannot carry the wall above them; the lintel bridges the opening and passes the load to the wall at the sides.</div>
+
+            <h3>7. Choosing materials the Nigerian way</h3>
             <ul>
-              <li>The 1:2:4 ratio order is cement : sand : granite — mixing the order loses the mark.</li>
-              <li>Concrete alone is strong in <b>compression</b>; it needs steel for <b>tension</b>.</li>
-              <li>Triangles make frames rigid; rectangles flop into parallelograms unless braced.</li>
+              <li><b>Climate:</b> heavy rain wants good roof pitch and rust protection; hot sun wants ventilation and shade.</li>
+              <li><b>Cost and availability:</b> laterite, sand and stone are local almost everywhere; imported finishes are where budgets die.</li>
+              <li><b>Maintenance:</b> the cheapest material today can be the most expensive in five years if it rots, rusts or cracks.</li>
+              <li><b>Skill:</b> a material is only as good as the hands that place it — workmanship is half the structure.</li>
             </ul>
-            `,
+
+            <h3>8. Glass, plastics and the supporting cast</h3>
+            <ul>
+              <li><b>Glass:</b> hard, transparent, brittle; lets light in while keeping weather out — windows, louvres, bulbs. Handle with gloves and carry panes on edge, never flat.</li>
+              <li><b>Plastics (PVC, HDPE):</b> light, rust-proof, mouldable — pipes, conduits, water tanks, ceiling sheets. Their weakness is heat and sunlight ageing.</li>
+              <li><b>Asbestos and lead:</b> once popular, now avoided — health hazards matter in material selection too; a material that sickens its users is a bad material however strong.</li>
+              <li><b>Roofing sheets:</b> aluminium or galvanised steel; the zinc coat is the rust shield, and scratches on that coat are where rust begins.</li>
+            </ul>
+            <div class="worked"><b>Worked example:</b> "Suggest a material for a water tank and give one reason." → plastic (HDPE): rust-proof, light and mouldable; or galvanised steel: strong and water-tight. Reason must match the material&apos;s real property.</div>
+
+            <h3>9. Try these (with answers)</h3>
+            <ul>
+              <li><b>Q1.</b> Difference between mortar and concrete. <i>Ans: mortar = cement + sand + water (glue); concrete adds granite aggregate (structural).</i></li>
+              <li><b>Q2.</b> What does the ratio 1:2:4 mean? <i>Ans: 1 part cement, 2 parts sand, 4 parts granite.</i></li>
+              <li><b>Q3.</b> Why cure concrete? <i>Ans: keeping it moist lets it gain full strength and prevents cracking.</i></li>
+              <li><b>Q4.</b> Concrete is strong in ___ but weak in ___. <i>Ans: compression; tension.</i></li>
+              <li><b>Q5.</b> Why put steel bars in concrete? <i>Ans: steel resists the tension (stretching) that concrete cannot.</i></li>
+              <li><b>Q6.</b> Three qualities of a good brick. <i>Ans: uniform shape, hard/well burnt, rings when struck, low water absorption, no cracks.</i></li>
+              <li><b>Q7.</b> Why season timber? <i>Ans: drying prevents warping, shrinking, rot and termite attack.</i></li>
+              <li><b>Q8.</b> Ferrous vs non-ferrous metals. <i>Ans: ferrous contain iron (rust-prone); non-ferrous do not (rust-resistant).</i></li>
+              <li><b>Q9.</b> Member over a door opening? <i>Ans: lintel.</i></li>
+              <li><b>Q10.</b> Function of a foundation. <i>Ans: spreads the building&apos;s load safely into the ground.</i></li>
+              <li><b>Q11.</b> Two ways to stop steel rusting. <i>Ans: paint, galvanise, grease — anything that keeps out water and oxygen.</i></li>
+              <li><b>Q12.</b> Give the load path of a building. <i>Ans: roof → beams/walls → columns → foundation → ground.</i></li>
+              <li><b>Q13.</b> One reason plastic suits water tanks. <i>Ans: it does not rust (and is light/mouldable).</i></li>
+            </ul>
+            <div class="formula">SUMMARY: building materials are chosen by matching properties (strength, durability, workability, cost, availability) to the job: sand, stone, cement, clay, timber, steel and water form the core list; mortar glues while concrete carries, mixed at ratios like 1:2:4 and cured moist; blocks and bricks must be uniform, hard and stable; timber must be seasoned and metals chosen ferrous or non-ferrous with rust protection; and simple structures hand the load down a clear path — roof to beams and walls, to columns, to foundation, to ground — with lintels bridging every door and window on the way.</div>
+
+`,
           cards: [
             { q: 'Name six common building materials.', a: 'Sand, granite/gravel, cement, blocks or bricks, iron rods (reinforcement), timber, zinc roofing sheets, water, nails and paint.' },
             { q: 'What is concrete, and what role does each ingredient play?', a: 'A mix of cement (binder), sand and gravel (aggregate, for strength and bulk) and water (activates the cement). Iron rods inside it (reinforced concrete) add tensile strength.' },
@@ -7569,38 +7782,123 @@ Ada eventually saved enough to buy her mother a gift and returned home proud." (
           tags: ['Simple machines', 'Mechanical advantage', 'Maintenance'],
           summary: 'How levers, pulleys, gears and belts make work easier, how mechanisms turn one motion into another, and why maintaining machines saves money and lives.',
           content: `
-            <h3>1. What a machine does</h3>
-            <p>A machine never reduces the total <b>work</b> — it makes work <i>easier</i> by trading effort for distance, or by changing the direction of a force. Three numbers describe every machine:</p>
-            <div class="formula">Mechanical Advantage (MA) = Load ÷ Effort &nbsp;·&nbsp; Velocity Ratio (VR) = distance moved by effort ÷ distance moved by load &nbsp;·&nbsp; Efficiency = (MA ÷ VR) × 100%</div>
-            <p>Friction is why efficiency is always below 100% — oiling and maintaining a machine raises its MA toward its VR.</p>
-            <h3>2. The simple machines around you</h3>
+            <h3>1. What a machine is, and the six simple ones</h3>
+            <p>A <b>machine</b> is any device that makes work easier by transferring or multiplying force — every complex machine, from a bicycle to a bulldozer, is only the six <b>simple machines</b> dressed up in metal.</p>
+            <table>
+              <tr><th>Simple machine</th><th>Everyday example</th><th>How it helps</th></tr>
+              <tr><td>Lever</td><td>crowbar, see-saw, bottle opener, wheelbarrow</td><td>a rigid bar turning about a fulcrum multiplies force</td></tr>
+              <tr><td>Pulley</td><td>water well, flag pole, crane hook</td><td>changes the direction of force; in blocks, multiplies it</td></tr>
+              <tr><td>Wheel and axle</td><td>steering wheel, bicycle pedals, door knob</td><td>a big wheel turning a small axle multiplies turning force</td></tr>
+              <tr><td>Inclined plane</td><td>ramp, loading slope, staircase</td><td>raising a load gradually needs less force than lifting straight up</td></tr>
+              <tr><td>Wedge</td><td>axe, knife, chisel, nail tip</td><td>a moving double inclined plane splits and cuts</td></tr>
+              <tr><td>Screw</td><td>jar lid, bolt, screw jack, drill bit</td><td>an inclined plane wrapped round a cylinder; huge force over tiny distance</td></tr>
+            </table>
+            <div class="formula">TRAP: a screw is a wrapped inclined plane and a wedge is a moving double inclined plane — examiners ask exactly that pairing.</div>
+
+            <h3>2. Levers and their three classes</h3>
             <ul>
-              <li><b>Lever</b> — a bar turning on a fulcrum. Class 1: fulcrum in the middle (scissors, crowbar); Class 2: load in the middle (wheelbarrow, bottle opener); Class 3: effort in the middle (broom, your forearm).</li>
-              <li><b>Pulley</b> — changes direction; a block-and-tackle multiplies force (VR = number of rope sections supporting the load).</li>
-              <li><b>Inclined plane</b> — a ramp: long slope, small effort.</li>
-              <li><b>Wheel and axle</b> — steering wheel, door knob, screwdriver.</li>
-              <li><b>Gears</b> — toothed wheels that transfer rotation; a small gear driving a big one trades speed for turning force (bicycle low gear uphill).</li>
-              <li><b>Belt and chain drives</b> — the fan belt in a generator, the chain on an okada: they carry motion between shafts some distance apart.</li>
+              <li>Every lever has three points: the <b>fulcrum</b> (F, pivot), the <b>load</b> (L, what you move) and the <b>effort</b> (E, what you apply). The class is decided by which one sits in the MIDDLE.</li>
+              <li><b>First class — F in the middle:</b> crowbar, see-saw, scissors, pliers, claw hammer pulling a nail.</li>
+              <li><b>Second class — L in the middle:</b> wheelbarrow, bottle opener, nutcracker. Always multiplies force (MA greater than 1).</li>
+              <li><b>Third class — E in the middle:</b> forearm lifting a spoon, tweezers, broom, fishing rod. Multiplies speed and reach instead of force.</li>
             </ul>
-            <h3>3. Mechanisms: changing the kind of motion</h3>
-            <p>A <b>mechanism</b> converts one type of motion into another. The <b>crank and slider</b> turns the up-down motion of an engine piston into the rotation of the crankshaft (or the reverse, in a water pump). <b>Cams</b> turn rotation into a repeated push (engine valves). <b>Linkages</b> such as the bicycle brake or a windscreen wiper copy and redirect a movement.</p>
-            <h3>4. Maintenance: the cheapest repair is prevention</h3>
+            <div class="diagram"><svg viewBox="0 0 460 190" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Three lever classes drawn as beams on pivots showing the order of fulcrum, load and effort in each class">
+              <rect x="8" y="8" width="444" height="174" rx="10" fill="#fdf4ff" stroke="#86198f" stroke-width="2"/>
+              <g font-size="10" font-weight="800" fill="#86198f">
+                <text x="24" y="34">FIRST CLASS — fulcrum in the middle (crowbar, see-saw)</text>
+                <text x="24" y="94">SECOND CLASS — load in the middle (wheelbarrow)</text>
+                <text x="24" y="154">THIRD CLASS — effort in the middle (forearm, broom)</text>
+              </g>
+              <line x1="40" y1="52" x2="250" y2="52" stroke="#0f172a" stroke-width="4"/>
+              <path d="M145 52 l-12 18 h24 z" fill="#f59e0b" stroke="#92400e"/>
+              <rect x="44" y="40" width="16" height="12" fill="#dc2626"/><text x="46" y="36" font-size="9" fill="#b91c1c" font-weight="700">L</text>
+              <path d="M238 52 l0 -14 m-5 0 h10" stroke="#16a34a" stroke-width="3"/><text x="232" y="32" font-size="9" fill="#15803d" font-weight="700">E</text>
+              <text x="138" y="82" font-size="9" fill="#92400e" font-weight="700">F</text>
+              <line x1="40" y1="112" x2="250" y2="112" stroke="#0f172a" stroke-width="4"/>
+              <path d="M52 112 l-12 18 h24 z" fill="#f59e0b" stroke="#92400e"/>
+              <rect x="140" y="100" width="16" height="12" fill="#dc2626"/><text x="142" y="96" font-size="9" fill="#b91c1c" font-weight="700">L</text>
+              <path d="M238 112 l0 -14 m-5 0 h10" stroke="#16a34a" stroke-width="3"/><text x="232" y="92" font-size="9" fill="#15803d" font-weight="700">E</text>
+              <text x="46" y="142" font-size="9" fill="#92400e" font-weight="700">F</text>
+              <line x1="40" y1="172" x2="250" y2="172" stroke="#0f172a" stroke-width="4"/>
+              <path d="M52 172 l-12 14 h24 z" fill="#f59e0b" stroke="#92400e"/>
+              <rect x="140" y="160" width="16" height="12" fill="#dc2626"/><text x="142" y="156" font-size="9" fill="#b91c1c" font-weight="700">L</text>
+              <path d="M96 172 l0 -14 m-5 0 h10" stroke="#16a34a" stroke-width="3"/><text x="90" y="152" font-size="9" fill="#15803d" font-weight="700">E</text>
+              <text x="46" y="186" font-size="9" fill="#92400e" font-weight="700">F</text>
+              <g font-size="9.5" fill="#6b21a8">
+                <text x="276" y="60">Remember with FLE:</text>
+                <text x="276" y="76">1-2-3 the middle is</text>
+                <text x="276" y="92">F, then L, then E.</text>
+                <text x="276" y="116">Second class always</text>
+                <text x="276" y="132">multiplies force;</text>
+                <text x="276" y="148">third class trades force</text>
+                <text x="276" y="164">for speed and reach.</text>
+              </g>
+            </svg></div>
+
+            <h3>3. The three numbers: MA, VR and efficiency</h3>
             <ul>
-              <li><b>Preventive maintenance</b> — planned care: cleaning, oiling, tightening, replacing worn parts <i>before</i> failure. Servicing a generator every month is preventive maintenance.</li>
-              <li><b>Corrective (breakdown) maintenance</b> — repairing after failure; always costs more time and money.</li>
-              <li>Good habits: keep machines clean and dry (rust is a killer in the rainy season), oil moving parts, store tools properly, follow the maker's instructions.</li>
+              <li><b>Mechanical advantage (MA) = Load ÷ Effort.</b> It counts how many times the machine multiplies your push. Lift 200 N with 50 N of effort and MA = 4.</li>
+              <li><b>Velocity ratio (VR) = distance moved by effort ÷ distance moved by load</b> — a geometry fact of the machine, fixed by its design (lever arms, pulley count, slope length).</li>
+              <li><b>Efficiency = (MA ÷ VR) × 100.</b> Real machines always lose some effort to friction and to lifting their own parts, so MA is always below VR and efficiency is always below 100%.</li>
             </ul>
-            <h3>Worked example</h3>
-            <p><b>A pulley system lifts a load of 600 N with an effort of 200 N. Its velocity ratio is 4. Find MA and efficiency.</b> MA = 600/200 = <b>3</b>. Efficiency = (MA/VR) × 100 = (3/4) × 100 = <b>75%</b>. The missing 25% is friction in the pulley bearings — which is exactly what oiling attacks.</p>
-            <h3>5. Safety with machines</h3>
-            <p>Guards cover moving belts and gears; loose clothing, hair and jewellery stay away from rotating parts; machines are switched off before cleaning or adjustment. Most workshop injuries happen when someone bypasses a safety guard to "work faster".</p>
-            <h3>Exam watch</h3>
+            <div class="worked"><b>Worked example:</b> a lever has VR 5. A worker applies 60 N and lifts 240 N. MA = 240 ÷ 60 = 4. Efficiency = (4 ÷ 5) × 100 = 80%. The missing 20% went to friction — every real machine pays that tax.</div>
+            <div class="formula">TRAP: efficiency above 100% means you swapped MA and VR or misread the numbers — no machine beats 100%, not even in exam dreams.</div>
+
+            <h3>4. Pulleys and gear trains: passing the motion on</h3>
             <ul>
-              <li>MA and VR are <b>ratios</b> — they have no units; efficiency is a percentage.</li>
-              <li>Identify the lever class by what sits in the <b>middle</b>: fulcrum (1), load (2), effort (3).</li>
-              <li>Efficiency can never reach 100% in a real machine — friction is unavoidable.</li>
+              <li><b>Fixed pulley:</b> VR = 1; it only changes direction — pulling down feels easier than lifting up because your weight helps.</li>
+              <li><b>Movable pulley:</b> VR = 2; the load hangs from two rope segments, so each carries half the weight.</li>
+              <li><b>Block and tackle:</b> several pulleys together; VR equals the number of rope segments supporting the load.</li>
+              <li><b>Gears:</b> the driver turns the driven. Gear ratio = teeth on driven ÷ teeth on driver. A 12-tooth driver on a 36-tooth driven gives ratio 3 — the driven turns 3 times slower but with 3 times the turning force.</li>
+              <li><b>Belts and chains:</b> belts can slip (quiet, cheap — fans, generators); chains and sprockets never slip (the rear wheel of a bicycle).</li>
             </ul>
-          `,
+            <div class="worked"><b>Worked example:</b> a bicycle chainring has 48 teeth, the rear sprocket 16. Ratio = 48 ÷ 16 = 3, so one pedal turn spins the rear wheel 3 times — that is why hard gears cover more ground per pedal stroke.</div>
+
+            <h3>5. Friction and lubrication: the enemy that is also a friend</h3>
+            <ul>
+              <li><b>Friction</b> opposes sliding between surfaces. Enemy: it wears parts, heats machines and wastes effort. Friend: it lets brakes stop wheels, lets your feet grip the floor, lets belts drive pulleys without slipping.</li>
+              <li><b>Lubrication</b> slips a film of oil or grease between surfaces so they glide instead of grind — less wear, less heat, less noise, longer life.</li>
+              <li>Common lubricants: engine oil (moving parts), grease (joints and bearings), graphite (locks and small mechanisms), even wax on a zip or a drawer runner.</li>
+            </ul>
+
+            <h3>6. Maintenance: keeping machines alive</h3>
+            <ul>
+              <li><b>Preventive maintenance:</b> servicing on a schedule BEFORE anything breaks — oil changes, tightening, cleaning, sharpening, lubricating.</li>
+              <li><b>Corrective (breakdown) maintenance:</b> repairing AFTER failure — always costlier and always at the worst moment.</li>
+              <li><b>Bicycle routine:</b> wash and dry, oil the chain, check tyre pressure, tighten nuts and bolts, test brakes, keep it under cover.</li>
+              <li><b>Generator routine:</b> check oil level, clean the air filter, use fresh fuel, run it briefly every week in storage, keep it dry and dust-free.</li>
+              <li><b>Rust control:</b> clean and dry metal, then paint, oil or grease it — rust needs water and oxygen, so a coating starves it of both.</li>
+              <li>The craftsman&apos;s rule: a machine is not owned when you buy it; it is owned when you maintain it.</li>
+            </ul>
+
+            <h3>7. The inclined plane in numbers</h3>
+            <ul>
+              <li>VR of an inclined plane = length of the slope ÷ height it raises the load. A 3 m ramp lifting 1 m has VR 3 — you push 3 times the distance with about a third of the force.</li>
+              <li>That is why loading a drum into a truck through a plank feels easier than lifting it straight up: the work is the same, the force is friendlier.</li>
+              <li>Wedges and screws inherit this: the longer and thinner the slope, the bigger the multiplication.</li>
+            </ul>
+            <div class="worked"><b>Worked example:</b> a ramp 5 m long raises a load 1 m. VR = 5 ÷ 1 = 5. If 80 N of effort moves the 300 N load, MA = 300 ÷ 80 = 3.75 and efficiency = (3.75 ÷ 5) × 100 = 75% — the slope&apos;s friction took the rest.</div>
+
+            <h3>8. Try these (with answers)</h3>
+            <ul>
+              <li><b>Q1.</b> List the six simple machines. <i>Ans: lever, pulley, wheel and axle, inclined plane, wedge, screw.</i></li>
+              <li><b>Q2.</b> A screw is which simple machine wrapped round a cylinder? <i>Ans: the inclined plane.</i></li>
+              <li><b>Q3.</b> Class of lever with the load in the middle? <i>Ans: second class (wheelbarrow, bottle opener).</i></li>
+              <li><b>Q4.</b> Give two third-class levers. <i>Ans: forearm, tweezers, broom, fishing rod.</i></li>
+              <li><b>Q5.</b> MA formula? <i>Ans: Load ÷ Effort.</i></li>
+              <li><b>Q6.</b> Efficiency formula? <i>Ans: (MA ÷ VR) × 100.</i></li>
+              <li><b>Q7.</b> Why is efficiency always below 100%? <i>Ans: friction and the weight of machine parts waste some effort.</i></li>
+              <li><b>Q8.</b> VR of a single fixed pulley? <i>Ans: 1 — it only changes direction.</i></li>
+              <li><b>Q9.</b> Gear ratio when a 12-tooth driver turns a 36-tooth driven? <i>Ans: 3.</i></li>
+              <li><b>Q10.</b> Why choose a chain over a belt? <i>Ans: it cannot slip.</i></li>
+              <li><b>Q11.</b> Two purposes of lubrication. <i>Ans: reduce wear and heat (and noise); lengthen life.</i></li>
+              <li><b>Q12.</b> Maintenance done before breakdown is called? <i>Ans: preventive maintenance.</i></li>
+              <li><b>Q13.</b> Two ways to prevent rust. <i>Ans: paint, oil, grease, keep dry — coat the metal against water and oxygen.</i></li>
+              <li><b>Q14.</b> Effort 50 N lifts 200 N: MA? <i>Ans: 4.</i></li>
+            </ul>
+            <div class="formula">SUMMARY: every machine resolves into six simple machines — lever, pulley, wheel and axle, inclined plane, wedge and screw; levers are classed by their middle point (F, L or E) with the second class multiplying force and the third multiplying speed; their power is measured by MA = Load ÷ Effort, VR = effort distance ÷ load distance, and efficiency = (MA ÷ VR) × 100, forever below 100% because of friction; motion is passed on through pulley blocks, gear trains, belts and chains; and the whole machine kingdom is kept alive by lubrication against friction and by preventive maintenance against breakdown — clean, oil, tighten, protect from rust, and service before it fails.</div>
+
+`,
           cards: [
             { q: 'Define a machine.', a: 'A device that makes work easier by changing the size or direction of the effort force — it never reduces the total work done, because friction wastes some energy.' },
             { q: 'Name four types of motion with an example each.', a: 'Rotary/rotational (a fan blade), reciprocating (a sewing machine needle), linear (a sliding door), and oscillating (a pendulum or windscreen wiper).' },
@@ -14414,7 +14712,7 @@ function renderQuiz(el) {
           <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-slate-900 text-[11px] font-bold text-white">${qi + 1}</span>
           <h3 class="flex-1 text-sm font-bold leading-relaxed text-slate-900">${q.q}${q.src ? `<span class="ml-2 inline-block rounded bg-amber-100 px-1.5 py-0.5 align-middle text-[9px] font-bold text-amber-700">${q.src}</span>` : ''}${q.subject ? `<span class="ml-2 inline-block rounded bg-indigo-50 px-1.5 py-0.5 align-middle text-[9px] font-bold text-indigo-600">${q.subject}</span>` : ''}</h3>
         </div>
-        <div class="grid gap-2">
+        <div class="grid grid-cols-1 gap-2">
           ${q.options.map((opt, oi) => {
             const picked = chosen === oi;
             return `
@@ -14579,7 +14877,7 @@ function renderQuiz(el) {
           <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-slate-900 text-[11px] font-bold text-white">${qi + 1}</span>
           <h3 class="flex-1 text-sm font-bold leading-relaxed text-slate-900">${q.q}${q.src ? `<span class="ml-2 inline-block rounded bg-amber-100 px-1.5 py-0.5 align-middle text-[9px] font-bold text-amber-700">${q.src}</span>` : ''}</h3>
         </div>
-        <div class="grid gap-2">
+        <div class="grid grid-cols-1 gap-2">
           ${q.options.map((opt, oi) => {
             const picked = chosen === oi;
             return `
@@ -14674,7 +14972,7 @@ function renderQuiz(el) {
             <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ${sub ? (isCorrect ? 'bg-emerald-500' : isWrong ? 'bg-rose-500' : 'bg-slate-400') : 'bg-slate-900'} text-[11px] font-bold text-white">${sub ? (isCorrect ? '✓' : isWrong ? '✕' : '–') : qi + 1}</span>
             <h3 class="flex-1 text-sm font-bold leading-relaxed text-slate-900">${q.q}${q.src ? `<span class="ml-2 inline-block rounded bg-amber-100 px-1.5 py-0.5 align-middle text-[9px] font-bold text-amber-700">${q.src}</span>` : ''}</h3>
           </div>
-          <div class="grid gap-2">
+          <div class="grid grid-cols-1 gap-2">
             ${q.options.map((opt, oi) => {
               const picked = chosen === oi;
               const correctOne = sub && oi === q.correct;
@@ -15170,7 +15468,7 @@ function missionSection() {
           : ` <span class="ml-1.5 rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-black text-slate-400">${doneCount}/3 done</span>`}</h3>
         <span class="text-[11px] font-semibold text-slate-400">${p.minutes} min · ${p.anyStats ? 'focus: ' + p.focus : 'diagnostic week'}</span>
       </div>
-      <div class="grid gap-2 md:grid-cols-3">
+      <div class="grid grid-cols-1 gap-2 md:grid-cols-3">
         <div class="flex items-center justify-between gap-2 rounded-xl border border-slate-100 bg-slate-50 p-3">
           <div class="min-w-0 text-xs font-semibold text-slate-700"> ${p.focus}: <span class="block truncate text-[11px] text-slate-500">${p.focusTopic || 'first topic'} — ${Math.max(5, Math.round(p.minutes * 0.4))} min</span></div>
           <div class="flex shrink-0 items-center gap-1.5">${chip(doneRead)}<button type="button" onclick="openTopic('${esc(p.focus)}','${esc(p.focusTopic)}')" class="rounded-lg bg-indigo-600 px-2.5 py-1 text-[10px] font-black text-white transition hover:bg-indigo-700">GO</button></div>

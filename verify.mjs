@@ -385,7 +385,9 @@ check('deep-lesson batches: all deepened lessons reach textbook depth', (() => {
       JSS3: ['Summary Writing & précis']
     },
     'Basic Technology': {
-      JSS1: ['Technology in Everyday Life', 'Common Tools & Their Uses']
+      JSS1: ['Technology in Everyday Life', 'Common Tools & Their Uses', 'Technical Drawing: Instruments, Lines & Lettering', 'Safety in the Workshop'],
+      JSS2: ['Geometrical Construction & Plane Figures', 'Building Materials & Simple Structures'],
+      JSS3: ['Machines, Mechanisms & Maintenance']
     }
   };
   for (const [subj, levels] of Object.entries(spec))
