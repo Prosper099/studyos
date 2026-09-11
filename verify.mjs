@@ -228,17 +228,19 @@ check('streak freeze: brand-new user starts at Day 1 without spending a freeze',
 check('badge catalog: 76 badges (59 secret) incl. streaks, focus family and exam badges', T.BADGES.length === 76
   && T.BADGES.filter(b => b.secret).length === 59
   && ['streak-7', 'streak-30', 'streak-365'].every(id => T.BADGES.some(b => b.id === id)));
-check('recordTask banks a freeze every 5 tasks (max 10) and awards badges', (() => {
+check('recordTask: activity extends the streak; 7-day milestone banks a freeze (max 3)', (() => {
   const st = T.getState();
-  const snap = JSON.stringify([st.tasks, st.streakFreezes, st.badges]);
+  const snap = JSON.stringify([st.tasks, st.streakFreezes, st.badges, st.streak, st.lastActiveDate, st.daily]);
   st.tasks = { quizzes: 0, perfects: 0, cards: 0, sessions: 0, tasksTotal: 4 };
-  st.streakFreezes = 0; st.badges = [];
+  st.streakFreezes = 0; st.badges = []; st.streak = 6;
+  st.lastActiveDate = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
   T.recordTask('quiz', { percent: 100 });
-  const gotFreeze = st.streakFreezes === 1 && st.tasks.tasksTotal === 5;
-  const gotBadge = st.badges.includes('first-steps') && st.badges.includes('perfectionist');
+  const ok = st.streak === 7 && st.streakFreezes >= 1 && st.streakFreezes <= 3;
+  const detail = 'streak=' + st.streak + ' freezes=' + st.streakFreezes + ' last=' + st.lastActiveDate;
   const restored = JSON.parse(snap);
-  [st.tasks, st.streakFreezes, st.badges] = restored;
-  return gotFreeze && gotBadge;
+  [st.tasks, st.streakFreezes, st.badges, st.streak, st.lastActiveDate, st.daily] = restored;
+  if (!ok) console.log('MILESTONE DETAIL:', detail);
+  return ok;
 })());
 
 // ---------- quiz grading ----------
@@ -726,11 +728,15 @@ await signIn();
 await new Promise(r => setImmediate(r));
 const docAfterLogin = globalThis.__FS_STORE.get('users/test-uid-1');
 check('signing in created users/{uid} in Firestore', !!docAfterLogin, JSON.stringify(docAfterLogin));
-check('first login seeds streak = 1 and lastActiveDate', docAfterLogin && docAfterLogin.streak === 1 && /^\d{4}-\d{2}-\d{2}$/.test(docAfterLogin.lastActiveDate));
+check('login leaves the streak untouched (activity-based)', docAfterLogin && docAfterLogin.streak === 0);
 check('name/email written to Firestore doc', docAfterLogin && docAfterLogin.name === 'Joseph Adeyemi' && docAfterLogin.email === 'joseph@example.com');
 check('enterApp() revealed the main app and hid auth',
   !byId('main-app').classList.contains('hidden') && byId('auth-screen').classList.contains('hidden'));
-check('streak badge in header/sidebar updated', byId('header-streak').textContent === '🔥 1' && /1 day/.test(byId('streak-count').textContent));
+check('streak badge shows 0 before any study activity', byId('header-streak').textContent === '🔥 0');
+T.recordTask('card', {});
+const docAfterActivity = globalThis.__FS_STORE.get('users/test-uid-1');
+check('first study activity starts the streak at Day 1', docAfterActivity.streak === 1 && /^\d{4}-\d{2}-\d{2}$/.test(docAfterActivity.lastActiveDate), 'streak=' + docAfterActivity.streak);
+check('streak badge in header/sidebar updated after activity', byId('header-streak').textContent === '🔥 1' && /1 day/.test(byId('streak-count').textContent));
 check('unboarded user is pushed into onboarding', !byId('onboarding-modal').classList.contains('hidden'));
 
 // onboarding — enterApp() defers openOnboarding() behind a setTimeout, so start it explicitly
@@ -742,15 +748,15 @@ check('onboarding modal opened with step 1 visible',
   && byId('onboard-title').textContent === 'What class are you in?');
 await w.onboardNext();
 check('step 1 refuses to advance without a class selection',
-  !byId('onboard-error').classList.contains('hidden') && byId('onboard-kicker').textContent === 'Step 1 of 3');
+  !byId('onboard-error').classList.contains('hidden') && byId('onboard-kicker').textContent === 'Step 1 of 6');
 w.pickOnboardOption('classLevel', 'SS3');
 await w.onboardNext();
-check('step 1 → step 2 after choosing a class', byId('onboard-kicker').textContent === 'Step 2 of 3');
+check('step 1 → step 2 after choosing a class', byId('onboard-kicker').textContent === 'Step 2 of 6');
 await w.onboardNext();
 check('step 2 refuses to advance without a target exam', !byId('onboard-error').classList.contains('hidden'));
 w.pickOnboardOption('targetExam', 'JAMB UTME');
 await w.onboardNext();
-check('step 2 → step 3 after choosing an exam', byId('onboard-kicker').textContent === 'Step 3 of 3');
+check('step 2 → step 3 after choosing an exam', byId('onboard-kicker').textContent === 'Step 3 of 6');
 await w.onboardNext();
 check('step 3 refuses to save with no subjects', !byId('onboard-error').classList.contains('hidden'));
 w.toggleOnboardSubject('Mathematics');
@@ -758,12 +764,26 @@ w.toggleOnboardSubject('Physics');
 w.toggleOnboardSubject('Physics');
 w.toggleOnboardSubject('Physics');
 check('subject chips toggle on and off', true);
-w.onboardBack();
-w.onboardNext();
+await w.onboardNext();
+check('step 3 → step 4 (target score)', byId('onboard-kicker').textContent === 'Step 4 of 6');
+await w.onboardNext();
+check('step 4 refuses without a target score', !byId('onboard-error').classList.contains('hidden'));
+w.pickOnboardOption('targetScore', '300+');
+await w.onboardNext();
+check('step 4 → step 5 (study preference)', byId('onboard-kicker').textContent === 'Step 5 of 6');
+await w.onboardNext();
+check('step 5 refuses without a preference', !byId('onboard-error').classList.contains('hidden'));
+w.pickOnboardOption('studyPref', 'balanced');
+await w.onboardNext();
+check('step 6 shows the generated study plan with the target and today’s mission',
+  byId('onboard-kicker').textContent === 'Step 6 of 6'
+  && byId('step-6').innerHTML.includes('300+') && /mission/i.test(byId('step-6').innerHTML),
+  byId('step-6').innerHTML.slice(0, 150));
 await w.onboardNext();
 const docAfterOnboard = globalThis.__FS_STORE.get('users/test-uid-1');
-check('onboarding persisted class + exam + subjects to Firestore',
+check('onboarding persisted class + exam + subjects + target + preference to Firestore',
   docAfterOnboard.classLevel === 'SS3' && docAfterOnboard.targetExam === 'JAMB UTME'
+  && docAfterOnboard.targetScore === '300+' && docAfterOnboard.studyPref === 'balanced'
   && JSON.stringify(docAfterOnboard.subjects) === JSON.stringify(['Mathematics', 'Physics'])
   && docAfterOnboard.onboarded === true, JSON.stringify(docAfterOnboard));
 check('onboarding modal closed after finish', byId('onboarding-modal').classList.contains('hidden'));
@@ -896,7 +916,11 @@ globalThis.__FS_STORE.set('users/test-uid-2', { name: 'Amaka', email: 'a@b.c', c
 await globalThis.__AUTH_CB({ uid: 'test-uid-2', email: 'a@b.c', displayName: 'Amaka' });
 await new Promise(r => setImmediate(r));
 const doc2 = globalThis.__FS_STORE.get('users/test-uid-2');
-check('stale lastActiveDate resets streak to 1 on login', doc2.streak === 1, 'streak=' + doc2.streak);
+check('login never touches the streak (activity-based)', doc2.streak === 7, 'streak=' + doc2.streak);
+T.recordTask('quiz', { percent: 80 });
+check('stale streak resets on the next study activity (no freeze banked)',
+  globalThis.__FS_STORE.get('users/test-uid-2').streak === 1,
+  'streak=' + globalThis.__FS_STORE.get('users/test-uid-2').streak);
 
 // logout
 await w.handleLogout();

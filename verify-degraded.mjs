@@ -127,6 +127,11 @@ w.pickOnboardOption('targetExam', 'WAEC WASSCE');
 await w.onboardNext();
 w.toggleOnboardSubject('Chemistry');
 await w.onboardNext();
+w.pickOnboardOption('targetScore', 'Mostly A1-B3');
+await w.onboardNext();
+w.pickOnboardOption('studyPref', 'balanced');
+await w.onboardNext();
+await w.onboardNext();
 check('onboarding completes without a Firestore connection', byId('onboarding-modal').classList.contains('hidden'));
 const saved = JSON.parse(store.get('studyos.demo.v1') || '{}');
 check('preferences fall back to localStorage', saved.profile && saved.profile.classLevel === 'SS3'
