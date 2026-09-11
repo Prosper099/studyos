@@ -1851,6 +1851,11 @@ const CURRICULUM = {
             { q: 'What is standard form?', a: 'Writing a number as A × 10ⁿ with 1 <= A &lt; 10. Example: 3,600,000 = 3.6 × 10^6.' }
           ],
           quiz: [
+            { q: 'Write 3,004,056 in words.', options: ['Three million, four thousand and fifty-six', 'Three million, four hundred and fifty-six', 'Thirty million, four thousand and fifty-six', 'Three billion, forty thousand, five hundred and six'], correct: 0, exp: 'The zeros are placeholders: 3,004,056 = 3 millions, 0 hundred-thousands, 0 ten-thousands, 4 thousands, 0 hundreds, 5 tens, 6 units.' },
+            { q: 'Round 6,996 to the nearest hundred.', options: ['7,000', '6,900', '6,000', '7,100'], correct: 0, exp: 'The tens digit is 9 (5 or more), so the hundreds round up: 6,996 -> 7,000.' },
+            { q: 'Find the HCF and LCM of 18 and 24.', options: ['HCF 6, LCM 72', 'HCF 12, LCM 36', 'HCF 6, LCM 36', 'HCF 3, LCM 72'], correct: 0, exp: '18 = 2 x 3^2 and 24 = 2^3 x 3, so HCF = 2 x 3 = 6 and LCM = 2^3 x 3^2 = 72. Check: 6 x 72 = 432 = 18 x 24.' },
+            { q: 'Evaluate 2^3 + 3^2.', options: ['17', '13', '36', '12'], correct: 0, exp: '2^3 = 8 and 3^2 = 9, so 8 + 9 = 17 — evaluate powers (Orders in BODMAS) before adding.' },
+            { q: 'Which statement about prime numbers is correct?', options: ['2 is the smallest and the only even prime', '1 is the smallest prime', '9 is prime because 3 x 3 = 9', 'Every odd number is prime'], correct: 0, exp: 'A prime has exactly two factors. 1 has only one factor, so it is not prime; 2 is the smallest and only even prime; 9 = 3 x 3 has three factors.' },
             { q: 'What is the value of the digit 7 in 4,732,015?', options: ['700,000', '70,000', '7,000', '7,000,000'], correct: 0,
               exp: 'The 7 sits in the hundred-thousands column, so its value is 7 × 100,000 = 700,000.' },
             { q: 'Write 45,308 in words.', options: ['Forty-five thousand, three hundred and eight', 'Forty-five thousand and thirty-eight', 'Four million, five hundred and thirty-eight', 'Forty-five hundred and eight'], correct: 0,
@@ -1946,6 +1951,11 @@ const CURRICULUM = {
             { q: 'How do you compare 1/2, 0.4 and 3/5 quickly?', a: 'Put all in the same form — as decimals: 0.5, 0.4, 0.6 — then order them: 0.4 &lt; 1/2 &lt; 3/5.' }
           ],
           quiz: [
+            { q: 'Convert 2 3/5 to an improper fraction.', options: ['13/5', '10/5', '6/5', '23/5'], correct: 0, exp: 'Multiply the whole number by the denominator and add the top: (2 x 5 + 3)/5 = 13/5.' },
+            { q: 'Work out 1/2 + 1/3 + 1/6.', options: ['1', '5/6', '3/6', '1 1/6'], correct: 0, exp: 'With denominator 6: 3/6 + 2/6 + 1/6 = 6/6 = 1.' },
+            { q: 'Express 0.04 as a fraction in its lowest terms.', options: ['1/25', '4/10', '1/40', '2/25'], correct: 0, exp: '0.04 = 4/100 = 1/25 after dividing top and bottom by 4.' },
+            { q: 'Calculate 2/3 x 3/4 x 8.', options: ['4', '6', '3', '16/9'], correct: 0, exp: '2/3 x 3/4 = 6/12 = 1/2, and 1/2 x 8 = 4 — cancelling early makes it faster.' },
+            { q: 'Which is greater: 7/9 or 5/6?', options: ['5/6', '7/9', 'They are equal', 'Cannot be compared'], correct: 0, exp: 'In eighteenths: 7/9 = 14/18 and 5/6 = 15/18, so 5/6 is greater — compare fractions with a common denominator.' },
             { q: '3/4 + 1/6 = ?', options: ['11/12', '4/10', '5/12', '2/3'], correct: 0,
               exp: 'LCM of 4 and 6 is 12: 9/12 + 2/12 = 11/12. Never add tops and bottoms.' },
             { q: '0.75 as a fraction in lowest terms is:', options: ['3/4', '75/10', '7/5', '15/20'], correct: 0,
@@ -2035,6 +2045,11 @@ const CURRICULUM = {
             { q: 'Perimeter of a rectangle with length (x+3) and width x?', a: 'P = 2(l + w) = 2(2x + 3) = 4x + 6. Algebra lets the answer stay general for any x.' }
           ],
           quiz: [
+            { q: 'Simplify 5x + 2y - 3x + 4y.', options: ['2x + 6y', '8x + 6y', '2x - 2y', '14xy'], correct: 0, exp: 'Collect like terms: (5x - 3x) + (2y + 4y) = 2x + 6y — unlike letters cannot be added together.' },
+            { q: 'If 4m - 5 = 11, find m.', options: ['4', '1.5', '6', '16'], correct: 0, exp: '4m = 11 + 5 = 16, so m = 16/4 = 4. Check: 4(4) - 5 = 11.' },
+            { q: 'Write in algebra: \'Three times a number n, decreased by 7\'.', options: ['3n - 7', '3(n - 7)', '7 - 3n', 'n/3 - 7'], correct: 0, exp: '\'Three times n\' is 3n and \'decreased by 7\' subtracts 7, giving 3n - 7; the bracket form 3(n - 7) would triple the whole.' },
+            { q: 'Evaluate x^2 + 2x when x = 3.', options: ['15', '9', '30', '12'], correct: 0, exp: '3^2 + 2(3) = 9 + 6 = 15 — square first, then multiply, then add (BODMAS).' },
+            { q: 'Expand and simplify: 2(a + 4) + 3(a - 1).', options: ['5a + 5', '5a + 11', '6a + 5', '5a - 5'], correct: 0, exp: '2a + 8 + 3a - 3 = 5a + 5.' },
             { q: 'Simplify 3a + 4a - 2a.', options: ['5a', '9a', '5a^2', 'a'], correct: 0,
               exp: '(3 + 4 - 2)a = 5a. The letter part never changes when collecting like terms.' },
             { q: 'If x = 4, then 2x + 3 = ?', options: ['11', '10', '14', '9'], correct: 0,
@@ -2143,6 +2158,11 @@ const CURRICULUM = {
             { q: 'Each angle of an equilateral triangle?', a: '180° ÷ 3 = 60°, because all three angles are equal.' }
           ],
           quiz: [
+            { q: 'Find each interior angle of a regular hexagon.', options: ['120 deg', '108 deg', '135 deg', '90 deg'], correct: 0, exp: 'Sum of interior angles = (6 - 2) x 180 = 720 deg; each angle = 720/6 = 120 deg.' },
+            { q: 'Two angles lie on a straight line. One is 115 deg. Find the other.', options: ['65 deg', '75 deg', '55 deg', '245 deg'], correct: 0, exp: 'Angles on a straight line sum to 180 deg: 180 - 115 = 65 deg.' },
+            { q: 'The angles of a triangle are x, 2x and 60 deg. Find x.', options: ['40 deg', '60 deg', '30 deg', '45 deg'], correct: 0, exp: 'x + 2x + 60 = 180, so 3x = 120 and x = 40 deg (the angles are 40, 80 and 60).' },
+            { q: 'A quadrilateral with exactly one pair of parallel sides is a...', options: ['trapezium', 'parallelogram', 'rhombus', 'rectangle'], correct: 0, exp: 'A trapezium has exactly one pair of parallel sides; parallelograms (including rhombus and rectangle) have two pairs.' },
+            { q: 'Two straight lines cross and one of the vertically opposite angles is 72 deg. What is its vertically opposite angle?', options: ['72 deg', '108 deg', '18 deg', '144 deg'], correct: 0, exp: 'Vertically opposite angles are always equal, so it is also 72 deg (the angles beside it are 108 deg).' },
             { q: 'Angles on a straight line add up to:', options: ['180°', '90°', '360°', '270°'], correct: 0,
               exp: 'A straight line is half a turn: 180°.' },
             { q: 'The sum of the angles of a triangle is:', options: ['180°', '90°', '360°', '45°'], correct: 0,
@@ -2231,6 +2251,11 @@ const CURRICULUM = {
             { q: 'Why is the ratio of 20 minutes to 1 hour equal to 1:3?', a: 'Ratios need the same units: 1 hour = 60 minutes, so 20:60, which divides down to 1:3.' }
           ],
           quiz: [
+            { q: 'Share 72 in the ratio 4 : 5.', options: ['32 and 40', '36 and 36', '28 and 44', '40 and 32'], correct: 0, exp: 'Total parts = 9, one part = 8: 4 x 8 = 32 and 5 x 8 = 40 — the larger share matches the larger ratio number.' },
+            { q: 'If 6 pens cost ₦900, what is the cost of 10 pens?', options: ['₦1,500', '₦1,200', '₦1,600', '₦5,400'], correct: 0, exp: 'One pen = 900/6 = ₦150, so 10 pens = ₦1,500 (unitary method).' },
+            { q: 'Express 45 minutes as a percentage of 3 hours.', options: ['25%', '15%', '45%', '75%'], correct: 0, exp: '3 hours = 180 minutes, so 45/180 x 100 = 25% — always convert to the same unit first.' },
+            { q: 'A price falls from ₦2,000 to ₦1,700. Find the percentage decrease.', options: ['15%', '30%', '17%', '85%'], correct: 0, exp: 'Decrease = ₦300; 300/2000 x 100 = 15% — divide by the ORIGINAL price.' },
+            { q: 'Convert 5/8 to a percentage.', options: ['62.5%', '58%', '52.5%', '80%'], correct: 0, exp: '5/8 = 0.625 = 62.5% — divide top by bottom, then multiply by 100.' },
             { q: 'Share ₦1,500 between Ada and Bola in the ratio 2:3. Ada gets:', options: ['₦600', '₦900', '₦750', '₦500'], correct: 0,
               exp: '2 + 3 = 5 parts; one part = 1,500 ÷ 5 = 300; Ada gets 2 × 300 = ₦600.' },
             { q: '45% of 240 = ?', options: ['108', '96', '120', '45'], correct: 0,
@@ -2316,6 +2341,11 @@ const CURRICULUM = {
             { q: 'How do you solve a two-step equation such as 2x - 5 = 11?', a: 'Undo the operations in reverse order: first add 5 to both sides (2x = 16), then divide both sides by 2 (x = 8). Undo addition/subtraction before multiplication/division.' }
           ],
           quiz: [
+            { q: 'Evaluate (-8) + 3 + (-5).', options: ['-10', '-6', '10', '0'], correct: 0, exp: 'Add the negatives first: -8 + (-5) = -13, then -13 + 3 = -10.' },
+            { q: 'Solve 7 - x = 10.', options: ['x = -3', 'x = 3', 'x = 17', 'x = -17'], correct: 0, exp: 'Subtract 7 from both sides: -x = 3, so x = -3. Check: 7 - (-3) = 7 + 3 = 10.' },
+            { q: 'Evaluate (-6) x 7 and (-6) x (-7).', options: ['-42 and 42', '42 and 42', '-42 and -42', '42 and -42'], correct: 0, exp: 'Unlike signs give a negative product (-42); like signs give a positive product (+42).' },
+            { q: 'Solve 2(x + 4) = 3x - 1.', options: ['x = 9', 'x = 7', 'x = -9', 'x = 3'], correct: 0, exp: 'Expand: 2x + 8 = 3x - 1; subtract 2x from both sides: 8 = x - 1; so x = 9. Check: 2(13) = 26 = 27 - 1.' },
+            { q: 'A submarine at 45 m below sea level rises 18 m. What is its new depth?', options: ['-27 m', '-63 m', '27 m', '-18 m'], correct: 0, exp: 'Below sea level is negative: -45 + 18 = -27 m — it is still 27 m below the surface.' },
             { q: 'Evaluate: -7 + 12', options: ['5', '-5', '19', '-19'], correct: 0,
               exp: 'Different signs, so subtract the smaller from the larger and keep the sign of the larger: 12 - 7 = 5, positive.' },
             { q: 'Evaluate: -6 - (-4)', options: ['-10', '-2', '2', '10'], correct: 1,
@@ -2405,6 +2435,11 @@ const CURRICULUM = {
             { q: 'What is commission?', a: 'A percentage of the value of sales paid to the person who made the sale. For example, 5% commission on N40,000 of sales is N2,000.' }
           ],
           quiz: [
+            { q: 'A phone bought for ₦12,000 is sold at 15% profit. Find the selling price.', options: ['₦13,800', '₦13,500', '₦14,000', '₦12,150'], correct: 0, exp: 'Profit = 15% of 12,000 = ₦1,800; selling price = 12,000 + 1,800 = ₦13,800.' },
+            { q: 'In how many years will ₦8,000 earn ₦1,200 simple interest at 5% per annum?', options: ['3 years', '2 years', '4 years', '5 years'], correct: 0, exp: 'T = 100I/(PR) = (100 x 1200)/(8000 x 5) = 120,000/40,000 = 3 years.' },
+            { q: 'A discount of ₦675 is given on a ₦4,500 bag. Find the discount percentage.', options: ['15%', '12%', '20%', '25%'], correct: 0, exp: '675/4500 x 100 = 15% — discount is measured on the marked price.' },
+            { q: 'Find the amount on ₦20,000 invested at 10% per annum compound interest for 2 years.', options: ['₦24,200', '₦24,000', '₦22,000', '₦44,000'], correct: 0, exp: 'A = 20,000 x 1.1 x 1.1 = ₦24,200 — the ₦200 above simple interest (₦24,000) is interest earned on the first year of interest.' },
+            { q: 'A trader bought goods for ₦9,000 and sold them for ₦7,650. Find the loss percentage.', options: ['15%', '13.5%', '85%', '20%'], correct: 0, exp: 'Loss = ₦1,350; loss% = 1350/9000 x 100 = 15% — loss percentage is on the cost price.' },
             { q: 'A trader buys a bag of rice for N800 and sells it for N1,000. What is her percentage profit?', options: ['20%', '25%', '80%', '125%'], correct: 1,
               exp: 'Profit = N200. Percentage profit is always on the cost price: 200/800 x 100 = 25%.' },
             { q: 'A phone case costs N500 to make. At 10% profit, what is the selling price?', options: ['N450', 'N505', 'N550', 'N600'], correct: 2,
@@ -2464,64 +2499,124 @@ const CURRICULUM = {
           tags: ['Characteristics of life', 'Hygiene', 'Disease prevention'],
           summary: 'What separates living from non-living things, and the everyday habits — hygiene, diet, nets — that keep a JSS student healthy.',
           content: `
-            <h3>1. The characteristics of living things</h3>
-            <div class="formula">M R N I G E R D — Movement, Respiration, Nutrition, Irritability, Growth, Excretion, Reproduction, Death.<br>
-            If it does all of these, it is alive.</div>
-            <table>
-              <tr><th>Characteristic</th><th>Meaning</th></tr>
-              <tr><td>Movement</td><td>Animals move whole body; plants move parts (shoots to light)</td></tr>
-              <tr><td>Respiration</td><td>Releasing energy from food — every living cell, day and night</td></tr>
-              <tr><td>Nutrition</td><td>Taking in food; plants make their own by photosynthesis</td></tr>
-              <tr><td>Irritability</td><td>Responding to changes: eye closes at bright light</td></tr>
-              <tr><td>Growth</td><td>Permanent increase in size</td></tr>
-              <tr><td>Excretion</td><td>Removing waste made inside the body (urine, CO2)</td></tr>
-              <tr><td>Reproduction</td><td>Producing new individuals of the same kind</td></tr>
-            </table>
-            <p>A stone, a table and a cloud do <b>none</b> of these — they are non-living. A car "moves" and "breathes" fuel but cannot grow, respond or reproduce by itself.</p>
-            <h3>2. Personal hygiene that actually prevents disease</h3>
+            <h3>1. Living and non-living things</h3>
+            <p>Everything in the world is either a <b>living thing</b> or a <b>non-living thing</b>. You, a goat, a mango tree and bacteria are alive. A stone, a chair, water and a motor car are not. The difference is not movement or noise — a car moves and a river 'travels', yet neither is alive. Living things carry out <b>all</b> the life processes listed below; non-living things carry out none of them by themselves.</p>
+            <div class="worked"><b>Think about it:</b> A flame 'eats' fuel, 'grows' when fed and 'dies' when starved — yet fire is not alive because it is not made of cells, cannot reproduce and has no organised body.</div>
+
+            <h3>2. Characteristics of living things — MR NIGER D</h3>
+            <p>Students remember the seven characteristics with the code <b>MR NIGER D</b>: <b>M</b>ovement, <b>R</b>espiration, <b>N</b>utrition, <b>I</b>rritability (sensitivity), <b>G</b>rowth, <b>E</b>xcretion, <b>R</b>eproduction — and, in time, <b>D</b>eath.</p>
             <ul>
-              <li>Wash hands with soap before eating and after the toilet — it breaks the faecal–oral route of cholera and typhoid.</li>
-              <li>Brush teeth morning and night; sugar left on teeth feeds decay bacteria.</li>
-              <li>Bathe daily, keep nails short, and wear clean clothes to prevent skin infections.</li>
+              <li><b>Movement</b> — animals move their whole bodies from place to place (locomotion); plants move parts only, such as roots growing towards water or shoots bending towards light.</li>
+              <li><b>Respiration</b> — breaking down food inside cells to release <b>energy</b>. Every living thing respires day and night; it is not the same as breathing, which is only the exchange of gases.</li>
+              <li><b>Nutrition</b> — taking in and using food. Green plants make their own food by <b>photosynthesis</b>; animals feed on plants or other animals.</li>
+              <li><b>Irritability (sensitivity)</b> — responding to changes (stimuli) such as heat, light, touch and sound. You pull your hand from a hot pot; the sensitive plant (Mimosa) folds its leaves when touched.</li>
+              <li><b>Growth</b> — a permanent increase in size and mass. A child grows into an adult; a seedling becomes a tree. Growth in animals stops at maturity, while many plants keep growing.</li>
+              <li><b>Excretion</b> — removing waste products made inside the body (urine, sweat, carbon dioxide). Waste that stays inside poisons the body — this is different from egestion (removing undigested food).</li>
+              <li><b>Reproduction</b> — producing new individuals so life does not end with the parent. It may be <b>sexual</b> (two parents) or <b>asexual</b> (one parent).</li>
+              <li><b>Death</b> — all living things have a limited life span.</li>
             </ul>
-            <h3>3. Malaria — Nigeria's biggest killer of school days</h3>
-            <p>Malaria spreads through the bite of an infected <b>female Anopheles mosquito</b>. Prevention: sleep under an <b>insecticide-treated net</b>, clear stagnant water and bush around the house, and use window screens.</p>
-            <h3>4. A balanced diet</h3>
-            <p>Every day your body needs carbohydrates (energy), proteins (growth and repair), fats and oils (stored energy), vitamins and minerals (regulation), roughage (digestion) and water. Eat from <b>all groups</b> — beans and egusi soup with vegetables covers several at once.</p>
-            <div class="worked"><b>Worked practice:</b> Classify: (a) a mango tree, (b) a motorcycle, (c) a mushroom.<br>
-            (a) Living — it grows, respires and reproduces. (b) Non-living — it cannot grow or reproduce by itself. (c) Living — fungi respire, grow and reproduce.</div>
-            <h3>Common mistakes</h3>
+            <div class="formula">EXAM CODE: M-R-N-I-G-E-R-D → Movement, Respiration, Nutrition, Irritability, Growth, Excretion, Reproduction, Death.</div>
+
+            <h3>3. Differences between plants and animals</h3>
             <ul>
-              <li>Saying plants do not respire because they photosynthesise — they do <b>both</b>.</li>
-              <li>Calling sweating excretion of "water only" — sweat also carries salts and urea.</li>
-              <li>Thinking malaria comes from dirty food; it comes from mosquito bites.</li>
+              <li><b>Feeding:</b> plants manufacture their own food (photosynthesis, using chlorophyll); animals depend on ready-made food.</li>
+              <li><b>Movement:</b> plants are fixed in one place and move parts only; animals move the whole body from place to place.</li>
+              <li><b>Growth:</b> plant growth is often continuous and spread through the body; animal growth is definite and stops at maturity.</li>
+              <li><b>Response:</b> plants respond slowly; animals respond quickly through a nervous system.</li>
+              <li><b>Cell structure:</b> plant cells have a cellulose cell wall and large vacuoles; animal cells do not.</li>
             </ul>
-            <h3>Deep dive: MR NIGER D, explained properly</h3>
+
+            <h3>4. The cell — the unit of life</h3>
+            <p>All living things are built of <b>cells</b>. Some organisms, like <b>Amoeba</b>, <b>Euglena</b> and bacteria, are a <b>single cell</b> that performs every life process on its own. Plants and animals are made of millions of cells that share the work — this is called <b>division of labour</b>.</p>
+            <svg viewBox="0 0 420 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Simple diagrams of an animal cell and a plant cell">
+              <circle cx="100" cy="100" r="70" fill="#eef2ff" stroke="#6366f1" stroke-width="3"/>
+              <circle cx="100" cy="100" r="22" fill="#c7d2fe" stroke="#4f46e5" stroke-width="2"/>
+              <circle cx="60" cy="70" r="7" fill="#f59e0b"/><circle cx="140" cy="75" r="7" fill="#f59e0b"/>
+              <circle cx="70" cy="140" r="6" fill="#f59e0b"/>
+              <text x="100" y="188" text-anchor="middle" font-size="13" font-weight="700" fill="#334155">Animal cell</text>
+              <text x="100" y="105" text-anchor="middle" font-size="10" fill="#3730a3">nucleus</text>
+              <rect x="250" y="30" width="150" height="130" rx="14" fill="#ecfdf5" stroke="#059669" stroke-width="4"/>
+              <circle cx="325" cy="95" r="22" fill="#a7f3d0" stroke="#047857" stroke-width="2"/>
+              <circle cx="280" cy="60" r="7" fill="#16a34a"/><circle cx="370" cy="60" r="7" fill="#16a34a"/>
+              <circle cx="280" cy="130" r="7" fill="#16a34a"/>
+              <text x="325" y="188" text-anchor="middle" font-size="13" font-weight="700" fill="#334155">Plant cell (cell wall outside)</text>
+              <text x="325" y="100" text-anchor="middle" font-size="10" fill="#065f46">nucleus</text>
+            </svg>
             <ul>
-              <li><b>Movement</b> — animals move their whole bodies; plants move parts (roots grow toward water, shoots toward light).</li>
-              <li><b>Respiration</b> — breaking down food to release <b>energy</b> in every living cell (not the same as breathing, which is just gas exchange).</li>
-              <li><b>Nutrition</b> — plants make their own food (photosynthesis); animals depend on plants or other animals.</li>
-              <li><b>Irritability</b> — responding to changes (you pull your hand from a hot pot; the sensitive-plant folds when touched).</li>
-              <li><b>Growth</b> — a permanent increase in size and mass; a balloon inflating is NOT growth because it is reversible and not built from food.</li>
-              <li><b>Excretion</b> — removing <b>chemical waste made inside cells</b> (urine, sweat, CO2). Removing undigested faeces is <b>egestion</b>, not excretion — examiners love this distinction.</li>
-              <li><b>Reproduction</b> — producing new ones, so life continues.</li>
-              <li><b>Death</b> — the lifespan ends; non-living things do not die because they never lived.</li>
+              <li><b>Cell membrane</b> — the living skin of the cell; it controls what enters and leaves.</li>
+              <li><b>Cytoplasm</b> — the jelly-like substance where most cell activities happen.</li>
+              <li><b>Nucleus</b> — the control centre; it directs all cell activities and carries heredity material.</li>
+              <li><b>Cell wall</b> (plants only) — a firm cellulose coat that gives shape and support.</li>
+              <li><b>Chloroplast</b> (plants only) — the green kitchen where photosynthesis happens.</li>
+              <li><b>Vacuole</b> — a sac of cell sap; large and permanent in plants, small or absent in animals.</li>
             </ul>
-            <h3>Health habits that actually matter</h3>
-            <p><b>Personal hygiene</b>: bathe daily, brush twice, wash hands before eating and after the toilet, keep nails short. <b>Community hygiene</b>: clean water, covered refuse bins, proper toilets, no stagnant water around the house (that is where mosquitoes breed). <b>Balanced diet</b>: one of each class every day — carbohydrates (energy), proteins (growth), fats, vitamins, minerals, fibre and water.</p>
-            <h3>Common diseases and their prevention</h3>
+            <div class="worked"><b>Levels of organisation:</b> cells join to form <b>tissues</b> (e.g. muscle tissue) → tissues form <b>organs</b> (e.g. the heart) → organs work together as <b>systems</b> (e.g. the circulatory system) → systems make the whole <b>organism</b>.</div>
+
+            <h3>5. Nutrition: the balanced diet</h3>
+            <p><b>Nutrition</b> is the taking in and use of food. A <b>balanced diet</b> contains all six food classes in the right amounts for a person's age and work. Eating one class alone never works — the body needs all of them together.</p>
             <ul>
-              <li><b>Malaria</b> — female Anopheles mosquito → sleep under treated nets, drain puddles.</li>
-              <li><b>Cholera & typhoid</b> — contaminated food/water → boil or treat water, wash foods, wash hands.</li>
-              <li><b>Ringworm & scabies</b> — shared towels/clothes → personal items stay personal.</li>
+              <li><b>Carbohydrates</b> (rice, yam, garri, maize) — the main <b>energy</b> foods.</li>
+              <li><b>Proteins</b> (beans, fish, eggs, meat, groundnut) — <b>growth and repair</b> of tissues.</li>
+              <li><b>Fats and oils</b> (palm oil, butter, groundnut oil) — concentrated energy, warmth and protection of organs.</li>
+              <li><b>Vitamins</b> (fruits and vegetables) — protect against disease and help the body use other foods.</li>
+              <li><b>Mineral salts</b> (vegetables, liver, fish bones) — build bones and teeth (calcium), carry oxygen in blood (iron) and regulate the body.</li>
+              <li><b>Water</b> — carries substances, regulates temperature and makes up most of the body.</li>
+              <li><b>Roughage (fibre)</b> — adds bulk to food so waste moves easily and prevents constipation.</li>
             </ul>
-            <h3>Exam watch</h3>
+            <p><b>Deficiency diseases</b> appear when a class is missing for a long time:</p>
             <ul>
-              <li>Respiration happens in <b>every living cell</b>, day and night — breathing is only the delivery system.</li>
-              <li>Excretion != egestion (see above).</li>
-              <li>Viruses are the odd ones out: they show living characteristics <b>only inside a living cell</b>.</li>
+              <li>Protein → <b>kwashiorkor</b> (swollen belly, poor growth in children); severe lack of all food → <b>marasmus</b> (extreme thinness).</li>
+              <li>Vitamin A → <b>night blindness</b>; Vitamin B1 → <b>beriberi</b>; Vitamin C → <b>scurvy</b> (bleeding gums); Vitamin D → <b>rickets</b> (soft, bent bones).</li>
+              <li>Iron → <b>anaemia</b> (weakness, pale blood); Iodine → <b>goitre</b> (swollen neck).</li>
             </ul>
-            `,
+            <div class="worked"><b>Worked example (meal planning):</b> A plate of rice (carbohydrate) + beans and fish (protein) + vegetables and fruit (vitamins and minerals) + a glass of water is balanced. Rice and stew alone, every day, lacks enough protein, vitamins and fibre.</div>
+
+            <h3>6. Health, disease and their prevention</h3>
+            <p><b>Health</b> is complete well-being of body and mind — not merely the absence of disease. A <b>disease</b> is any condition that disturbs the normal working of the body. Causes include <b>germs</b> (bacteria, viruses, parasites), <b>deficient diet</b>, <b>inherited defects</b> and <b>unhealthy habits</b>.</p>
+            <ul>
+              <li><b>Malaria</b> — spread by the bite of the <b>female Anopheles mosquito</b>; prevented with insecticide-treated nets, clearing stagnant water and screening windows.</li>
+              <li><b>Cholera</b> — from food or water contaminated with faeces; prevented by boiling or treating drinking water, washing hands and covering food.</li>
+              <li><b>Tuberculosis</b> — a coughing sickness of the lungs spread in air; prevented by ventilation, BCG immunisation and completing treatment.</li>
+              <li><b>Measles, polio</b> — viral diseases largely prevented by <b>immunisation</b> (vaccines train the body to fight germs).</li>
+              <li><b>Ringworm, scabies</b> — from sharing towels, combs and clothes; prevented by personal hygiene.</li>
+            </ul>
+            <p><b>Personal hygiene habits:</b> bathe at least twice daily; brush teeth morning and night; wash hands with soap before eating and after the toilet; wear clean clothes; keep nails short; cover food and water; sleep under a treated net.</p>
+            <p><b>Community hygiene:</b> keep gutters and drains clear, dispose of refuse in bins (not on vacant plots), provide pipe-borne or treated water, and build proper latrines/toilets away from water sources.</p>
+
+            <h3>7. Rest, sleep and exercise</h3>
+            <ul>
+              <li><b>Sleep</b> repairs the body and brain; children and teenagers need about 8-10 hours nightly. Lack of sleep causes tiredness, poor memory and weak resistance to disease.</li>
+              <li><b>Rest</b> relaxes tired muscles after work — not all rest is sleep; sitting quietly after football also rests the body.</li>
+              <li><b>Exercise</b> strengthens the heart and muscles, improves blood circulation and keeps weight healthy. Daily play, walking and sport count — but exercise must not be so hard that it injures.</li>
+              <li><b>Posture</b> — sitting and standing straight protects the spine; heavy loads should be shared by both arms or carried on the head with care.</li>
+            </ul>
+
+            <h3>8. First aid</h3>
+            <p><b>First aid</b> is the immediate help given to a sick or injured person before professional treatment arrives. Its aims are to <b>preserve life</b>, <b>prevent the condition worsening</b> and <b>promote recovery</b>.</p>
+            <ul>
+              <li><b>Cuts:</b> wash around the wound, press gently with a clean cloth to stop bleeding, cover with a clean dressing; see a nurse for deep cuts (tetanus injection may be needed).</li>
+              <li><b>Burns/scalds:</b> pour cool (not icy) running water over the area for several minutes; cover loosely with clean cloth; never apply toothpaste or engine oil.</li>
+              <li><b>Fainting:</b> lay the person flat with legs raised, loosen tight clothing, let fresh air circulate.</li>
+              <li><b>Fracture (suspected broken bone):</b> do not move the limb — support it and get help.</li>
+              <li>Always <b>report</b> accidents to an adult and record what happened.</li>
+            </ul>
+            <div class="worked"><b>First aid box contents:</b> cotton wool, bandages and gauze, antiseptic, iodine, adhesive plasters, scissors, safety pins, disposable gloves — and a list of emergency numbers.</div>
+
+            <h3>9. Growth and development</h3>
+            <p><b>Growth</b> is a permanent increase in size, height and mass — it can be measured. <b>Development</b> is the improvement of skills and abilities: a baby learns to sit, crawl, walk and talk. Both proceed together from birth through childhood and adolescence to adulthood.</p>
+            <div class="formula">EXAM TRAP: growth is measurable (cm, kg); development is about ability. A question may ask you to distinguish them — do not use them as one word.</div>
+
+            <h3>10. Try these (with answers)</h3>
+            <ul>
+              <li><b>Q1.</b> List the seven characteristics of living things. <i>Ans: movement, respiration, nutrition, irritability, growth, excretion, reproduction (MR NIGER D).</i></li>
+              <li><b>Q2.</b> Why is a motor car not a living thing although it moves? <i>Ans: it does not grow, reproduce, respire in cells, excrete or respond like living things — it shows none of the life processes on its own.</i></li>
+              <li><b>Q3.</b> Name the food class needed for (a) energy, (b) growth and repair, (c) preventing constipation. <i>Ans: (a) carbohydrates, (b) proteins, (c) roughage/fibre.</i></li>
+              <li><b>Q4.</b> State the deficiency disease caused by lack of (a) vitamin C, (b) iron, (c) protein in children. <i>Ans: (a) scurvy, (b) anaemia, (c) kwashiorkor.</i></li>
+              <li><b>Q5.</b> Give three ways of preventing malaria. <i>Ans: insecticide-treated nets; clearing stagnant water where mosquitoes breed; window screens (also: treated clothing, indoor spraying).</i></li>
+              <li><b>Q6.</b> What is first aid, and what should you do first for a burn? <i>Ans: immediate help before professional care; pour cool running water over the burn for several minutes and cover it loosely.</i></li>
+            </ul>
+            <div class="formula">SUMMARY: Living things alone show ALL of MR NIGER D. They are built of cells organised into tissues, organs and systems. A balanced diet of six classes plus fibre keeps the body healthy; deficiency, germs and poor hygiene cause disease; hygiene, immunisation, rest, exercise and first-aid knowledge protect health.</div>
+`,
           cards: [
             { q: 'List the seven characteristics of living things (MR NIGER D).', a: 'Movement, Respiration, Nutrition, Irritability (sensitivity), Growth, Excretion, Reproduction and Death — non-living things may show one or two, but only living things show all.' },
             { q: 'State three differences between plants and animals.', a: 'Plants make their own food (photosynthesis), are fixed in one place and grow throughout life; animals feed on others, move from place to place and stop growing at maturity.' },
@@ -2540,6 +2635,11 @@ const CURRICULUM = {
             { q: 'Why is a car not alive even though it moves and uses fuel?', a: 'It cannot grow, respond by itself, excrete or reproduce — it fails most of MR NIGER D.' }
           ],
           quiz: [
+            { q: 'A motor car moves and uses oxygen, yet it is not alive. Which reason best explains this?', options: ['It cannot grow or reproduce', 'It cannot move fast', 'It has no colour', 'It makes noise'], correct: 0, exp: 'Living things show ALL the life processes — growth, reproduction, nutrition, excretion and sensitivity — which a car never does.' },
+            { q: 'Kwashiorkor in children is caused by a lack of...', options: ['protein', 'carbohydrate', 'fat', 'water'], correct: 0, exp: 'Kwashiorkor is the protein-deficiency disease (swollen belly, poor growth); marasmus comes from severe lack of all food.' },
+            { q: 'What is the basic structural and functional unit of all living things?', options: ['The cell', 'The tissue', 'The organ', 'The blood'], correct: 0, exp: 'Every living thing is made of cells — Amoeba is a single cell doing everything, while humans have trillions of specialised cells.' },
+            { q: 'Malaria is transmitted by... and can be prevented by...', options: ['the female Anopheles mosquito; sleeping under treated nets', 'dirty water; boiling drinking water', 'the air; wearing face masks', 'rats; storing food well'], correct: 0, exp: 'The female Anopheles mosquito carries the parasite; treated nets, clearing stagnant water and window screens prevent bites.' },
+            { q: 'Which food class is needed mainly for growth and repair of body tissues?', options: ['Proteins', 'Carbohydrates', 'Fats', 'Roughage'], correct: 0, exp: 'Proteins (beans, fish, eggs, meat) build and repair tissues; carbohydrates mainly supply energy.' },
             { q: 'The letters in "MR NIGER D" stand for the:', options: ['characteristics of living things', 'parts of a plant', 'steps of an experiment', 'food groups'], correct: 0,
               exp: 'Movement, Respiration, Nutrition, Irritability, Growth, Excretion, Reproduction, Death.' },
             { q: 'Which gas do we take in when breathing?', options: ['Oxygen', 'Carbon dioxide', 'Nitrogen', 'Hydrogen'], correct: 0,
@@ -2641,6 +2741,11 @@ const CURRICULUM = {
             { q: 'Why is the sun called the main source of energy?', a: 'It drives wind and the water cycle, powers photosynthesis (food), and ancient stored sunlight became fossil fuels.' }
           ],
           quiz: [
+            { q: 'The energy stored in food, petrol and a dry cell is...', options: ['chemical energy', 'kinetic energy', 'heat energy', 'solar energy'], correct: 0, exp: 'Foods, fuels and batteries store chemical energy, released when they burn, are digested, or react in a circuit.' },
+            { q: 'What is the main energy conversion in a solar panel?', options: ['Light to electrical', 'Electrical to light', 'Heat to kinetic', 'Chemical to electrical'], correct: 0, exp: 'A solar (photovoltaic) panel converts sunlight directly into electrical energy.' },
+            { q: 'Water held behind a dam has... energy, which becomes... as it falls.', options: ['potential; kinetic', 'kinetic; potential', 'chemical; light', 'sound; heat'], correct: 0, exp: 'Stored height gives gravitational potential energy; falling water turns it into kinetic energy that spins the turbines.' },
+            { q: 'Which of these energy sources is renewable?', options: ['Sunlight', 'Coal', 'Petroleum', 'Natural gas'], correct: 0, exp: 'Sunlight never runs out; coal, petroleum and natural gas are fossil fuels that took millions of years to form.' },
+            { q: 'State the law of conservation of energy.', options: ['Energy can only change form — never created or destroyed', 'Energy keeps increasing forever', 'Energy can be created from nothing', 'All energy ends up as light'], correct: 0, exp: 'The total energy stays constant — it only transforms, e.g. chemical -> electrical -> light in a torch (with some heat lost).' },
             { q: 'The SI unit of energy is the:', options: ['joule', 'newton', 'watt', 'ampere'], correct: 0,
               exp: 'Energy is measured in joules; force in newtons; power in watts.' },
             { q: 'The energy of a moving object is:', options: ['kinetic energy', 'potential energy', 'chemical energy', 'nuclear energy'], correct: 0,
@@ -2750,6 +2855,11 @@ const CURRICULUM = {
             { q: 'State four laboratory safety rules.', a: 'Never taste or directly smell chemicals; wear goggles and a lab coat; point heated test tubes away from people; add acid to water, never water to acid; report all breakages.' }
           ],
           quiz: [
+            { q: 'What is the SI unit of temperature?', options: ['Kelvin', 'Degrees Celsius', 'Joule', 'Calorie'], correct: 0, exp: 'The kelvin (K) is the SI base unit; degrees Celsius is the everyday scale (0 degC = 273 K).' },
+            { q: 'Which instrument is best for measuring the internal diameter of a test tube?', options: ['Vernier caliper', 'Metre rule', 'Measuring tape', 'Spring balance'], correct: 0, exp: 'A vernier caliper measures internal diameters accurately to 0.01 cm; a rule cannot reach inside precisely.' },
+            { q: 'Convert 2.5 kg to grams and 3 hours to seconds.', options: ['2,500 g and 10,800 s', '250 g and 1,080 s', '2,500 g and 180 s', '25,000 g and 10,800 s'], correct: 0, exp: '1 kg = 1000 g, so 2.5 kg = 2,500 g; 1 hour = 3600 s, so 3 hours = 10,800 s.' },
+            { q: 'A chemical splashes onto your hand during an experiment. What should you do first?', options: ['Wash with plenty of running water and report to the teacher', 'Wipe it with your sleeve', 'Apply cream immediately', 'Wait and see if it hurts'], correct: 0, exp: 'Flush the chemical off at once with lots of clean running water, then report — fast washing limits the damage.' },
+            { q: 'Why must chemicals never be tasted in the laboratory?', options: ['Many are poisonous or corrosive', 'It spoils the chemical', 'It is considered rude', 'Chemicals have no taste'], correct: 0, exp: 'Even small amounts can burn the mouth or poison the body — substances are identified with safe tests, never by tasting.' },
             { q: 'Which instrument measures the volume of a liquid?', options: ['Measuring cylinder', 'Metre rule', 'Stopwatch', 'Beam balance'], correct: 0,
               exp: 'A measuring cylinder is graduated in cm^3 for liquids; length, time and mass need other tools.' },
             { q: 'The SI unit of mass is the:', options: ['kilogram', 'metre', 'second', 'newton'], correct: 0,
@@ -2777,59 +2887,118 @@ const CURRICULUM = {
           tags: ['Physical vs chemical change', 'Elements & compounds', 'Diffusion'],
           summary: 'What matter is, how to tell a physical change from a chemical one, and the evidence that particles move.',
           content: `
-            <h3>1. What matter is</h3>
-            <p>Matter is anything that has <b>mass</b> and <b>occupies space</b>. It exists as a solid, liquid or gas.</p>
-            <h3>2. Physical and chemical properties</h3>
-            <p><b>Physical properties</b> can be observed without changing the substance: colour, odour, melting point, boiling point, density, solubility.<br>
-            <b>Chemical properties</b> describe how a substance reacts: flammability, rusting, reaction with acid.</p>
-            <h3>3. Physical versus chemical change</h3>
-            <table>
-              <tr><th>Physical change</th><th>Chemical change</th></tr>
-              <tr><td>No new substance forms</td><td>A new substance forms</td></tr>
-              <tr><td>Usually reversible</td><td>Usually irreversible</td></tr>
-              <tr><td>Small energy change</td><td>Large energy change</td></tr>
-              <tr><td>Melting ice, dissolving salt, tearing paper</td><td>Burning wood, rusting iron, souring milk</td></tr>
-            </table>
-            <div class="worked"><b>Worked example:</b> Classify each: (a) water boiling (b) a nail rusting (c) sugar dissolving (d) a candle burning.<br>
-            (a) physical — it is still water. (b) chemical — iron oxide forms. (c) physical — the sugar can be recovered by evaporation. (d) chemical — new gases and soot form.</div>
-            <h3>4. Elements, compounds and mixtures</h3>
+            <h3>1. What is matter?</h3>
+            <p><b>Matter</b> is anything that has <b>mass</b> and <b>occupies space</b> (has volume). Your body, your desk, the water you drink and even the air you breathe are matter. Light, heat and sound are <b>not</b> matter — they have no mass and take up no space; they are forms of energy.</p>
             <ul>
-              <li><b>Element</b> — one kind of atom; it cannot be split by chemical means (oxygen, iron, gold).</li>
-              <li><b>Compound</b> — two or more elements chemically combined in a fixed ratio (water H2O, salt NaCl). It can only be separated chemically.</li>
-              <li><b>Mixture</b> — substances physically combined in any ratio (air, sea water). It can be separated physically.</li>
+              <li><b>Mass</b> is the amount of matter in a body, measured in kilograms (kg) with a beam balance. Mass is the same everywhere.</li>
+              <li><b>Weight</b> is the pull of gravity on that mass, measured in newtons (N) with a spring balance. Weight changes from place to place (less on a mountain, far less on the Moon).</li>
+              <li><b>Volume</b> is the space a body occupies — solids by measurement, liquids with a measuring cylinder, irregular solids by water displacement.</li>
             </ul>
-            <h3>5. Evidence that matter is made of particles</h3>
+            <div class="worked"><b>Displacement activity:</b> Put 50 cm3 of water in a measuring cylinder, drop in a stone, and read the new level (say 68 cm3). The stone's volume is 68 - 50 = <b>18 cm3</b>.</div>
+
+            <h3>2. The three states of matter and the particle theory</h3>
+            <p>All matter is made of tiny <b>particles</b> (atoms and molecules) that are always moving. The state of a substance depends on how closely its particles are packed and how fast they move.</p>
+            <svg viewBox="0 0 450 150" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Particle arrangement in solids, liquids and gases">
+              <rect x="10" y="20" width="130" height="90" fill="#eef2ff" stroke="#6366f1" stroke-width="2"/>
+              <g fill="#4f46e5"><circle cx="35" cy="45" r="8"/><circle cx="75" cy="45" r="8"/><circle cx="115" cy="45" r="8"/><circle cx="35" cy="85" r="8"/><circle cx="75" cy="85" r="8"/><circle cx="115" cy="85" r="8"/></g>
+              <text x="75" y="132" text-anchor="middle" font-size="13" font-weight="700" fill="#334155">Solid: tight, regular</text>
+              <rect x="160" y="20" width="130" height="90" fill="#ecfeff" stroke="#0891b2" stroke-width="2"/>
+              <g fill="#0891b2"><circle cx="185" cy="80" r="8"/><circle cx="215" cy="90" r="8"/><circle cx="245" cy="78" r="8"/><circle cx="200" cy="55" r="8"/><circle cx="240" cy="50" r="8"/><circle cx="270" cy="70" r="8"/></g>
+              <text x="225" y="132" text-anchor="middle" font-size="13" font-weight="700" fill="#334155">Liquid: close, loose</text>
+              <rect x="310" y="20" width="130" height="90" fill="#fef2f2" stroke="#dc2626" stroke-width="2"/>
+              <g fill="#dc2626"><circle cx="335" cy="40" r="8"/><circle cx="410" cy="55" r="8"/><circle cx="360" cy="95" r="8"/><circle cx="330" cy="90" r="8"/><circle cx="415" cy="100" r="8"/></g>
+              <text x="375" y="132" text-anchor="middle" font-size="13" font-weight="700" fill="#334155">Gas: far apart, fast</text>
+            </svg>
             <ul>
-              <li><b>Diffusion</b> — a drop of ink spreads through still water; the smell of perfume crosses a room.</li>
-              <li><b>Brownian motion</b> — pollen grains jiggle on water because invisible water molecules strike them.</li>
-              <li><b>Dissolving</b> — sugar disappears into water but the water tastes sweet.</li>
+              <li><b>Solids</b> — particles packed tightly in a fixed pattern, only vibrating. A solid keeps its shape and volume, and cannot be compressed.</li>
+              <li><b>Liquids</b> — particles close but free to slide over one another. A liquid keeps its volume but takes the <b>shape of its container</b>, flows, and is almost impossible to compress.</li>
+              <li><b>Gases</b> — particles far apart, moving rapidly in all directions. A gas has no fixed shape or volume: it <b>fills any container</b> completely and is easily <b>compressed</b> (e.g. air in a tyre or gas cylinder).</li>
             </ul>
-            <div class="worked"><b>Worked example:</b> Explain why a gas fills any container but a solid keeps its shape.<br>
-            Gas particles are far apart and move rapidly in all directions, so they spread out. Solid particles are held in fixed positions by strong forces and can only vibrate.</div>
-            <h3>Common mistakes</h3>
+            <div class="formula">EXAM LINE: solids keep shape AND volume; liquids keep volume but not shape; gases keep neither — and only gases compress easily.</div>
+
+            <h3>3. Properties of matter</h3>
+            <p><b>Physical properties</b> can be observed or measured without changing the substance into something new:</p>
             <ul>
-              <li>Calling a mixture a compound — air is a <b>mixture</b>, because its components can be separated physically.</li>
-              <li>Thinking melting is a chemical change because the appearance changes. The substance is unchanged.</li>
+              <li><b>State, colour, odour and taste</b> — how matter appears to the senses (never taste unknown substances!).</li>
+              <li><b>Melting point and boiling point</b> — the fixed temperatures at which a pure solid melts and a pure liquid boils; impurities change them.</li>
+              <li><b>Density</b> — mass per unit volume; it decides whether things float or sink.</li>
+              <li><b>Solubility</b> — whether a substance dissolves in a solvent such as water.</li>
+              <li><b>Conductivity</b> — whether it carries heat or electricity (metals do; wood and plastic do not).</li>
+              <li><b>Malleability and ductility</b> — being hammered into sheets (aluminium) and drawn into wires (copper).</li>
             </ul>
-            <h3>Deep dive: the particle theory</h3>
-            <p>All matter is made of <b>tiny particles</b> in constant motion. Evidence: <b>diffusion</b> (perfume spreads across a room; a drop of ink colours still water), <b>Brownian motion</b> (smoke particles jiggle under a microscope because invisible air particles bombard them), and <b>evaporation</b>. Particle arrangement explains the states: <b>solids</b> — packed, fixed positions, definite shape and volume; <b>liquids</b> — close but sliding, definite volume, shape of the container; <b>gases</b> — far apart, fast, filling any container.</p>
-            <h3>State changes</h3>
-            <div class="formula">solid →(melting)→ liquid →(evaporation/boiling)→ gas; reversed: condensation, freezing; solid →(sublimation)→ gas (camphor, iodine)</div>
-            <p><b>Evaporation</b> happens at any temperature, from the surface only, slowly; <b>boiling</b> happens at one fixed temperature throughout the liquid, fast, with bubbles.</p>
-            <h3>Physical vs chemical changes</h3>
+            <p><b>Chemical properties</b> describe how a substance changes into new substances: iron <b>rusts</b> in damp air, paper <b>burns</b>, milk <b>sours</b>, food <b>digests</b>.</p>
+
+            <h3>4. Changes of state</h3>
+            <p>Heating a substance gives its particles more energy; cooling removes energy. Matter therefore changes state at particular temperatures:</p>
             <ul>
-              <li><b>Physical</b> — no new substance, usually reversible: melting ice, dissolving salt, tearing paper, boiling water.</li>
-              <li><b>Chemical</b> — new substances form, usually irreversible: burning wood, rusting iron, souring milk, digesting food, a candle burning.</li>
+              <li><b>Melting</b> — solid → liquid at the <b>melting point</b> (ice melts at 0 degC).</li>
+              <li><b>Evaporation</b> — liquid → vapour at any temperature, from the surface only.</li>
+              <li><b>Boiling</b> — liquid → vapour rapidly throughout the liquid at the fixed <b>boiling point</b> (pure water boils at 100 degC at normal pressure).</li>
+              <li><b>Condensation</b> — vapour → liquid when cooled (dew on grass; droplets on a cold drink bottle).</li>
+              <li><b>Freezing (solidification)</b> — liquid → solid at the freezing point (water freezes at 0 degC).</li>
+              <li><b>Sublimation</b> — solid → vapour directly on heating, without melting: <b>camphor (eka), iodine, ammonium chloride</b>. The reverse (vapour → solid) is also called sublimation/deposition.</li>
             </ul>
-            <h3>Worked example</h3>
-            <p><b>Classify: (a) melting candle wax (b) the candle wick burning (c) dissolving sugar in tea.</b> (a) physical — cooling re-solidifies it; (b) chemical — produces CO2, water vapour and soot; (c) physical — evaporate the tea and the sugar returns.</p>
-            <h3>Exam watch</h3>
+            <div class="worked"><b>Key point:</b> during melting or boiling the temperature stays CONSTANT even though heating continues — the heat is used to break the bonds between particles, not to raise temperature.</div>
+
+            <h3>5. Evaporation, boiling and cooling</h3>
             <ul>
-              <li>A burning candle shows BOTH changes: melting wax (physical) and burning wick (chemical).</li>
-              <li>Dissolving is physical, not chemical — the classic trap.</li>
-              <li>Sublimation skips the liquid state entirely: camphor "disappears" into vapour.</li>
+              <li><b>Evaporation</b> happens at ALL temperatures, only at the surface, quietly. The fastest (most energetic) particles escape first, so the remaining liquid COOLS — this is why <b>sweating cools the body</b> and why a wet cloth on the forehead reduces fever.</li>
+              <li>Evaporation is faster when it is hot, windy, dry, or the liquid is spread out (a puddle dries faster than the same water in a cup).</li>
+              <li><b>Boiling</b> happens at one fixed temperature, throughout the liquid, with bubbles. Adding salt or impurities RAISES the boiling point; lowering pressure (high mountain) LOWERS it — a pressure cooker raises pressure so food cooks above 100 degC.</li>
             </ul>
-            `,
+
+            <h3>6. Evidence that matter is made of particles</h3>
+            <ul>
+              <li><b>Diffusion</b> — particles spread from where they are many to where they are few. The smell of frying onions travels through the house; a drop of ink colours a whole cup of still water; perfume spreads across a room.</li>
+              <li><b>Brownian motion</b> — smoke particles in air (or pollen in water) jiggle in zigzags because invisible, fast-moving particles keep bumping into them — direct evidence that matter is made of moving particles.</li>
+              <li>Diffusion is fastest in gases, slower in liquids, and extremely slow in solids — the particles of gases move fastest and are freest.</li>
+            </ul>
+
+            <h3>7. Physical and chemical changes</h3>
+            <ul>
+              <li><b>Physical change</b> — NO new substance is formed, and the change is usually reversible: melting ice, dissolving salt in water, tearing paper, a bulb glowing.</li>
+              <li><b>Chemical change</b> — a NEW substance is formed, and the change is usually irreversible: burning wood or a candle wick, rusting of iron, souring of milk, cooking food, digesting a meal.</li>
+            </ul>
+            <div class="formula">TEST: ask 'can I get the original substance back by simple means?' Ice → water → ice (physical). Paper → ash (chemical — ash cannot become paper again).</div>
+
+            <h3>8. Elements, mixtures and compounds</h3>
+            <ul>
+              <li><b>Mixture</b> — two or more substances physically combined in ANY proportion; each keeps its own properties and can be separated physically (sand and salt; air; a bowl of rice and beans).</li>
+              <li><b>Compound</b> — two or more elements CHEMICALLY combined in a FIXED proportion, with entirely new properties, separable only by chemical means: water (H2O), common salt (NaCl), carbon(IV) oxide (CO2).</li>
+              <li><b>Element</b> — a substance that cannot be split into simpler substances by chemical means: iron, gold, oxygen, hydrogen.</li>
+            </ul>
+            <div class="worked"><b>Compare:</b> sodium (a reactive metal) + chlorine (a poisonous gas) combine to form common salt — safe to eat. The compound's properties are nothing like its elements' — that is the mark of a chemical combination.</div>
+
+            <h3>9. Simple separation methods</h3>
+            <ul>
+              <li><b>Filtration</b> — separates an insoluble solid from a liquid (sand from water) using filter paper; the solid left is the <b>residue</b>, the liquid passing through is the <b>filtrate</b>.</li>
+              <li><b>Evaporation</b> — recovers a dissolved solid (salt from salt solution) by driving off the water.</li>
+              <li><b>Decantation</b> — carefully pouring off a liquid from a settled solid (mud water after standing).</li>
+              <li><b>Sieving</b> — separates solids of different sizes (stones from sand).</li>
+              <li><b>Magnetic separation</b> — a magnet lifts iron filings from a mixture.</li>
+              <li><b>Separating funnel</b> — separates immiscible liquids such as oil and water (oil floats on top).</li>
+              <li><b>Winnowing</b> — wind blows away lighter chaff from heavier grain.</li>
+            </ul>
+
+            <h3>10. Density: floating and sinking</h3>
+            <div class="formula">Density = mass / volume   (units: g/cm3 or kg/m3)</div>
+            <p>A body floats in a fluid if it is LESS dense than the fluid and sinks if it is MORE dense. That is why a steel ship floats (its hollow shape makes its overall density less than water) while a steel nail sinks. Water has a density of 1 g/cm3.</p>
+            <div class="worked"><b>Worked example:</b> A stone has mass 60 g and volume 24 cm3. Density = 60/24 = <b>2.5 g/cm3</b> — more than water's 1 g/cm3, so the stone sinks.</div>
+
+            <h3>11. Expansion and contraction</h3>
+            <p>Matter expands when heated (particles vibrate or move farther apart) and contracts when cooled. Gases expand most, liquids less, solids least. Everyday results: expansion gaps in bridges and railway lines; overhead wires hung slack so winter contraction cannot snap them; a tight metal lid loosened under hot water; thick glass cracking when hot water is poured in suddenly (uneven expansion).</p>
+
+            <h3>12. Try these (with answers)</h3>
+            <ul>
+              <li><b>Q1.</b> Define matter and give two examples of things that are NOT matter. <i>Ans: anything with mass that occupies space; light, heat, sound and shadows are not matter.</i></li>
+              <li><b>Q2.</b> Why can gases be compressed but solids cannot? <i>Ans: gas particles are far apart with room to be pushed closer; solid particles are already tightly packed.</i></li>
+              <li><b>Q3.</b> Name the changes: (a) solid to liquid, (b) liquid to vapour throughout the liquid, (c) solid straight to vapour. <i>Ans: (a) melting, (b) boiling, (c) sublimation.</i></li>
+              <li><b>Q4.</b> Give two pieces of evidence that matter is made of tiny moving particles. <i>Ans: diffusion (smells spreading, ink colouring water) and Brownian motion (smoke/pollen jiggling).</i></li>
+              <li><b>Q5.</b> Classify: burning of kerosene, melting of butter, rusting of a nail, dissolving sugar. <i>Ans: chemical, physical, chemical, physical.</i></li>
+              <li><b>Q6.</b> A metal block has mass 540 g and volume 200 cm3. Find its density and say whether it floats on water. <i>Ans: 540/200 = 2.7 g/cm3; more dense than water (1 g/cm3), so it sinks.</i></li>
+            </ul>
+            <div class="formula">SUMMARY: Matter has mass and volume and exists as solid, liquid or gas depending on its particles' spacing and motion. It shows physical and chemical properties, changes state at fixed temperatures, may be an element, mixture or compound, and can be separated or measured using density and simple laboratory methods.</div>
+`,
           cards: [
             { q: 'Define matter and give its two basic properties.', a: 'Matter is anything that has mass and occupies space (volume) — everything around you, including air, is matter.' },
             { q: 'Describe the particles in a solid, a liquid and a gas.', a: 'Solid: particles packed tightly in fixed positions, vibrating only. Liquid: particles close but able to slide past one another. Gas: particles far apart, moving fast in all directions.' },
@@ -2848,6 +3017,11 @@ const CURRICULUM = {
             { q: 'Density formula and its use?', a: 'Density = mass ÷ volume. A block of 240 g and 80 cm^3 gives 3 g/cm^3; anything denser than water (1 g/cm^3) sinks in it.' }
           ],
           quiz: [
+            { q: 'Which state of matter is easily compressed, and why?', options: ['Gas — its particles are far apart', 'Solid — it is hard', 'Liquid — it flows', 'None can be compressed'], correct: 0, exp: 'Gas particles have wide spaces between them so they can be pushed closer; solid and liquid particles are already touching.' },
+            { q: 'Camphor (eka) changes directly from solid to vapour on heating. This change is called...', options: ['sublimation', 'evaporation', 'melting', 'condensation'], correct: 0, exp: 'Sublimation is solid -> gas without becoming liquid first; iodine and ammonium chloride also sublime.' },
+            { q: 'Which is a chemical change: candle wax melting, or the candle wick burning?', options: ['The wick burning', 'The wax melting', 'Both of them', 'Neither of them'], correct: 0, exp: 'Burning makes new substances (ash, smoke, gases) and cannot be reversed; melting wax is only a change of state.' },
+            { q: 'Which property makes copper suitable for electrical wires?', options: ['It is ductile and conducts electricity well', 'It is very heavy', 'It is magnetic', 'It dissolves in water'], correct: 0, exp: 'Ductility lets copper be drawn into thin wires, and its excellent conductivity carries current with little loss.' },
+            { q: 'Name the best methods to separate (a) sand from water and (b) salt from salt solution.', options: ['(a) Filtration, (b) Evaporation', '(a) Evaporation, (b) Filtration', '(a) Decantation, (b) Magnet', '(a) Sieving, (b) Filtration'], correct: 0, exp: 'Filtration traps the insoluble sand; evaporating the water leaves the dissolved salt behind.' },
             { q: 'The three common states of matter are:', options: ['solid, liquid, gas', 'hot, cold, warm', 'heavy, light, medium', 'ice, water, steam only'], correct: 0,
               exp: 'Ice/water/steam are just one substance (water) showing the three states.' },
             { q: 'Which state has a fixed shape AND a fixed volume?', options: ['Solid', 'Liquid', 'Gas', 'Vapour'], correct: 0,
@@ -2956,6 +3130,11 @@ const CURRICULUM = {
             { q: 'Describe the pH scale.', a: 'A 0-14 scale showing how acidic or basic a solution is: below 7 acidic, exactly 7 neutral, above 7 basic. The lower the number, the stronger the acid; the higher, the stronger the base.' }
           ],
           quiz: [
+            { q: 'Blue litmus paper is dipped into orange juice. What colour does it turn?', options: ['Red', 'Blue', 'Green', 'Yellow'], correct: 0, exp: 'Orange juice contains citric acid, and acids turn blue litmus red.' },
+            { q: 'What is the pH of a neutral solution such as pure water?', options: ['7', '0', '14', '1'], correct: 0, exp: 'The pH scale runs 0-14: below 7 acidic, exactly 7 neutral, above 7 alkaline.' },
+            { q: 'Milk of magnesia relieves stomach pain because it...', options: ['neutralises excess stomach acid', 'adds more acid to the stomach', 'kills all stomach bacteria', 'cools the stomach down'], correct: 0, exp: 'It is a mild base that neutralises excess hydrochloric acid, forming a harmless salt and water.' },
+            { q: 'Which two gases in polluted air cause acid rain?', options: ['Sulphur dioxide and nitrogen oxides', 'Oxygen and hydrogen', 'Carbon dioxide and helium', 'Chlorine and ammonia'], correct: 0, exp: 'SO2 and nitrogen oxides from factories and vehicles dissolve in rainwater to form weak acids that fall as acid rain.' },
+            { q: 'Which household substance is alkaline: soap solution or vinegar?', options: ['Soap solution', 'Vinegar', 'Both are alkaline', 'Neither is alkaline'], correct: 0, exp: 'Soap solution is basic (slippery feel, turns red litmus blue); vinegar contains ethanoic acid.' },
             { q: 'Which acid is found in oranges and lemons?', options: ['hydrochloric acid', 'citric acid', 'sulphuric acid', 'lactic acid'], correct: 1,
               exp: 'Citrus fruits contain citric acid - it gives oranges and lemons their sour taste.' },
             { q: 'The acid in vinegar is...', options: ['ethanoic (acetic) acid', 'citric acid', 'nitric acid', 'carbonic acid'], correct: 0,
@@ -3059,6 +3238,11 @@ const CURRICULUM = {
             { q: 'Why can a machine never reduce the work done?', a: 'A machine trades a smaller force for a longer distance, and friction wastes some energy as heat, so the work output is never greater than the work put in. Machines make work EASIER, not less.' }
           ],
           quiz: [
+            { q: 'A crowbar used to lift a stone is which class of lever?', options: ['First class', 'Second class', 'Third class', 'Not a lever'], correct: 0, exp: 'The pivot lies between the effort and the load — the signature of a first-class lever, like scissors and a see-saw.' },
+            { q: 'A bottle opener is which class of lever?', options: ['Second class', 'First class', 'Third class', 'A pulley'], correct: 0, exp: 'The load (the bottle cap) sits between the pivot and the effort — a second-class lever, like a wheelbarrow.' },
+            { q: 'A microphone converts sound energy mainly into...', options: ['electrical energy', 'light energy', 'kinetic energy', 'chemical energy'], correct: 0, exp: 'Sound vibrations become changing electrical signals that can be amplified and recorded.' },
+            { q: 'Why are ball bearings fitted inside machines?', options: ['To reduce friction between moving parts', 'To add weight', 'To make machines louder', 'To store energy'], correct: 0, exp: 'Ball bearings replace sliding friction with rolling friction, so parts turn smoothly with less wear and heat.' },
+            { q: 'A machine uses 200 J of energy and delivers 150 J of useful work. Find its efficiency.', options: ['75%', '25%', '150%', '66%'], correct: 0, exp: 'Efficiency = useful output/input x 100 = 150/200 x 100 = 75% — the rest is wasted, mostly as heat from friction.' },
             { q: 'Energy stored in a body because of its height or position is...', options: ['kinetic energy', 'potential energy', 'heat energy', 'chemical energy'], correct: 1,
               exp: 'A raised object stores potential energy; as it falls, that energy changes into kinetic energy.' },
             { q: 'The SI unit of energy is the...', options: ['newton', 'watt', 'joule', 'metre'], correct: 2,
@@ -3165,6 +3349,11 @@ const CURRICULUM = {
             { q: 'How do you keep your body systems healthy?', a: 'Eat a balanced diet (carbohydrates, proteins, fats, vitamins, minerals, fibre and water), exercise regularly, avoid tobacco, alcohol and drugs, wash your hands and drink safe water.' }
           ],
           quiz: [
+            { q: 'Which blood vessels carry blood away from the heart?', options: ['Arteries', 'Veins', 'Capillaries', 'Nerves'], correct: 0, exp: 'Arteries carry blood away from the heart (usually oxygen-rich); veins bring it back; capillaries are the tiny exchange vessels.' },
+            { q: 'Where is digested food absorbed into the blood?', options: ['The small intestine', 'The stomach', 'The large intestine', 'The oesophagus'], correct: 0, exp: 'The small intestine, lined with finger-like villi, absorbs the digested food into the bloodstream.' },
+            { q: 'Which organ filters the blood to form urine?', options: ['The kidney', 'The liver', 'The heart', 'The lung'], correct: 0, exp: 'The kidneys filter wastes (especially urea) and excess water from the blood to form urine.' },
+            { q: 'Which teeth are used mainly for grinding food?', options: ['Molars and premolars', 'Incisors', 'Canines', 'Wisdom teeth only'], correct: 0, exp: 'Molars and premolars have broad surfaces for grinding; incisors cut and canines tear.' },
+            { q: 'Which part of the brain controls balance and muscular coordination?', options: ['The cerebellum', 'The cerebrum', 'The medulla oblongata', 'The spinal cord'], correct: 0, exp: 'The cerebellum coordinates movement and balance — alcohol affects it first, which is why drunk people stagger.' },
             { q: 'Which system transports oxygen, nutrients and hormones round the body?', options: ['digestive', 'circulatory', 'nervous', 'skeletal'], correct: 1,
               exp: 'The heart, blood vessels and blood form the body\'s transport system.' },
             { q: 'Gas exchange - oxygen in, carbon dioxide out - happens in the...', options: ['stomach', 'alveoli of the lungs', 'kidneys', 'liver'], correct: 1,
@@ -3268,6 +3457,11 @@ const CURRICULUM = {
             { q: 'Why is drug abuse especially dangerous to a student?', a: 'It causes addiction, damages organs such as the brain and liver, destroys concentration and judgement, and leads to poor school performance and risky behaviour.' }
           ],
           quiz: [
+            { q: 'Where does fertilisation normally take place in humans?', options: ['In the fallopian tube (oviduct)', 'In the uterus', 'In the ovary', 'In the vagina'], correct: 0, exp: 'The sperm meets and fertilises the egg in the fallopian tube; the zygote then implants in the uterus.' },
+            { q: 'Name the male and female gametes.', options: ['Sperm and egg (ovum)', 'Testis and ovary', 'Uterus and womb', 'Sperm and uterus'], correct: 0, exp: 'Gametes are the sex cells: the sperm from the testes and the egg (ovum) from the ovary.' },
+            { q: 'State two changes that occur in girls during puberty.', options: ['Breast development and the start of menstruation', 'Voice deepening and beard growth', 'Growth of the Adam apple', 'Broadening of the shoulders only'], correct: 0, exp: 'Girls develop breasts, begin menstruating and hips widen; voice deepening and beards are male changes.' },
+            { q: 'Give one health effect and one social effect of drug abuse.', options: ['Liver or brain damage; crime and family breakdown', 'Better memory; more friends', 'Stronger body; popularity', 'None at all'], correct: 0, exp: 'Drug abuse damages organs and the mind (addiction, mental illness) and destroys relationships, schooling and careers.' },
+            { q: 'HIV can be transmitted by... but NOT by...', options: ['unprotected sex and infected blood; hugging or sharing plates', 'hugging; unprotected sex', 'mosquito bites; transfusion', 'sharing plates; infected needles'], correct: 0, exp: 'HIV spreads through unprotected sex, infected blood/needles and mother-to-child — never through hugging, sharing food or mosquito bites.' },
             { q: 'The stage of development when the body becomes capable of reproduction is...', options: ['infancy', 'puberty', 'menopause', 'old age'], correct: 1,
               exp: 'Puberty brings the physical changes - deepening voice in boys, breast development and the start of menstruation in girls.' },
             { q: 'Menstruation is...', options: ['the release of an egg only', 'the monthly shedding of the lining of the uterus', 'the fusion of gametes', 'a disease'], correct: 1,
@@ -3360,6 +3554,11 @@ const CURRICULUM = {
             { q: 'What makes an electric circuit "complete"?', a: 'An unbroken conducting path from one terminal of the cell, through the components (bulb, switch) and back to the other terminal. An open switch breaks the path and the bulb goes out.' }
           ],
           quiz: [
+            { q: 'Why can we see objects that do not give out their own light?', options: ['They reflect light into our eyes', 'They produce light at night', 'Our eyes send out rays', 'They are always white'], correct: 0, exp: 'Non-luminous objects are seen because they reflect light from a source (the Sun, a lamp) into our eyes.' },
+            { q: 'An echo is caused by the... of sound.', options: ['reflection', 'refraction', 'absorption', 'diffraction'], correct: 0, exp: 'An echo is sound reflected off a hard surface back to the listener — soft surfaces absorb sound instead.' },
+            { q: 'What kind of image does a plane mirror form?', options: ['Virtual, upright, same size, laterally inverted', 'Real and upside down', 'Always magnified', 'Always smaller'], correct: 0, exp: 'A plane mirror gives a virtual image that is upright, the same size, and laterally inverted (left and right swapped).' },
+            { q: 'Which material will complete an electric circuit: copper wire or rubber band?', options: ['Copper wire', 'Rubber band', 'Both', 'Neither'], correct: 0, exp: 'Copper is a conductor (free electrons carry the current); rubber is an insulator and blocks the flow.' },
+            { q: 'What device protects a circuit by melting when the current becomes too high?', options: ['A fuse', 'A switch', 'A battery', 'A bulb'], correct: 0, exp: 'The fuse wire heats and melts on excess current, breaking the circuit before cables overheat — a circuit breaker does the same job by tripping.' },
             { q: 'Light travels in...', options: ['curved paths', 'straight lines', 'circles', 'only through air'], correct: 1,
               exp: 'Rectilinear propagation - light travels in straight lines, which is why shadows have sharp edges.' },
             { q: 'The bouncing back of light from a smooth surface such as a mirror is called...', options: ['refraction', 'reflection', 'dispersion', 'absorption'], correct: 1,
@@ -4494,6 +4693,11 @@ const CURRICULUM = {
             { q: 'Which conjunction joins contrasting ideas?', a: '"but" — "Kunle is short but strong." "and" adds ideas; "or" offers a choice.' }
           ],
           quiz: [
+            { q: 'Identify the subject of the sentence: \'The naughty boys broke the window.\'', options: ['The naughty boys', 'broke', 'the window', 'naughty'], correct: 0, exp: 'The subject is who or what the sentence is about — \'The naughty boys\'; \'broke the window\' is the predicate.' },
+            { q: 'What type of sentence is \'Close the door!\'?', options: ['Imperative (command)', 'Declarative (statement)', 'Interrogative (question)', 'Exclamatory'], correct: 0, exp: 'It gives a command or makes a request, so it is imperative — even though the subject \'you\' is understood, not written.' },
+            { q: 'Choose the best conjunction: \'She was tired ___ she kept working.\'', options: ['but', 'so', 'because', 'or'], correct: 0, exp: '\'but\' joins contrasting ideas — she was tired, YET she kept working.' },
+            { q: 'Which of these is a complete sentence?', options: ['The dog ran fast.', 'Running fast.', 'Because it was late.', 'The tall man in black.'], correct: 0, exp: 'A complete sentence needs a subject and a verb expressing a full thought: \'The dog ran fast.\' The others are fragments.' },
+            { q: 'What end punctuation does \'What a lovely dress\' need?', options: ['An exclamation mark', 'A question mark', 'A comma', 'No punctuation'], correct: 0, exp: 'It expresses strong feeling (admiration), so it ends with an exclamation mark: \'What a lovely dress!\' It is not a question.' },
             { q: 'Every complete sentence must have:', options: ['a subject and a verb', 'an adjective', 'a conjunction', 'ten words'], correct: 0,
               exp: 'The subject names who/what; the predicate (with the verb) says something about it.' },
             { q: 'Which is a complete sentence?', options: ['The bell rang.', 'Running fast.', 'Under the tree.', 'Because he came.'], correct: 0,
@@ -4583,6 +4787,11 @@ const CURRICULUM = {
             { q: 'How is the plural ending pronounced in "boxes"?', a: '/ɪz/, because the word ends in an s-sound. Compare cats /s/ and bags /z/.' }
           ],
           quiz: [
+            { q: 'Which pair of words differs by a long and a short vowel?', options: ['sheep / ship', 'pat / bat', 'fan / van', 'cot / cut'], correct: 0, exp: '\'sheep\' has the long /i:/ and \'ship\' the short /I/ — the other pairs differ by consonant sounds.' },
+            { q: 'Which word contains a silent letter?', options: ['island', 'ideal', 'issue', 'item'], correct: 0, exp: 'In "island" the s is silent (it sounds like "eye-land"); in the other three every letter is pronounced.' },
+            { q: 'In \'PHOtograph\' and \'phoTOGraphy\', what changes?', options: ['The position of the word stress', 'The number of letters', 'The spelling of the vowels', 'Nothing changes'], correct: 0, exp: 'Adding the suffix moves the stress: PHO-to-graph but pho-TO-gra-phy — wrong stress can make a word unrecognisable.' },
+            { q: 'The word \'think\' begins with which sound?', options: ['/θ/ (voiceless th)', '/t/', '/f/', '/ð/ (voiced th)'], correct: 0, exp: '\'think\' starts with the voiceless /θ/ of \'thin\' — /ð/ is the voiced sound in \'this\' and \'that\'.' },
+            { q: 'What intonation do yes/no questions usually take?', options: ['A rising tone', 'A falling tone', 'A flat tone', 'No tone'], correct: 0, exp: '\'Are you ready?\' rises at the end; wh-questions and statements usually fall.' },
             { q: 'How many vowel letters does English have?', options: ['5', '4', '6', '21'], correct: 0,
               exp: 'a, e, i, o, u — though they make many more vowel sounds.' },
             { q: 'Which word has the same vowel sound as "ship"?', options: ['sit', 'sheep', 'seat', 'shape'], correct: 0,
@@ -4682,6 +4891,11 @@ const CURRICULUM = {
             { q: 'What makes an inference different from a detail?', a: 'A detail is stated; an inference is concluded from clues — "She opened her umbrella" implies rain without saying it.' }
           ],
           quiz: [
+            { q: 'What does \'scanning\' a passage mean?', options: ['Searching quickly for a specific detail', 'Reading every word slowly', 'Reading only the title', 'Copying the passage'], correct: 0, exp: 'Scanning hunts for one specific piece of information — a name, date or figure — while skimming gives the general idea.' },
+            { q: 'When writing a summary, should you copy sentences from the passage?', options: ['No — use your own words', 'Yes, copying is safest', 'Only long sentences', 'Only the first sentence'], correct: 0, exp: 'Copying whole sentences loses marks; the examiner tests whether you understood and can restate the ideas briefly.' },
+            { q: 'To guess the meaning of a new word in a passage, you should use...', options: ['context clues around the word', 'a guess based on its first letter', 'its meaning in another language', 'the number of letters it has'], correct: 0, exp: 'The surrounding sentence — examples, contrasts and the general sense — reveals what the word must mean.' },
+            { q: 'A question asks what a word means \'as used in the passage\'. What does this demand?', options: ['The meaning that fits that context', 'Every dictionary meaning', 'The opposite meaning', 'The spelling'], correct: 0, exp: 'Many words have several meanings; you must choose the one that works in THAT sentence — test it by substituting it back.' },
+            { q: 'Name two things to leave out of a summary.', options: ['Examples and repetition', 'Main ideas', 'The topic', 'Key conclusions'], correct: 0, exp: 'Summaries keep the main points only — examples, illustrations, statistics used as evidence and repetitions are cut.' },
             { q: 'Before reading a passage, you should first read:', options: ['the questions', 'the last paragraph', 'a dictionary', 'another passage'], correct: 0,
               exp: 'The questions tell you exactly what to look for during your reading.' },
             { q: 'The "main idea" of a passage is:', options: ['the central point the whole passage supports', 'the first word', 'any name mentioned', 'the longest sentence'], correct: 0,
@@ -4790,6 +5004,11 @@ const CURRICULUM = {
             { q: 'Give three irregular plurals.', a: 'child → children, foot → feet, mouse → mice (also man → men, tooth → teeth). They do not take -s.' }
           ],
           quiz: [
+            { q: 'In \'The tired teacher slept\', what part of speech is \'tired\'?', options: ['An adjective', 'A verb', 'An adverb', 'A noun'], correct: 0, exp: '\'tired\' describes the noun \'teacher\', so it is an adjective — don\'t be fooled: it looks like a past verb here but functions as a describing word.' },
+            { q: 'What part of speech is \'carefully\' in \'She wrote carefully\'?', options: ['An adverb', 'An adjective', 'A preposition', 'A conjunction'], correct: 0, exp: '\'carefully\' tells HOW she wrote — adverbs modify verbs, and many end in -ly.' },
+            { q: 'Which part of speech is \'and\' in \'bread and butter\'?', options: ['A conjunction', 'A preposition', 'An interjection', 'An adverb'], correct: 0, exp: '\'and\' joins words of equal rank, so it is a conjunction — other examples: but, or, because.' },
+            { q: 'In \'Wow! We won the match!\', the word \'Wow!\' is a(n)...', options: ['interjection', 'exclamation mark', 'adjective', 'adverb'], correct: 0, exp: 'An interjection expresses sudden feeling and stands apart from the sentence — \'Wow!\', \'Oh!\', \'Alas!\'' },
+            { q: 'Identify the pronoun in \'Ada lost her pen.\'', options: ['her', 'Ada', 'lost', 'pen'], correct: 0, exp: '\'her\' stands in place of a noun (Ada\'s), so it is a pronoun — \'Ada\' itself is a proper noun.' },
             { q: '"Quickly" belongs to which class of words?', options: ['Adverb', 'Adjective', 'Verb', 'Noun'], correct: 0,
               exp: 'It tells how an action is done, and many adverbs end in -ly.' },
             { q: 'Which of these is a pronoun?', options: ['she', 'Lagos', 'run', 'blue'], correct: 0,
@@ -4899,6 +5118,11 @@ const CURRICULUM = {
             { q: 'What is sequence of tenses?', a: 'When the main verb is in the past, the subordinate verb normally shifts to a past form too: "He said that he was tired", not "He said that he is tired".' }
           ],
           quiz: [
+            { q: 'Choose the correct form: \'Look! The bus ___.\'', options: ['is coming', 'comes', 'came', 'will come'], correct: 0, exp: '\'Look!\' signals an action happening NOW, so the present continuous \'is coming\' is correct.' },
+            { q: 'Give the past tense of \'buy\' and \'teach\'.', options: ['bought and taught', 'buyed and teached', 'bought and teachted', 'bought and taught-ed'], correct: 0, exp: 'Both are irregular verbs: buy-bought-bought, teach-taught-taught — they do not take -ed.' },
+            { q: 'Complete: \'I ___ here since 2019.\'', options: ['have lived', 'lived', 'live', 'was living'], correct: 0, exp: '\'since\' links the past to the present, which requires the present perfect: \'I have lived here since 2019.\'' },
+            { q: 'Complete: \'While we ___ home, it ___ to rain.\'', options: ['were walking; started', 'walked; was starting', 'are walking; starts', 'walk; started'], correct: 0, exp: 'The longer background action takes the past continuous (\'were walking\') and the interrupting action the simple past (\'started\').' },
+            { q: 'What is the simple present of \'go\' with the subject \'she\'?', options: ['goes', 'go', 'going', 'gone'], correct: 0, exp: 'Third-person singular subjects (he, she, it) add -s/-es in the simple present: \'She goes to school every day.\'' },
             { q: 'Which sentence is in the simple present tense?', options: ['She reads every night.', 'She is reading now.', 'She has read three books.', 'She read it yesterday.'], correct: 0,
               exp: 'The simple present describes habits and general truths - "every night" is the classic signal word.' },
             { q: '"Look! The baby ___ towards the gate." Choose the correct form.', options: ['crawls', 'is crawling', 'has crawled', 'crawled'], correct: 1,
@@ -5007,6 +5231,11 @@ const CURRICULUM = {
             { q: 'How do you answer "give a word or phrase that means the same as..."?', a: 'Lift the exact word(s) from the passage - do not add or change anything - and check the part of speech: a noun answer for a noun slot.' }
           ],
           quiz: [
+            { q: 'How does a précis differ from an ordinary summary?', options: ['It keeps the original structure and proportion in a fixed shorter length', 'It adds new examples', 'It is always longer', 'It is written in verse'], correct: 0, exp: 'A précis condenses the passage to a set fraction of its length while keeping the order and balance of the original ideas.' },
+            { q: 'In what person should a précis normally be written?', options: ['Third person', 'First person', 'Second person', 'Any person, mixed freely'], correct: 0, exp: 'You report the writer\'s ideas from the outside (\'the writer argues...\') — no \'I think\' and no mixing of viewpoints.' },
+            { q: 'If told to \'summarise in three sentences\', how should you present four points?', options: ['Select the three MAIN points, one per sentence', 'Cram four points into three sentences', 'Write four sentences anyway', 'Write one long sentence'], correct: 0, exp: 'Follow the instruction exactly: choose the three most important points and give each one clear, grammatical sentence.' },
+            { q: 'Which two items should be removed when condensing a passage?', options: ['Examples and repetitions', 'Main claims', 'Key conclusions', 'The central theme'], correct: 0, exp: 'Examples, illustrations, statistics-as-evidence and repeated statements are dropped; claims, conclusions and the theme stay.' },
+            { q: 'Why must you count your words in a summary answer?', options: ['Exceeding the stated length is penalised', 'It makes the summary prettier', 'Longer summaries always score more', 'It is not important'], correct: 0, exp: 'Examiners mark within limits — a summary over the required words loses marks even when the content is right.' },
             { q: 'What is the single biggest loss of marks in summary questions?', options: ['writing too briefly', 'lifting whole sentences from the passage', 'using simple vocabulary', 'writing in your own words'], correct: 1,
               exp: 'Examiners are instructed to ignore copied material - a lifted sentence scores zero even if it contains the right point.' },
             { q: 'According to the five-step method, what should you do first?', options: ['Read the passage twice', 'Underline the topic sentences', 'Read the question and note the exact instruction', 'Draft the answer'], correct: 2,
@@ -5137,6 +5366,11 @@ const CURRICULUM = {
             { q: 'Two negative effects of technology?', a: 'Pollution from factories, generators and vehicles; and machines replacing some human jobs, plus over-dependence when systems fail.' }
           ],
           quiz: [
+            { q: 'Technology is best defined as...', options: ['the application of scientific knowledge and tools to solve problems', 'the study of living things', 'only computers and phones', 'the building of roads'], correct: 0, exp: 'Technology applies science, skills and tools to meet human needs — from a matchet to a satellite.' },
+            { q: 'A local hand loom for weaving aso-oke is an example of...', options: ['indigenous technology', 'developed technology', 'information technology', 'space technology'], correct: 0, exp: 'Indigenous (local) technology uses traditional tools and methods developed within the community.' },
+            { q: 'What is the FIRST step of the design/technological process?', options: ['Identify the need or problem', 'Make the product', 'Test the product', 'Advertise it'], correct: 0, exp: 'Every design starts by identifying a need or problem, then gathering information, planning, making, testing and improving.' },
+            { q: 'Name two disadvantages of technology.', options: ['Pollution and unemployment', 'Faster work and comfort', 'Better medicine and travel', 'Cheaper food and clothing'], correct: 0, exp: 'Factories and vehicles pollute, machines replace some jobs, and misuse brings accidents — every advance has a cost to manage.' },
+            { q: 'Give two ways technology has improved agriculture.', options: ['Tractors and improved seeds', 'Hand hoes only', 'Storing grain in pots', 'Waiting for rain alone'], correct: 0, exp: 'Tractors plough faster, improved seeds and fertilisers raise yields, and irrigation supplies water in the dry season.' },
             { q: 'Technology is best defined as:', options: ['applying knowledge and tools to solve problems', 'only computers', 'magic', 'only machines with engines'], correct: 0,
               exp: 'Science discovers; technology applies. A pot and a phone are both technology.' },
             { q: 'Which is an ANCIENT technology?', options: ['Clay pot', 'Smartphone', 'Drone', 'Laptop'], correct: 0,
@@ -5252,6 +5486,11 @@ const CURRICULUM = {
             { q: 'Why must a screwdriver never be used as a chisel?', a: 'Its tip is hardened to turn screws; struck like a chisel it can snap and fly into an eye.' }
           ],
           quiz: [
+            { q: 'Which tool holds work firmly on the bench while you saw or file it?', options: ['Bench vice', 'Hammer', 'Chisel', 'Spanner'], correct: 0, exp: 'A bench vice clamps the work to the bench, leaving both hands free and preventing slips.' },
+            { q: 'Which saw is used for cutting metal?', options: ['Hacksaw', 'Cross-cut saw', 'Rip saw', 'Tenon saw'], correct: 0, exp: 'The hacksaw has a fine, hard blade for metal; the others are wood saws.' },
+            { q: 'What does a try square check?', options: ['Whether corners and edges are at right angles', 'The length of a board', 'The weight of a tool', 'The sharpness of a blade'], correct: 0, exp: 'The try square tests squareness (90 deg) and marks straight lines across a workpiece.' },
+            { q: 'State two ways of caring for hand tools.', options: ['Cleaning, oiling and storing them properly', 'Leaving them outside', 'Using them for any job', 'Throwing them in a pile'], correct: 0, exp: 'Clean tools after use, oil metal parts against rust, and store them safely — cared-for tools last for years.' },
+            { q: 'Which screwdriver fits a star-shaped screw head?', options: ['Phillips screwdriver', 'Flat-head screwdriver', 'Try square', 'File'], correct: 0, exp: 'The Phillips (star/cross-head) screwdriver matches star-headed screws; the flat-head matches single-slot screws.' },
             { q: 'A hammer is used to:', options: ['drive nails', 'cut metal', 'measure angles', 'smooth wood'], correct: 0,
               exp: 'The face drives nails; the claw of a claw hammer pulls them out.' },
             { q: 'Screws are turned with a:', options: ['screwdriver', 'hammer', 'file', 'try square'], correct: 0,
@@ -5366,6 +5605,11 @@ const CURRICULUM = {
             { q: 'Difference between a compass and dividers?', a: 'A compass draws circles and arcs; dividers only step off and transfer equal distances without drawing.' }
           ],
           quiz: [
+            { q: 'Which instrument is used to draw horizontal lines?', options: ['T-square', 'Divider', 'Compass', 'Protractor'], correct: 0, exp: 'The T-square slides along the left edge of the board to draw horizontal lines and to support set squares.' },
+            { q: 'In technical drawing, hidden details are shown with...', options: ['short dashed lines', 'thick continuous lines', 'zigzag lines', 'dotted circles'], correct: 0, exp: 'Line convention: thick continuous = visible outlines; short dashes = hidden edges; long-short-long dashes = centre lines.' },
+            { q: 'Which set square has 30 deg and 60 deg angles?', options: ['The 30/60 set square', 'The 45 set square', 'The T-square', 'The protractor'], correct: 0, exp: 'Set squares come as 45-45-90 and 30-60-90; combining them gives 15 deg and 75 deg lines too.' },
+            { q: 'Name two items of information found in a title block.', options: ['The drawing title and the scale', 'The cost of the paper', 'The colour of the board', 'The weather'], correct: 0, exp: 'The title block carries the title, draughtsman\'s name, date, scale, drawing number and projection symbol.' },
+            { q: 'What does the pencil grade HB mean?', options: ['Medium hardness — between H and B', 'Very hard and light', 'Very soft and black', 'Used only for colouring'], correct: 0, exp: 'H pencils are hard (light construction lines), B are soft (dark outlines), and HB sits in the middle for general work.' },
             { q: 'Which instrument draws horizontal lines?', options: ['T-square', 'Compass', 'Protractor', 'Dividers'], correct: 0,
               exp: 'The T-square slides on the board edge for horizontals and supports set squares.' },
             { q: 'A 45° set square is used for:', options: ['45° and 90° lines', 'circles', 'measuring mass', 'lettering'], correct: 0,
@@ -5477,6 +5721,11 @@ const CURRICULUM = {
             { q: 'Why clamp work instead of holding it?', a: 'A bench vice holds the work firmly so both hands stay clear of the cutting tool — holding it yourself risks the blade slipping into your palm.' }
           ],
           quiz: [
+            { q: 'Which PPE protects the eyes and the feet?', options: ['Safety goggles and safety boots', 'Apron and gloves', 'Nose mask and cap', 'Ear muffs and apron'], correct: 0, exp: 'Goggles shield the eyes from flying chips; strong boots protect feet from falling tools and materials.' },
+            { q: 'Which extinguisher should be used on an electrical fire?', options: ['CO2 or dry powder — never water', 'Water hose', 'Foam only', 'Sand only'], correct: 0, exp: 'Water conducts electricity and can electrocute you; CO2 or dry-powder extinguishers put out electrical fires safely.' },
+            { q: 'Why is loose clothing forbidden near rotating machines?', options: ['It can be caught and pulled into moving parts', 'It looks untidy', 'It gets too hot', 'It hides tools'], correct: 0, exp: 'Loose sleeves, ties or jewellery can be grabbed by rotating parts and drag the wearer in — wear fitted clothes and tie back long hair.' },
+            { q: 'State two common causes of workshop accidents.', options: ['Carelessness and faulty tools', 'Wearing PPE', 'Good housekeeping', 'Following instructions'], correct: 0, exp: 'Most accidents come from carelessness, horseplay, damaged tools, cluttered floors and rushing — all preventable.' },
+            { q: 'What does \'good housekeeping\' mean in the workshop?', options: ['Keeping the workplace clean, dry and organised', 'Painting the walls yearly', 'Buying new machines', 'Locking the workshop'], correct: 0, exp: 'Sweeping sawdust, wiping oil spills and returning tools prevents slips, trips and tool damage — most accidents are housekeeping failures.' },
             { q: 'Which PPE protects the eyes from flying chips?', options: ['Safety goggles', 'Boots', 'Overalls', 'Ear defenders'], correct: 0,
               exp: 'Goggles stop chips, dust and splashes; each PPE item guards one hazard.' },
             { q: 'Gloves near a rotating drill or lathe are:', options: ['never worn — they can be caught', 'always worn', 'worn only on Mondays', 'worn if loose'], correct: 0,
@@ -5582,6 +5831,11 @@ const CURRICULUM = {
             { q: 'Name the main parts of a circle.', a: 'Radius (centre to edge), diameter (twice the radius, through the centre), chord (any line joining two points on the circle), circumference (the perimeter) and arc (a part of the circumference).' }
           ],
           quiz: [
+            { q: 'Which two instruments are needed to bisect an angle?', options: ['A pair of compasses and a ruler', 'A protractor and scissors', 'A T-square only', 'A divider and a hammer'], correct: 0, exp: 'Arcs struck with the compasses locate points equidistant from both arms; the ruler joins them to the vertex.' },
+            { q: 'Bisecting a 90 deg angle produces two angles of...', options: ['45 deg', '30 deg', '60 deg', '22.5 deg'], correct: 0, exp: 'Bisection halves the angle: 90/2 = 45 deg — bisect again for 22.5 deg.' },
+            { q: 'When constructing a regular hexagon in a circle, the compass is set to...', options: ['the radius of the circle', 'twice the radius', 'half the radius', 'any random width'], correct: 0, exp: 'Stepping the radius round the circumference gives six equal arcs — the hexagon splits into six equilateral triangles.' },
+            { q: 'Constructing a triangle from its three given side lengths is called...', options: ['SSS construction', 'SAS construction', 'AAA construction', 'RHS construction'], correct: 0, exp: 'Side-Side-Side: arcs struck with the two shorter lengths from the base ends meet at the third vertex.' },
+            { q: 'What is the diameter of a circle of radius 4.5 cm?', options: ['9 cm', '4.5 cm', '13.5 cm', '2.25 cm'], correct: 0, exp: 'Diameter = 2 x radius = 2 x 4.5 = 9 cm — the diameter is always twice the radius.' },
             { q: 'The two tools used for accurate geometrical construction are...', options: ['a protractor and a calculator', 'a pair of compasses and a ruler (straight edge)', 'a set square and a tape measure', 'a ruler and a calculator'], correct: 1,
               exp: 'Construction means compasses and straight edge only - measuring angles with a protractor does not count as construction.' },
             { q: 'To bisect a line, arcs are drawn from both endpoints with the radius set to...', options: ['exactly half the line', 'any length at all', 'more than half the line', 'the full length of the line'], correct: 2,
@@ -5687,6 +5941,11 @@ const CURRICULUM = {
             { q: 'Explain compression and tension in structures, with examples.', a: 'Compression squeezes a member (a column carrying a roof); tension stretches it (a cable in a suspension bridge). In a loaded beam the top is compressed and the bottom is in tension.' }
           ],
           quiz: [
+            { q: 'Which ingredients make concrete?', options: ['Cement, sand, gravel and water', 'Mud and straw only', 'Cement and water only', 'Sand and stones dry'], correct: 0, exp: 'Cement binds, sand and gravel (aggregate) give bulk and strength, and water activates the cement\'s setting reaction.' },
+            { q: 'Why are iron rods placed inside concrete?', options: ['To add tensile strength (reinforcement)', 'To make it heavier', 'To change its colour', 'To make it set slower'], correct: 0, exp: 'Concrete is strong in compression but weak when stretched; the steel rods carry tension — that is reinforced concrete.' },
+            { q: 'What is the function of a lintel?', options: ['To carry the wall load over a door or window opening', 'To hold the roof tiles', 'To drain rainwater', 'To decorate the wall'], correct: 0, exp: 'Without a lintel the masonry above an opening would collapse into the gap.' },
+            { q: 'Name two traditional Nigerian building materials.', options: ['Mud/adobe and thatch', 'Zinc and cement', 'Glass and steel', 'Plastic and foam'], correct: 0, exp: 'Mud walls, thatch roofs, laterite and bamboo are local materials — cheap and cool, though less durable than modern ones.' },
+            { q: 'Why is freshly cast concrete kept wet (cured) for several days?', options: ['So the cement hydrates fully and gains strength', 'To cool the building', 'To wash away the cement', 'To make it dry faster'], correct: 0, exp: 'Cement hardens by reacting with water (hydration); drying too fast leaves it weak and cracked.' },
             { q: 'Which of these is a hardwood?', options: ['pine', 'iroko', 'spruce', 'fir'], correct: 1,
               exp: 'Iroko is a tropical hardwood - dense and durable; pine, spruce and fir are softwoods.' },
             { q: 'Concrete is a mixture of...', options: ['cement, sand, gravel and water', 'clay and straw', 'lime and wood ash', 'tar and stone'], correct: 0,
@@ -5766,6 +6025,11 @@ const CURRICULUM = {
             { q: 'Preventive vs corrective maintenance — which is cheaper and why?', a: 'Preventive maintenance (cleaning, oiling, planned part replacement before failure) is cheaper because corrective maintenance waits for breakdown, which causes more damage, downtime and cost.' }
           ],
           quiz: [
+            { q: 'The needle of a sewing machine shows which type of motion?', options: ['Reciprocating (up and down)', 'Rotary', 'Circular only', 'Random'], correct: 0, exp: 'Reciprocating motion moves to and fro along a line; the pedal crank converts your foot\'s rocking into the wheel\'s rotation.' },
+            { q: 'A small gear drives a larger gear. What happens to speed and turning force?', options: ['Speed decreases and turning force increases', 'Both increase', 'Speed increases and force decreases', 'Nothing changes'], correct: 0, exp: 'The driven gear turns more slowly than the driver but with greater force — the trade-off behind gearboxes and bicycle gearing.' },
+            { q: 'Name the three main types of maintenance.', options: ['Routine, preventive and breakdown', 'Daily, weekly, monthly', 'Painting, washing, oiling', 'Fast, slow, medium'], correct: 0, exp: 'Routine/corrective fixes faults as they appear; preventive services machines on schedule before failure; breakdown repair happens after failure — the costliest.' },
+            { q: 'Why must moving parts of machines be lubricated?', options: ['To reduce friction, wear and heat', 'To make them heavier', 'To change their colour', 'To slow them always'], correct: 0, exp: 'Oil and grease form a slippery film so parts slide or roll smoothly — less friction means less wasted energy and longer life.' },
+            { q: 'Name two machine fasteners.', options: ['Bolts and nuts; screws', 'Levers and pulleys', 'Belts and chains', 'Gears and cams'], correct: 0, exp: 'Fasteners (bolts and nuts, screws, rivets, pins) hold machine parts together — levers, pulleys, belts and gears are mechanisms, not fasteners.' },
             { q: 'Mechanical advantage is defined as', options: ['effort ÷ load', 'load ÷ effort', 'load × effort', 'VR × efficiency'], correct: 1, exp: 'MA = Load ÷ Effort — how many times the machine multiplies your force.' },
             { q: 'A machine has MA = 4 and VR = 5. Its efficiency is', options: ['20%', '80%', '125%', '9%'], correct: 1, exp: 'Efficiency = MA/VR × 100 = 4/5 × 100 = 80%.' },
             { q: 'Which simple machine is a bottle opener?', options: ['class 1 lever', 'class 2 lever', 'class 3 lever', 'pulley'], correct: 1, exp: 'The load (cap) is between the fulcrum (edge on the cap rim) and the effort (your hand) — load in the middle = class 2.' },

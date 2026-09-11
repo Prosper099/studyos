@@ -282,15 +282,15 @@ check('all resource URLs are https', subjects.every(s => T.CURRICULUM[s].resourc
 // ---------- per-topic quizzes & flashcards (new contract) ----------
 const JUNIOR_SUBS = ['Mathematics', 'English Language', 'Basic Science', 'Basic Technology'];
 const JUNIOR_LEVELS = ['JSS1', 'JSS2', 'JSS3'];
-check('every JSS topic carries a 10-question topic quiz',
-  JUNIOR_SUBS.every(sub => JUNIOR_LEVELS.every(L => T.levelTopics(sub, L).every((t, i) => T.topicQuiz(sub, L, i).length === 10))),
+check('every JSS topic carries a 15-question topic quiz',
+  JUNIOR_SUBS.every(sub => JUNIOR_LEVELS.every(L => T.levelTopics(sub, L).every((t, i) => T.topicQuiz(sub, L, i).length >= 15))),
   JUNIOR_SUBS.map(sub => sub + ':' + JUNIOR_LEVELS.map(L => T.levelTopics(sub, L).map((t, i) => T.topicQuiz(sub, L, i).length).join('/')).join(' ')).join('  '));
 check('every JSS topic has at least 3 flashcards with real answers',
   JUNIOR_SUBS.every(sub => JUNIOR_LEVELS.every(L => T.levelTopics(sub, L).every(t =>
     (t.cards || []).length >= 3 && t.cards.every(c => c.q && c.a && c.a.length > 20)))));
 check('topicQuiz ids are stable per subject/level/topic/question', (() => {
   const q = T.topicQuiz('Mathematics', 'JSS1', 2);
-  return q.length === 10 && q[0].id === 'mat-JSS1-2-0' && q[9].id === 'mat-JSS1-2-9';
+  return q.length === 15 && q[0].id === 'mat-JSS1-2-0' && q[14].id === 'mat-JSS1-2-14';
 })());
 const SENIOR_SUBS = ['Mathematics', 'English Language', 'Physics', 'Chemistry', 'Biology'];
 const SENIOR_LEVELS = ['SS1', 'SS2', 'SS3'];
@@ -352,6 +352,21 @@ check('new badge catalogue includes focus, past-paper, night-owl, early-bird and
 check('plainMath strips LaTeX so students never see raw markup', (() => {
   const out = T.plainMath('The root is $\\frac{-b}{2a}$ and area $= \\pi r^{2}$ \\times 2');
   return !/[$\\{}]/.test(out) && out.includes('(-b)/(2a)') && out.includes('r^2');
+})());
+check('every JSS1-3 topic has at least 15 quiz questions', (() => {
+  for (const sv of Object.values(T.CURRICULUM))
+    for (const [lv, ts] of Object.entries(sv.topics))
+      if (lv.startsWith('JSS'))
+        for (const t of ts) if ((t.quiz || []).length < 15) return false;
+  return true;
+})());
+check('deep-lesson batch 1: JSS1 Basic Science lessons reach textbook depth', (() => {
+  const ts = T.CURRICULUM['Basic Science'].topics.JSS1;
+  for (const title of ['Living Things & Health', 'Matter, Its Properties & Changes']) {
+    const t = ts.find(x => x.title === title);
+    if (!t || (t.content || '').length < 12000 || !t.content.includes('<svg')) return false;
+  }
+  return true;
 })());
 check('every topic in every subject has at least 15 flashcards', (() => {
   for (const sv of Object.values(T.CURRICULUM))
