@@ -378,6 +378,9 @@ check('deep-lesson batches: all deepened lessons reach textbook depth', (() => {
       JSS1: ['Whole Numbers, Place Value & Estimation', 'Fractions & Decimals', 'Introduction to Algebra: Letters & Simple Equations', 'Angles & Plane Figures', 'Ratio, Proportion & Percentages'],
       JSS2: ['Simple Equations & Directed Numbers'],
       JSS3: ['Business Mathematics: Profit, Loss, Discount & Interest']
+    },
+    'English Language': {
+      JSS1: ['Sentence Structure & Composition', 'Oral English: Vowels, Consonants & Stress']
     }
   };
   for (const [subj, levels] of Object.entries(spec))
