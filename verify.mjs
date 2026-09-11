@@ -380,7 +380,9 @@ check('deep-lesson batches: all deepened lessons reach textbook depth', (() => {
       JSS3: ['Business Mathematics: Profit, Loss, Discount & Interest']
     },
     'English Language': {
-      JSS1: ['Sentence Structure & Composition', 'Oral English: Vowels, Consonants & Stress', 'Comprehension & Summary Basics', 'Parts of Speech']
+      JSS1: ['Sentence Structure & Composition', 'Oral English: Vowels, Consonants & Stress', 'Comprehension & Summary Basics', 'Parts of Speech'],
+      JSS2: ['Verb Tenses Made Simple'],
+      JSS3: ['Summary Writing & précis']
     }
   };
   for (const [subj, levels] of Object.entries(spec))
