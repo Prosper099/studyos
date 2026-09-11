@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>StudyOS — Free JAMB Readiness Check (10 questions, 10 minutes)</title>
+<meta name="description" content="Take the free 10-minute StudyOS readiness check: real JAMB/WAEC-style questions, instant score, subject breakdown. No sign-up needed." />
+<style>
+  :root { --ink:#0f172a; --mut:#64748b; --line:#e2e8f0; --ind:#4f46e5; --grn:#10b981; --amb:#f59e0b; --rose:#f43f5e; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif; background:#f1f5f9; color:var(--ink); min-height:100vh; }
+  .wrap { max-width:640px; margin:0 auto; padding:16px 14px 60px; }
+  .card { background:#fff; border:1px solid var(--line); border-radius:18px; box-shadow:0 10px 24px -18px rgba(15,23,42,.35); padding:20px; }
+  .btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; border:0; border-radius:14px; padding:14px 22px; font-weight:800; font-size:14px; cursor:pointer; text-decoration:none; transition:.15s; }
+  .btn-p { background:var(--ind); color:#fff; } .btn-p:hover { background:#4338ca; }
+  .btn-d { background:var(--ink); color:#fff; } .btn-d:hover { background:#1e293b; }
+  .btn-g { background:#fff; color:#334155; border:1px solid var(--line); } .btn-g:hover { background:#f8fafc; }
+  .brand { display:flex; align-items:center; gap:10px; margin:6px 0 18px; }
+  .logo { width:38px; height:38px; border-radius:11px; background:linear-gradient(135deg,#4f46e5,#0ea5e9); display:flex; align-items:center; justify-content:center; color:#fff; font-size:19px; }
+  .brand b { font-size:17px; } .brand span { display:block; font-size:10px; color:var(--mut); font-weight:700; letter-spacing:.08em; text-transform:uppercase; }
+  .hero { background:linear-gradient(135deg,#0f172a,#312e81 60%,#0f172a); color:#fff; border-radius:20px; padding:26px 22px; margin-bottom:14px; }
+  .hero h1 { font-size:23px; line-height:1.25; } .hero p { margin-top:10px; font-size:13px; color:#cbd5e1; line-height:1.55; }
+  .pill { display:inline-block; background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.18); color:#e0e7ff; border-radius:999px; padding:5px 12px; font-size:11px; font-weight:800; letter-spacing:.06em; }
+  .stats { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin:14px 0; }
+  .stat { background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.14); border-radius:14px; padding:10px 6px; text-align:center; }
+  .stat b { display:block; font-size:17px; } .stat span { font-size:10px; color:#94a3b8; font-weight:700; }
+  ul.why { list-style:none; margin-top:6px; } ul.why li { font-size:13px; color:#334155; padding:7px 0 7px 26px; position:relative; }
+  ul.why li::before { content:'✓'; position:absolute; left:4px; color:var(--grn); font-weight:900; }
+  .foot { text-align:center; font-size:11px; color:var(--mut); margin-top:18px; line-height:1.6; }
+  .foot a { color:var(--ind); font-weight:700; text-decoration:none; }
+  /* exam */
+  .hall { background:var(--ink); color:#fff; border-radius:16px; padding:14px 16px; display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin-bottom:12px; }
+  .hall .t { font-weight:900; letter-spacing:.14em; font-size:13px; }
+  .hall .q { font-size:12px; color:#cbd5e1; font-weight:700; }
+  .timer { margin-left:auto; background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.2); border-radius:999px; padding:6px 12px; font-family:ui-monospace,monospace; font-size:13px; font-weight:800; }
+  .timer.warn { background:#78350f; border-color:#b45309; color:#fde68a; }
+  .timer.crit { background:#881337; border-color:#e11d48; color:#ffe4e6; animation:pulse 1s infinite; }
+  @keyframes pulse { 50% { opacity:.6; } }
+  .subj-tag { display:inline-block; background:#eef2ff; color:var(--ind); border-radius:6px; padding:2px 8px; font-size:10px; font-weight:800; margin-left:8px; vertical-align:middle; }
+  .qtitle { font-size:15px; font-weight:700; line-height:1.5; margin:10px 0 14px; }
+  .opt { display:flex; width:100%; gap:10px; align-items:center; text-align:left; background:#fff; border:1.5px solid var(--line); border-radius:13px; padding:12px 14px; font-size:13.5px; font-weight:600; color:#334155; cursor:pointer; margin-bottom:9px; transition:.12s; font-family:inherit; }
+  .opt:hover { border-color:#a5b4fc; background:#eef2ff66; }
+  .opt.on { border-color:#818cf8; background:#eef2ff; box-shadow:0 0 0 1px #818cf8 inset; }
+  .opt .L { flex:none; width:26px; height:26px; border-radius:8px; background:#f1f5f9; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:900; }
+  .opt.on .L { background:var(--ind); color:#fff; }
+  .row { display:flex; gap:10px; justify-content:space-between; align-items:center; margin-top:14px; flex-wrap:wrap; }
+  .nav-row { display:flex; flex-wrap:wrap; gap:6px; margin-top:14px; }
+  .dot { width:34px; height:34px; border-radius:9px; border:1px solid var(--line); background:#fff; font-size:12px; font-weight:800; color:#475569; cursor:pointer; }
+  .dot.cur { background:var(--ink); color:#fff; box-shadow:0 0 0 2px #a5b4fc; }
+  .dot.ans { background:var(--ind); border-color:var(--ind); color:#fff; }
+  .banner { background:#fff1f2; border:1px solid #fecdd3; color:#9f1239; border-radius:16px; padding:14px; text-align:center; font-weight:800; font-size:14px; margin-bottom:12px; }
+  /* results */
+  .big { font-size:44px; font-weight:900; }
+  .kpis { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin:14px 0; text-align:center; }
+  .kpi b { display:block; font-size:16px; } .kpi span { font-size:10px; color:var(--mut); font-weight:700; }
+  .bar { height:7px; background:#f1f5f9; border-radius:99px; overflow:hidden; } .bar i { display:block; height:100%; border-radius:99px; }
+  .srow { margin-bottom:10px; } .srow .lbl { display:flex; justify-content:space-between; font-size:12px; font-weight:700; margin-bottom:4px; }
+  .lockwrap { position:relative; border-radius:16px; overflow:hidden; }
+  .locked { filter:blur(7px); user-select:none; pointer-events:none; }
+  .lockveil { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; background:rgba(255,255,255,.55); text-align:center; padding:18px; }
+  .exp { border:1px solid var(--line); border-radius:13px; padding:12px 14px; margin-bottom:9px; background:#fff; }
+  .exp .qq { font-size:12.5px; font-weight:700; } .exp .aa { font-size:12px; color:#047857; font-weight:700; margin-top:4px; } .exp .ee { font-size:11.5px; color:#475569; margin-top:5px; line-height:1.5; }
+  .hidden { display:none !important; }
+  .share-tip { font-size:11px; color:var(--mut); margin-top:8px; text-align:center; }
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<script>
+var QS = [{"s": "Maths", "q": "Calculate 23 mod 5.", "o": ["1", "2", "3", "4"], "c": 2, "e": "23 ÷ 5 = 4 remainder 3, so 23 mod 5 = 3. Modulo always returns the remainder."}, {"s": "Maths", "q": "Evaluate log10 1000.", "o": ["3", "30", "100", "10"], "c": 0, "e": "10^3 = 1000, so the log of 1000 to base 10 is 3."}, {"s": "Maths", "q": "In a class of 40, 25 play football, 20 play basketball and every pupil plays at least one game. How many play both?", "o": ["5", "15", "10", "45"], "c": 0, "e": "n(F ∩ B) = 25 + 20 - 40 = 5."}, {"s": "Maths", "q": "What is the common ratio of the G.P. 2, 6, 18, ...?", "o": ["3", "4", "2", "12"], "c": 0, "e": "r = 6/2 = 18/6 = 3. In a G.P. each term is multiplied by the same ratio."}, {"s": "Maths", "q": "Where does the line y = 3x + 5 cross the y-axis?", "o": ["5", "3", "-5", "(0, 3)"], "c": 0, "e": "The constant c in y = mx + c is the y-intercept: the line crosses at (0, 5)."}, {"s": "Maths", "q": "At a turning point of a curve, dy/dx equals...", "o": ["0", "1", "the maximum value", "infinity"], "c": 0, "e": "The tangent is horizontal at a turning point, so the gradient - dy/dx - is zero."}, {"s": "Maths", "q": "Find the volume of a cylinder of radius 7 cm and height 10 cm. (π = 22/7)", "o": ["1540 cm^3", "154 cm^3", "440 cm^3", "770 cm^3"], "c": 0, "e": "V = πr^2h = 154 x 10 = 1540 cm^3 - the base area stacked up 10 times."}, {"s": "Maths", "q": "Find the HCF and LCM of 18 and 24.", "o": ["HCF 6, LCM 72", "HCF 12, LCM 36", "HCF 6, LCM 36", "HCF 3, LCM 72"], "c": 0, "e": "18 = 2 x 3^2 and 24 = 2^3 x 3, so HCF = 2 x 3 = 6 and LCM = 2^3 x 3^2 = 72. Check: 6 x 72 = 432 = 18 x 24."}, {"s": "Maths", "q": "2/5 of ₦2,500 = ?", "o": ["₦1,000", "₦500", "₦1,250", "₦2,000"], "c": 0, "e": "\"of\" means multiply: (2,500 ÷ 5) × 2 = 500 × 2 = ₦1,000."}, {"s": "Maths", "q": "Solve x - 4 = 9.", "o": ["13", "5", "-13", "36"], "c": 0, "e": "Add 4 to both sides: x = 9 + 4 = 13."}, {"s": "Maths", "q": "Express 45 minutes as a percentage of 3 hours.", "o": ["25%", "15%", "45%", "75%"], "c": 0, "e": "3 hours = 180 minutes, so 45/180 x 100 = 25% — always convert to the same unit first."}, {"s": "Maths", "q": "Evaluate: -3 x (-5)", "o": ["-15", "15", "-8", "8"], "c": 1, "e": "A negative multiplied by a negative gives a positive, so the answer is 15."}, {"s": "English", "q": "Choose the option nearest in meaning to the underlined word: \"The chairman’s speech was very CONCISE.\"", "o": ["lengthy", "brief", "confusing", "emotional"], "c": 1, "e": "Concise means short and to the point, so \"brief\" is nearest in meaning. Always check whether the stem asks for nearest or opposite."}, {"s": "English", "q": "Choose the correct verb: \"Mathematics ___ an interesting subject.\"", "o": ["is", "are", "were", "have been"], "c": 0, "e": "Names of subjects, games and disciplines ending in -s are singular: Mathematics IS interesting."}, {"s": "English", "q": "A colon is used to...", "o": ["introduce a list or explanation", "join two verbs", "end a question", "show possession"], "c": 0, "e": "The colon announces what follows: \"Bring three things: a pen, a ruler and a calculator.\""}, {"s": "English", "q": "\"Choose the word NEAREST in meaning\" asks for...", "o": ["a synonym", "an antonym", "a homophone", "a prefix"], "c": 0, "e": "Nearest in meaning = synonym. Always check the stem - \"opposite in meaning\" flips the task."}, {"s": "English", "q": "Which is a good closing line for a debate speech?", "o": ["\"I hope I have been able to convince you, and not confuse you.\"", "\"Yours faithfully.\"", "\"Write back soon.\"", "\"Your friend in need.\""], "c": 0, "e": "Debates end by thanking and persuading the audience - not with letter closings."}, {"s": "English", "q": "In reported speech, \"tomorrow\" becomes...", "o": ["the next day / the following day", "yesterday", "today", "last day"], "c": 0, "e": "Time words shift with the change of viewpoint: tomorrow becomes the next day or the following day."}, {"s": "English", "q": "Complete: \"This bag belongs ___ me.\"", "o": ["to", "for", "with", "at"], "c": 0, "e": "Belong TO - a fixed pair, like listen to and agree with."}, {"s": "English", "q": "What end punctuation does 'What a lovely dress' need?", "o": ["An exclamation mark", "A question mark", "A comma", "No punctuation"], "c": 0, "e": "It expresses strong feeling (admiration), so it ends with an exclamation mark: 'What a lovely dress!' It is not a question."}, {"s": "English", "q": "How many vowel letters does English have?", "o": ["5", "4", "6", "21"], "c": 0, "e": "a, e, i, o, u — though they make many more vowel sounds."}, {"s": "English", "q": "The \"main idea\" of a passage is:", "o": ["the central point the whole passage supports", "the first word", "any name mentioned", "the longest sentence"], "c": 0, "e": "Every paragraph should connect back to it."}, {"s": "English", "q": "In \"The tall man walked\", \"tall\" is:", "o": ["an adjective", "a verb", "an adverb", "a noun"], "c": 0, "e": "It describes the noun \"man\", so it is an adjective."}, {"s": "English", "q": "Which sentence is correct?", "o": ["I have seen him yesterday.", "I saw him yesterday.", "I have see him yesterday.", "I am seeing him yesterday."], "c": 1, "e": "The present perfect never goes with a definite past time like \"yesterday\" - use the simple past: I saw him yesterday."}, {"s": "Physics", "q": "A 0.5 kg stone tied to a 2 m string moves at 4 m/s. The centripetal force is:", "o": ["2 N", "4 N", "8 N", "16 N"], "c": 1, "e": "F = mv^2/r = 0.5 × 16 ÷ 2 = 4 N. Note the square on the velocity — doubling the speed quadruples the force."}, {"s": "Physics", "q": "A scalar quantity has...", "o": ["magnitude only", "direction only", "magnitude and direction", "units of newtons"], "c": 0, "e": "Scalars (mass, time, temperature, energy) need only a size and a unit."}, {"s": "Physics", "q": "What is the SI unit of force?", "o": ["newton", "joule", "watt", "pascal"], "c": 0, "e": "One newton (N) is the force that gives a 1 kg mass an acceleration of 1 m/s^2."}, {"s": "Physics", "q": "The principle of conservation of energy says energy...", "o": ["can change form but cannot be created or destroyed", "is always lost as heat", "grows with use", "exists only in machines"], "c": 0, "e": "The total energy of a closed system is constant - it merely transforms from one form to another."}, {"s": "Physics", "q": "A cone balanced on its tip is in...", "o": ["unstable equilibrium", "stable equilibrium", "neutral equilibrium", "dynamic equilibrium"], "c": 0, "e": "The slightest tilt lowers its centre of gravity further, so it topples - unstable equilibrium."}, {"s": "Physics", "q": "Increasing the radius of the circle (speed constant) makes the required centripetal force...", "o": ["smaller", "larger", "unchanged", "zero"], "c": 0, "e": "The radius sits in the denominator: F = mv^2/r, so a wider curve needs less inward force."}, {"s": "Physics", "q": "Dark, dull surfaces are the best...", "o": ["absorbers and emitters of heat radiation", "reflectors of radiation", "insulators against conduction", "conductors of electricity"], "c": 0, "e": "Black, matt surfaces absorb and radiate heat best; shiny, light surfaces reflect it - which is why desert robes are often white."}, {"s": "Physics", "q": "Good conductors of electricity have...", "o": ["very low resistance", "very high resistance", "no electrons", "insulating coatings"], "c": 0, "e": "Copper and aluminium offer little opposition to current, which is why wires are made from them."}, {"s": "Physics", "q": "The wave equation connecting speed, frequency and wavelength is...", "o": ["v = fλ", "v = f/λ", "f = vλ", "λ = vf"], "c": 0, "e": "Speed = frequency x wavelength. If 50 waves of 2 m pass each second, the wave travels 100 m/s."}, {"s": "Physics", "q": "A beta particle is...", "o": ["a fast-moving electron", "a helium nucleus", "a photon", "a proton"], "c": 0, "e": "Beta decay ejects an electron from the nucleus at high speed; charge -1."}, {"s": "Chemistry", "q": "In the reaction Zn + Cu^2⁺ → Zn^2⁺ + Cu, zinc is:", "o": ["Reduced", "Oxidised", "A catalyst", "Unchanged"], "c": 1, "e": "Zinc loses two electrons (oxidation number 0 → +2), so it is oxidised. Cu^2⁺ gains those electrons and is reduced."}, {"s": "Chemistry", "q": "The mass number of an atom equals...", "o": ["protons + neutrons", "protons + electrons", "neutrons + electrons", "protons only"], "c": 0, "e": "Mass number counts the nucleons in the nucleus; electron mass is negligible."}, {"s": "Chemistry", "q": "In a coordinate (dative) bond, the shared pair of electrons comes from...", "o": ["one atom only", "both atoms equally", "the solvent", "free electrons"], "c": 0, "e": "One partner donates both electrons - the arrow in diagrams points from donor to acceptor, as in NH4⁺."}, {"s": "Chemistry", "q": "Two miscible liquids with close boiling points are separated by...", "o": ["fractional distillation", "simple filtration", "separating funnel", "magnetism"], "c": 0, "e": "The fractionating column gives repeated evaporation-condensation cycles, sharpening the separation."}, {"s": "Chemistry", "q": "An acid reacts with a base to form...", "o": ["a salt and water only", "hydrogen gas", "carbon dioxide always", "an oxide only"], "c": 0, "e": "Neutralisation: acid + base → salt + water. This is the defining acid-base reaction."}, {"s": "Chemistry", "q": "The first member of the alkene family is...", "o": ["ethene", "methene", "propene", "butene"], "c": 0, "e": "A double bond needs two carbons, so the series starts at C2H4 - ethene."}, {"s": "Chemistry", "q": "In the classic experiment to find the percentage of oxygen in air, the water level rises by about...", "o": ["one-fifth (20%)", "one-half", "three-quarters", "it does not rise"], "c": 0, "e": "The burning substance uses up the oxygen (about a fifth of the air), so water rises to fill the space."}, {"s": "Chemistry", "q": "An oxidising agent...", "o": ["is itself reduced", "is itself oxidised", "donates electrons", "never changes"], "c": 0, "e": "It takes electrons from another substance - and in accepting them, it is reduced."}, {"s": "Chemistry", "q": "Increasing the concentration of a reactant...", "o": ["increases the rate of reaction", "decreases the rate", "changes only the colour", "lowers the temperature"], "c": 0, "e": "More particles per unit volume means more frequent successful collisions."}, {"s": "Chemistry", "q": "The number of moles is calculated as...", "o": ["mass / molar mass", "mass x molar mass", "molar mass / mass", "mass + molar mass"], "c": 0, "e": "n = m/M - for example 36 g of water is 36/18 = 2 moles."}, {"s": "Biology", "q": "Which cell organelle is found in plant cells but NOT in animal cells?", "o": ["Mitochondrion", "Chloroplast", "Ribosome", "Nucleus"], "c": 1, "e": "Chloroplasts carry out photosynthesis and are only present in green plant cells. Animal cells have mitochondria, ribosomes and a nucleus."}, {"s": "Biology", "q": "Which structures are found in plant cells but NOT in animal cells?", "o": ["cell wall and chloroplasts", "nucleus and mitochondria", "cell membrane and cytoplasm", "ribosomes and vacuoles"], "c": 0, "e": "Plant cells add a cellulose cell wall, chloroplasts and a large permanent vacuole - animal cells have none of these."}, {"s": "Biology", "q": "Bile is produced by the...", "o": ["liver", "stomach", "pancreas", "gall bladder"], "c": 0, "e": "The liver makes bile; the gall bladder merely stores and releases it."}, {"s": "Biology", "q": "Sandy soil is characterised by...", "o": ["large particles, fast drainage and low nutrients", "tiny particles and waterlogging", "no air spaces", "rich humus always"], "c": 0, "e": "Big particles leave big gaps, so water and dissolved nutrients drain away quickly."}, {"s": "Biology", "q": "The placenta functions to...", "o": ["exchange nutrients, gases and wastes between mother and foetus", "cushion the foetus from shocks", "connect the foetus to the placenta", "produce the egg"], "c": 0, "e": "Food and oxygen cross in, wastes cross out - the mother’s and foetus’s blood never mix directly."}, {"s": "Biology", "q": "A reflex action is best described as...", "o": ["automatic, rapid and involuntary", "slow and deliberate", "controlled by thought", "learned through practice"], "c": 0, "e": "Reflexes bypass conscious thought for speed - vital for protection."}, {"s": "Biology", "q": "Venom production and hibernation chemistry are examples of...", "o": ["physiological adaptation", "structural adaptation", "behavioural adaptation", "accidental change"], "c": 0, "e": "Physiological adaptations are internal body processes - how the organism’s chemistry copes."}, {"s": "Biology", "q": "A dominant allele is conventionally represented by...", "o": ["a capital letter", "a small letter", "a number", "a Greek letter"], "c": 0, "e": "T for dominant tall, t for recessive short - capitals dominate."}, {"s": "Biology", "q": "A primary consumer is...", "o": ["a herbivore that eats producers", "a carnivore", "a decomposer", "a producer"], "c": 0, "e": "First step up the food chain: plant-eaters like grasshoppers and rabbits."}, {"s": "Biology", "q": "The raw materials of photosynthesis are...", "o": ["carbon dioxide and water", "oxygen and glucose", "glucose and water", "oxygen and carbon dioxide"], "c": 0, "e": "CO2 from the air and water from the soil; light provides the energy."}, {"s": "Basic Science", "q": "Which of these is NOT a characteristic of living things?", "o": ["Respiration", "Photosynthesis", "Excretion", "Irritability"], "c": 1, "e": "Photosynthesis happens only in green plants, so it is not a general characteristic of all living things. The rest are in MR NIGER D."}, {"s": "Basic Science", "q": "Which gas do we take in when breathing?", "o": ["Oxygen", "Carbon dioxide", "Nitrogen", "Hydrogen"], "c": 0, "e": "We inhale oxygen for respiration and exhale carbon dioxide."}, {"s": "Basic Science", "q": "The SI unit of energy is the:", "o": ["joule", "newton", "watt", "ampere"], "c": 0, "e": "Energy is measured in joules; force in newtons; power in watts."}, {"s": "Basic Science", "q": "Why must chemicals never be tasted in the laboratory?", "o": ["Many are poisonous or corrosive", "It spoils the chemical", "It is considered rude", "Chemicals have no taste"], "c": 0, "e": "Even small amounts can burn the mouth or poison the body — substances are identified with safe tests, never by tasting."}, {"s": "Basic Science", "q": "Which property makes copper suitable for electrical wires?", "o": ["It is ductile and conducts electricity well", "It is very heavy", "It is magnetic", "It dissolves in water"], "c": 0, "e": "Ductility lets copper be drawn into thin wires, and its excellent conductivity carries current with little loss."}, {"s": "Basic Science", "q": "Milk of magnesia relieves stomach pain because it...", "o": ["neutralises excess stomach acid", "adds more acid to the stomach", "kills all stomach bacteria", "cools the stomach down"], "c": 0, "e": "It is a mild base that neutralises excess hydrochloric acid, forming a harmless salt and water."}, {"s": "Basic Science", "q": "A bottle opener is which class of lever?", "o": ["Second class", "First class", "Third class", "A pulley"], "c": 0, "e": "The load (the bottle cap) sits between the pivot and the effort — a second-class lever, like a wheelbarrow."}, {"s": "Basic Science", "q": "Which blood vessels carry blood away from the heart?", "o": ["Arteries", "Veins", "Capillaries", "Nerves"], "c": 0, "e": "Arteries carry blood away from the heart (usually oxygen-rich); veins bring it back; capillaries are the tiny exchange vessels."}, {"s": "Basic Science", "q": "Which habit protects the digestive system?", "o": ["smoking", "washing hands and drinking safe water", "skipping meals", "drinking alcohol"], "c": 1, "e": "Germs enter with dirty hands and unsafe water - hygiene prevents infections such as diarrhoea and typhoid."}, {"s": "Basic Science", "q": "Which of these is an effect of drug abuse?", "o": ["improved memory", "addiction, organ damage and poor judgement", "stronger bones", "better concentration"], "c": 1, "e": "Drug abuse damages the brain, liver and other organs, causes addiction, and destroys judgement, schoolwork and relationships."}];
+var PICK = 10, MINUTES = 10;
+var paper = [], answers = {}, idx = 0, deadline = 0, tick = null, done = false, timeUp = false, startedAt = 0;
+
+function shuffle(a) { for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+function fmt(ms) { var t = Math.max(0, Math.ceil(ms / 1000)); return Math.floor(t / 60) + ':' + String(t % 60).padStart(2, '0'); }
+function $(id) { return document.getElementById(id); }
+
+function landing() {
+  $('app').innerHTML =
+    '<div class="brand"><div class="logo">📚</div><div><b>StudyOS</b><span>Nigeria&apos;s study companion</span></div></div>' +
+    '<div class="hero">' +
+      '<span class="pill">🖥️ FREE CBT READINESS CHECK</span>' +
+      '<h1 style="margin-top:12px">How ready are you for JAMB?</h1>' +
+      '<p>10 real exam-style questions. 10 minutes. Instant score with a subject-by-subject breakdown — no sign-up, no stress.</p>' +
+      '<div class="stats">' +
+        '<div class="stat"><b>10</b><span>questions</span></div>' +
+        '<div class="stat"><b>10:00</b><span>timer</span></div>' +
+        '<div class="stat"><b>₦0</b><span>forever</span></div>' +
+      '</div>' +
+      '<button class="btn btn-p" style="width:100%" onclick="startExam()">⚡ Start the check — it&apos;s free</button>' +
+    '</div>' +
+    '<div class="card">' +
+      '<b style="font-size:14px">Why 5,000+ students study with StudyOS</b>' +
+      '<ul class="why">' +
+        '<li>83 topics · 1,000+ exam-style questions · 1,200+ flashcards</li>' +
+        '<li>Full CBT exam hall — practise exactly like the real JAMB centre</li>' +
+        '<li>Personal study plans that follow your weak areas</li>' +
+        '<li>JSS1–SS3 · Maths, English, Physics, Chemistry, Biology &amp; more</li>' +
+      '</ul>' +
+      '<a class="btn btn-d" style="width:100%;margin-top:10px" href="/">Open the full StudyOS app →</a>' +
+    '</div>' +
+    '<p class="foot">Made with 💜 for Nigerian students · <a href="/">studyos.app</a><br>Share this check with your class group — wisdom multiplies when shared.</p>';
+}
+
+function startExam() {
+  paper = shuffle(QS.slice()).slice(0, PICK);
+  answers = {}; idx = 0; done = false; timeUp = false;
+  startedAt = Date.now();
+  deadline = Date.now() + MINUTES * 60000;
+  clearInterval(tick); tick = setInterval(beat, 1000);
+  render();
+}
+
+function beat() {
+  var el = $('tm'); if (!el) return;
+  var left = deadline - Date.now();
+  el.textContent = '⏱ ' + fmt(left);
+  el.className = 'timer' + (left <= 60000 ? ' crit' : left <= 300000 ? ' warn' : '');
+  if (left <= 0) { clearInterval(tick); timeUp = true; finish(); }
+}
+
+function pick(i) { answers[idx] = i; render(); }
+function go(i) { idx = i; render(); }
+function next() { if (idx < paper.length - 1) { idx++; render(); } }
+function prev() { if (idx > 0) { idx--; render(); } }
+
+function render() {
+  var q = paper[idx];
+  var html =
+    '<div class="hall"><span class="t">STUDYOS EXAM</span><span class="q">JAMB Readiness · Question ' + (idx + 1) + ' / ' + paper.length + '</span><span class="timer" id="tm">⏱ ' + fmt(deadline - Date.now()) + '</span></div>' +
+    '<div class="card">' +
+      '<div><span class="subj-tag">' + esc(q.s) + '</span></div>' +
+      '<p class="qtitle">' + esc(q.q) + '</p>' +
+      q.o.map(function (o, i) {
+        return '<button class="opt' + (answers[idx] === i ? ' on' : '') + '" onclick="pick(' + i + ')"><span class="L">' + 'ABCD'[i] + '</span><span>' + esc(o) + '</span></button>';
+      }).join('') +
+      '<div class="row">' +
+        '<button class="btn btn-g" onclick="prev()"' + (idx === 0 ? ' disabled' : '') + '>← Back</button>' +
+        (idx === paper.length - 1
+          ? '<button class="btn btn-p" onclick="confirmFinish()">Submit ✓</button>'
+          : '<button class="btn btn-d" onclick="next()">Next →</button>') +
+      '</div>' +
+      '<div class="nav-row">' + paper.map(function (_, i) {
+        var cls = i === idx ? ' cur' : answers[i] !== undefined ? ' ans' : '';
+        return '<button class="dot' + cls + '" onclick="go(' + i + ')">' + (i + 1) + '</button>';
+      }).join('') + '</div>' +
+    '</div>' +
+    '<p class="share-tip">Timer runs automatically — the paper submits itself at 00:00, just like the real CBT.</p>';
+  $('app').innerHTML = html;
+}
+
+function confirmFinish() {
+  var n = Object.keys(answers).length;
+  if (n < paper.length && !confirm('You answered ' + n + ' of ' + paper.length + '. Unanswered questions score zero. Submit now?')) return;
+  finish();
+}
+
+function finish() {
+  clearInterval(tick); done = true;
+  var correct = 0, wrong = 0, blank = 0;
+  var by = {};
+  paper.forEach(function (q, i) {
+    by[q.s] = by[q.s] || { c: 0, t: 0 };
+    by[q.s].t++;
+    var a = answers[i];
+    if (a === undefined) blank++;
+    else if (a === q.c) { correct++; by[q.s].c++; }
+    else wrong++;
+  });
+  var pct = Math.round((correct / paper.length) * 100);
+  var subs = Object.keys(by).map(function (s) { return { s: s, c: by[s].c, t: by[s].t, p: Math.round((by[s].c / by[s].t) * 100) }; }).sort(function (a, b) { return b.p - a.p; });
+  var strong = subs[0], weak = subs[subs.length - 1];
+  var secs = Math.round((Date.now() - startedAt) / 1000);
+  var verdict = pct >= 80 ? '🏆 Exam-ready! Sharp work.' : pct >= 60 ? '🎉 Solid — a little polishing and you are set.' : pct >= 40 ? '💪 Good start — your weak spots are now visible.' : '📈 Everyone starts somewhere. This is your baseline.';
+
+  var mistakes = paper.map(function (q, i) { return { q: q, a: answers[i], i: i }; }).filter(function (m) { return m.a !== m.q.c; });
+
+  var html =
+    (timeUp ? '<div class="banner">⏰ Time&apos;s up! Your paper was submitted automatically.</div>' : '') +
+    '<div class="card" style="text-align:center">' +
+      '<div style="font-size:11px;font-weight:900;letter-spacing:.1em;color:var(--ind)">🎯 YOUR READINESS SCORE</div>' +
+      '<div class="big" style="color:' + (pct >= 60 ? 'var(--grn)' : 'var(--amb)') + '">' + pct + '%</div>' +
+      '<p style="font-size:13px;font-weight:700;color:#334155">' + verdict + '</p>' +
+      '<div class="kpis">' +
+        '<div class="kpi"><b style="color:var(--grn)">' + correct + '</b><span>correct</span></div>' +
+        '<div class="kpi"><b style="color:var(--rose)">' + wrong + '</b><span>wrong</span></div>' +
+        '<div class="kpi"><b style="color:#64748b">' + blank + '</b><span>blank</span></div>' +
+        '<div class="kpi"><b style="color:var(--ind)">' + fmt(secs * 1000) + '</b><span>time used</span></div>' +
+      '</div>' +
+      '<div class="bar"><i style="width:' + pct + '%;background:' + (pct >= 60 ? 'var(--grn)' : 'var(--amb)') + '"></i></div>' +
+      '<div class="row" style="justify-content:center">' +
+        '<button class="btn btn-g" onclick="shareResult(' + pct + ')">📤 Share my score</button>' +
+        '<button class="btn btn-g" onclick="startExam()">↻ Try again</button>' +
+      '</div>' +
+    '</div>' +
+    '<div class="card" style="margin-top:12px">' +
+      '<b style="font-size:14px">📊 Subject breakdown</b>' +
+      '<div style="margin-top:12px">' + subs.map(function (x) {
+        return '<div class="srow"><div class="lbl"><span>' + esc(x.s) + '</span><span style="color:' + (x.p >= 60 ? 'var(--grn)' : 'var(--amb)') + '">' + x.p + '% (' + x.c + '/' + x.t + ')</span></div><div class="bar"><i style="width:' + x.p + '%;background:' + (x.p >= 60 ? 'var(--grn)' : 'var(--amb)') + '"></i></div></div>';
+      }).join('') + '</div>' +
+      '<p style="font-size:12.5px;line-height:1.6;color:#334155;margin-top:6px">🧠 <b>StudyOS analysis:</b> your strongest area is <b>' + esc(strong.s) + '</b> (' + strong.p + '%). Needs attention: <b>' + esc(weak.s) + '</b> (' + weak.p + '%).</p>' +
+    '</div>' +
+    '<div class="card" style="margin-top:12px">' +
+      (mistakes.length
+        ? '<b style="font-size:14px">📖 Worked explanations (' + mistakes.length + ' question' + (mistakes.length === 1 ? '' : 's') + ' to review)</b>'
+        : '<b style="font-size:14px">🏆 Perfect paper — nothing to review!</b>') +
+      '<div class="lockwrap" style="margin-top:12px">' +
+        '<div class="locked">' + (mistakes.length ? mistakes : [{ q: { q: 'Every explanation unlocked inside the app', o: ['', '', '', ''], c: 0 }, a: undefined }]).map(function (m) {
+          var q = m.q;
+          return '<div class="exp"><p class="qq">' + esc(q.q) + '</p><p class="aa">✅ Correct: ' + esc(q.o[q.c]) + '</p><p class="ee">' + esc(q.e || '') + '</p></div>';
+        }).join('') + '</div>' +
+        '<div class="lockveil">' +
+          '<div style="font-size:26px">🔒</div>' +
+          '<b style="font-size:14px">Every answer explained, step by step</b>' +
+          '<p style="font-size:12px;color:#475569;max-width:340px">Plus a personal study plan that drills your weak topics daily — free inside StudyOS.</p>' +
+          '<a class="btn btn-p" href="/">Unlock in StudyOS — free →</a>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+    '<p class="foot">StudyOS — 83 topics · 1,000+ questions · full CBT exam hall.<br><a href="/">Open the full app</a> · Free forever during launch 🚀</p>';
+  $('app').innerHTML = html;
+  window.scrollTo({ top: 0 });
+}
+
+function shareResult(pct) {
+  var text = 'I scored ' + pct + '% on the free StudyOS JAMB Readiness Check 🖥️📚 — 10 questions, 10 minutes. Try it: ' + location.href.split('#')[0];
+  if (navigator.share) { navigator.share({ title: 'StudyOS Readiness Check', text: text }).catch(function () {}); return; }
+  if (navigator.clipboard) { navigator.clipboard.writeText(text).then(function () { alert('Score copied — paste it in your class group! 📋'); }); return; }
+  alert(text);
+}
+
+landing();
+</script>
+</body>
+</html>
