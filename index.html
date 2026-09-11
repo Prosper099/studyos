@@ -1798,48 +1798,136 @@ const CURRICULUM = {
           tags: ['Place value', 'Rounding', 'LCM & HCF'],
           summary: 'Reading, writing and rounding large numbers, estimating answers, and the LCM/HCF tools every JSS paper loves.',
           content: `
-            <h3>1. Place value of large numbers</h3>
-            <p>Every digit's value depends on its <b>position</b>. In 4,732,015 the 7 is in the <b>hundred-thousands</b> column, so its value is 700,000 — not 7.</p>
-            <table>
-              <tr><th>Millions</th><th>Hundred-thousands</th><th>Ten-thousands</th><th>Thousands</th><th>Hundreds</th><th>Tens</th><th>Ones</th></tr>
-              <tr><td>4</td><td>7</td><td>3</td><td>2</td><td>0</td><td>1</td><td>5</td></tr>
-            </table>
-            <p><b>Writing in words:</b> 4,732,015 = "four million, seven hundred and thirty-two thousand, and fifteen". Group in threes from the right, then read each group with its name (million, thousand).</p>
-            <h3>2. Rounding</h3>
+            <h3>1. The number families you must know</h3>
+            <p>Mathematics begins with counting, but not all numbers belong to the same family. In JSS1 you must be able to name the families and sort any number into the right one.</p>
             <ul>
-              <li>Look at the digit <b>right of</b> the place you are rounding to.</li>
-              <li>5 or more → round up; 4 or less → stay.</li>
-              <li>6,749 to the nearest 100: look at the tens digit (4) → <b>6,700</b>.</li>
+              <li><b>Counting (natural) numbers</b> — 1, 2, 3, 4, ... the numbers you use for counting objects.</li>
+              <li><b>Whole numbers</b> — the counting numbers PLUS zero: 0, 1, 2, 3, ...</li>
+              <li><b>Integers</b> — whole numbers PLUS their negatives: ..., -3, -2, -1, 0, 1, 2, 3, ...</li>
+              <li><b>Even numbers</b> — divisible by 2 exactly (2, 4, 6, 8, ...); <b>odd numbers</b> — not divisible by 2 (1, 3, 5, 7, ...). Zero is even.</li>
             </ul>
-            <h3>3. Estimation</h3>
-            <p>Round first, then calculate: 48 × 21 ~= 50 × 20 = <b>1,000</b>. Estimation checks that a calculator answer is sensible.</p>
-            <h3>4. LCM and HCF</h3>
-            <div class="formula">LCM = smallest common multiple · HCF = largest common factor<br>12 = 2^2 × 3, 18 = 2 × 3^2 → HCF = 2 × 3 = 6, LCM = 2^2 × 3^2 = 36</div>
-            <h3>5. Standard (scientific) form</h3>
-            <p>Write a number as A × 10ⁿ where 1 <= A &lt; 10. So 3,600,000 = <b>3.6 × 10^6</b>.</p>
-            <div class="worked"><b>Worked example:</b> A trader sells 198 baskets at ₦1,012 each. Estimate the takings.<br>
-            198 ~= 200 and ₦1,012 ~= ₦1,000, so ~= 200 × 1,000 = <b>₦200,000</b>.</div>
-            <h3>Common mistakes</h3>
+            <div class="worked"><b>Think about it:</b> a temperature of 5 degC above zero and a temperature of 5 degC below zero are both '5 degrees', but they are opposite integers: +5 and -5. Integers exist because life keeps giving us opposite pairs — profit and loss, above and below sea level, deposit and withdrawal.</div>
+
+            <h3>2. Place value — the power of position</h3>
+            <p>Our number system is a <b>base-10 (denary)</b> system: the VALUE of a digit depends on its POSITION. Each position is worth ten times the position to its right.</p>
+            <p>Take <b>3,254,618</b>. Reading the digits from the left: 3 millions, 2 hundred-thousands, 5 ten-thousands, 4 thousands, 6 hundreds, 1 ten, 8 ones (units).</p>
             <ul>
-              <li>Reading 407 as "four hundred and seventy" — the zero means <b>no tens</b>: "four hundred and seven".</li>
-              <li>Rounding twice (6,749 → 6,750 → 6,800). Round once, from the original number.</li>
-              <li>Mixing up LCM and HCF: LCM is never smaller than the bigger number; HCF is never bigger than the smaller.</li>
+              <li><b>Face value</b> of a digit is the digit itself (the 5 in 3,254,618 has face value 5).</li>
+              <li><b>Place value</b> is what the digit is worth in that position (the 5 is in the ten-thousands place, so its place value is 50,000).</li>
+              <li>Group digits in THREES from the right with commas: 3,254,618 — never from the left.</li>
             </ul>
-            <h3>Deep dive: place value does the heavy lifting</h3>
-            <p>Every digit's worth depends on its <b>position</b>: in 4,738 the 4 means 4 thousands, the 7 means 7 hundreds, the 3 means 3 tens and the 8 means 8 units. Writing the number in a place-value chart before any calculation prevents the classic "misaligned column" errors in addition and subtraction.</p>
-            <h3>Rounding: the one rule</h3>
-            <p>Look at the digit <b>immediately right</b> of the place you are rounding to: <b>5 or more → round up; less than 5 → leave it</b>. Round 4,738 to the nearest hundred: the digit right of the 7 is 3 (&lt; 5), so 4,738 ~= <b>4,700</b>. To the nearest ten: digit 8 >= 5, so 4,738 ~= <b>4,740</b>.</p>
-            <h3>Estimating before you calculate</h3>
-            <p>Round each number first, then compute: 48 × 21 ~= 50 × 20 = <b>1,000</b>. The true answer (1,008) must be near your estimate — if your final answer is 10,008 or 100.8, the estimate instantly tells you something went wrong. Always estimate first; it is the cheapest error-checker in mathematics.</p>
-            <h3>Worked example</h3>
-            <p><b>A shop sold ₦2,847 on Monday and ₦3,196 on Tuesday. Estimate the total, then find it exactly.</b> Estimate: 3,000 + 3,000 = 6,000. Exact: 2,847 + 3,196 = 6,043 — close to the estimate ✓.</p>
-            <h3>Exam watch</h3>
+            <div class="worked"><b>Worked example:</b> in 7,040,206 — the 7 is worth 7,000,000; the 4 is worth 40,000; the 2 is worth 200; the 6 is worth 6. Notice the zeros: they hold places empty so every other digit sits in the right seat.</div>
+            <div class="formula">EXAM LINE: 'What is the value of the digit 4 in ...?' means PLACE VALUE, not face value. If the question says 'difference between the place value and face value of 4', for 4 in the thousands place: 4,000 - 4 = 3,996.</div>
+
+            <h3>3. Writing numbers in words and in figures</h3>
             <ul>
-              <li>0 is a placeholder, not "nothing to write": three hundred and five = 305, not 35.</li>
-              <li>"Nearest hundred" of 4,950 is 5,000 — the 5 rounds up, then everything right becomes 0.</li>
-              <li>Read the question: "round" != "truncate" (truncate just chops digits off).</li>
+              <li><b>Figures to words:</b> 45,082 → 'forty-five thousand and eighty-two'. Read each group (thousands group, units group) and join with 'thousand', 'million'.</li>
+              <li><b>Words to figures:</b> 'two million, three hundred and six thousand, five hundred and forty' → 2,306,540. Write the millions group, then the thousands group, then the units group — insert zeros where a group is thin.</li>
+              <li>Nigerian context: 'one hundred and fifty million naira' → ₦150,000,000; Lagos State's population is above 15,000,000 people.</li>
             </ul>
-            `,
+            <div class="formula">TRAP: 'four hundred and five thousand' is 405,000 — NOT 400,050 or 4,050. The word 'thousand' tells you which group the 'four hundred and five' belongs to.</div>
+
+            <h3>4. Expanded form and index (exponential) form</h3>
+            <p><b>Expanded form</b> opens a number into the sum of its place values: 64,307 = 60,000 + 4,000 + 300 + 0 + 7. <b>Index form</b> writes each part using powers of ten: 64,307 = (6 x 10^4) + (4 x 10^3) + (3 x 10^2) + (0 x 10^1) + (7 x 10^0). Remember that 10^0 = 1.</p>
+            <div class="worked"><b>Worked example:</b> write 508,014 in index form.<br>(5 x 10^5) + (0 x 10^4) + (8 x 10^3) + (0 x 10^2) + (1 x 10^1) + (4 x 10^0).</div>
+
+            <h3>5. Comparing and ordering whole numbers</h3>
+            <ul>
+              <li>First compare the NUMBER OF DIGITS: 99,999 &lt; 100,000 — any 6-figure number beats any 5-figure number.</li>
+              <li>Same number of digits? Compare from the LEFT (the biggest place) until the digits differ: 45,210 &gt; 45,199 because at the hundreds place 2 &gt; 1.</li>
+              <li>Use the symbols &gt; (greater than), &lt; (less than), = (equal to). The 'mouth' of the symbol opens towards the bigger number.</li>
+              <li><b>Ascending order</b> = smallest first; <b>descending order</b> = biggest first. Read the question carefully — mixing the two up loses free marks.</li>
+            </ul>
+
+            <h3>6. Rounding off</h3>
+            <p>To round to a given place, look at the digit ONE PLACE TO THE RIGHT. If it is 5 or more, round UP; if it is 4 or less, round DOWN (the digit stays). All digits to the right of the rounding place become zeros.</p>
+            <ul>
+              <li>Round 4,672 to the nearest 10: look at the units (2) → 4,670.</li>
+              <li>Round 4,672 to the nearest 100: look at the tens (7) → 4,700.</li>
+              <li>Round 4,672 to the nearest 1,000: look at the hundreds (6) → 5,000.</li>
+              <li>Round 35 to the nearest 10 → 40 (5 always rounds up).</li>
+            </ul>
+            <div class="worked"><b>Worked example:</b> round 2,947,518 to the nearest million. The digit after the millions place is 9 (hundred-thousands), which is 5 or more, so round up: 3,000,000.</div>
+            <div class="formula">TRAP: rounding is done in ONE step using only the digit immediately to the right. Do NOT round 4,672 → 4,700 → 5,000 and claim 4,672 ≈ 5,000 to the nearest 100. Each request is its own operation.</div>
+
+            <h3>7. Estimation — fast, sensible answers</h3>
+            <p><b>Estimation</b> means rounding numbers first so the calculation becomes easy, giving an answer close enough for real life. You estimate when you check a market bill, guess a crowd size, or sanity-check an exam answer.</p>
+            <ul>
+              <li><b>Sum:</b> 4,821 + 2,975 ≈ 5,000 + 3,000 = 8,000.</li>
+              <li><b>Difference:</b> 9,054 - 3,889 ≈ 9,000 - 4,000 = 5,000.</li>
+              <li><b>Product:</b> 48 x 21 ≈ 50 x 20 = 1,000.</li>
+            </ul>
+            <div class="worked"><b>Market example:</b> Mama buys rice ₦4,850, beans ₦2,980 and oil ₦1,970. Estimating: 5,000 + 3,000 + 2,000 = ₦10,000. If the trader's bill says ₦15,000, she knows instantly to re-check — estimation is a defence against mistakes (and against being cheated).</div>
+
+            <h3>8. Factors, multiples, primes and composites</h3>
+            <ul>
+              <li>A <b>factor</b> divides a number exactly: factors of 12 are 1, 2, 3, 4, 6, 12.</li>
+              <li>A <b>multiple</b> is what you get by counting on in a number's times table: multiples of 5 are 5, 10, 15, 20, ...</li>
+              <li>A <b>prime number</b> has exactly TWO factors (1 and itself): 2, 3, 5, 7, 11, 13, 17, 19, 23, ... Note: 2 is the ONLY even prime; 1 is NOT prime.</li>
+              <li>A <b>composite number</b> has more than two factors: 4, 6, 8, 9, 10, 12, ...</li>
+              <li><b>Prime factors</b> are factors that are prime: 60 = 2 x 2 x 3 x 5.</li>
+            </ul>
+
+            <h3>9. LCM and HCF</h3>
+            <ul>
+              <li><b>LCM (Lowest Common Multiple)</b> — the smallest number two or more numbers divide into exactly. LCM of 4 and 6: multiples of 4 = 4, 8, 12, ...; of 6 = 6, 12, ... → LCM = 12.</li>
+              <li><b>HCF (Highest Common Factor)</b> — the biggest number that divides two or more numbers exactly. HCF of 12 and 18: common factors 1, 2, 3, 6 → HCF = 6.</li>
+              <li><b>Prime-factorisation method:</b> 24 = 2^3 x 3; 36 = 2^2 x 3^2. HCF = product of the LOWEST powers shared = 2^2 x 3 = 12. LCM = product of the HIGHEST powers = 2^3 x 3^2 = 72.</li>
+            </ul>
+            <div class="worked"><b>Worked example:</b> two buses leave a park every 8 minutes and every 12 minutes. They leave together at 7:00 am. When next? LCM of 8 and 12 = 24, so they leave together again 24 minutes later — 7:24 am.</div>
+
+            <h3>10. Integers on the number line</h3>
+            <p>Draw a line with 0 in the middle. Positive integers march to the RIGHT (1, 2, 3, ...), negative integers to the LEFT (-1, -2, -3, ...). The further right a number is, the BIGGER it is. That is why -2 &gt; -7, even though 7 looks 'bigger' — on the number line -2 sits to the right of -7.</p>
+            <svg viewBox="0 0 460 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A number line from minus five to plus five showing negative integers to the left of zero and positive integers to the right, with an arrow jumping from zero three steps right to plus three and an arrow jumping from zero four steps left to minus four">
+              <path d="M20 60 L440 60" stroke="#334155" stroke-width="2.5"/>
+              <path d="M432 54 L440 60 L432 66" fill="#334155"/>
+              <path d="M28 54 L20 60 L28 66" fill="#334155"/>
+              <g font-size="11" fill="#334155" text-anchor="middle" font-weight="700">
+                <text x="40" y="82">-5</text><text x="80" y="82">-4</text><text x="120" y="82">-3</text><text x="160" y="82">-2</text><text x="200" y="82">-1</text><text x="240" y="82">0</text><text x="280" y="82">1</text><text x="320" y="82">2</text><text x="360" y="82">3</text><text x="400" y="82">4</text>
+              </g>
+              <g stroke="#334155" stroke-width="2"><path d="M40 55 L40 65"/><path d="M80 55 L80 65"/><path d="M120 55 L120 65"/><path d="M160 55 L160 65"/><path d="M200 55 L200 65"/><path d="M240 55 L240 65"/><path d="M280 55 L280 65"/><path d="M320 55 L320 65"/><path d="M360 55 L360 65"/><path d="M400 55 L400 65"/></g>
+              <path d="M240 40 C280 12 320 12 358 38" stroke="#059669" stroke-width="2.5" fill="none"/>
+              <path d="M352 30 L360 40 L348 42" fill="#059669"/>
+              <text x="300" y="16" text-anchor="middle" font-size="11" font-weight="700" fill="#047857">+3 (three steps right)</text>
+              <path d="M240 100 C200 116 120 116 84 98" stroke="#d97706" stroke-width="2.5" fill="none"/>
+              <path d="M92 92 L80 96 L90 104" fill="#d97706"/>
+              <text x="160" y="114" text-anchor="middle" font-size="11" font-weight="700" fill="#b45309">-4 (four steps left)</text>
+            </svg>
+
+            <h3>11. Adding and subtracting integers</h3>
+            <ul>
+              <li><b>Same signs:</b> add the sizes and KEEP the sign: (+3) + (+5) = +8; (-3) + (-5) = -8.</li>
+              <li><b>Different signs:</b> subtract the smaller size from the bigger and TAKE THE SIGN OF THE BIGGER: (+7) + (-2) = +5; (-7) + (+2) = -5.</li>
+              <li><b>Subtracting</b> means adding the opposite: (+5) - (+8) = (+5) + (-8) = -3; (-4) - (-6) = (-4) + (+6) = +2.</li>
+            </ul>
+            <div class="worked"><b>Worked example (money sense):</b> your account has ₦500. You spend ₦800 (the bank allows an overdraft). Balance = 500 - 800 = -₦300: you OWE the bank ₦300. Then you deposit ₦1,000: -300 + 1,000 = +₦700. Integers are exactly how banks think.</div>
+
+            <h3>12. A first look at base 2 (binary)</h3>
+            <p>Our everyday system is base 10 (ten digits, 0-9). Computers use <b>base 2</b>: only the digits 0 and 1, because a switch is either OFF (0) or ON (1). Each position in base 2 is worth double the one to its right: 1, 2, 4, 8, 16, ...</p>
+            <ul>
+              <li>1101 (base 2) = (1 x 8) + (1 x 4) + (0 x 2) + (1 x 1) = 8 + 4 + 0 + 1 = 13 (base 10).</li>
+              <li>To change base 10 to base 2, keep HALVING and writing the remainders: 13 ÷ 2 = 6 r1; 6 ÷ 2 = 3 r0; 3 ÷ 2 = 1 r1; 1 ÷ 2 = 0 r1. Read remainders UPWARDS: 1101.</li>
+            </ul>
+            <div class="formula">EXAM CODE: base-2 questions in JSS1 only use small numbers (up to 31). Memorise the place values 1, 2, 4, 8, 16 and both directions of conversion — they are guaranteed marks.</div>
+
+            <h3>13. Try these (with answers)</h3>
+            <ul>
+              <li><b>Q1.</b> Give the place value of 6 in 2,605,418. <i>Ans: 600,000 (six hundred thousands).</i></li>
+              <li><b>Q2.</b> Write 708,045 in words. <i>Ans: seven hundred and eight thousand and forty-five.</i></li>
+              <li><b>Q3.</b> Write 52,306 in index form. <i>Ans: (5 x 10^4) + (2 x 10^3) + (3 x 10^2) + (0 x 10^1) + (6 x 10^0).</i></li>
+              <li><b>Q4.</b> Arrange in ascending order: 45,201; 45,199; 44,999. <i>Ans: 44,999; 45,199; 45,201.</i></li>
+              <li><b>Q5.</b> Round 7,456 to the nearest 100. <i>Ans: 7,500.</i></li>
+              <li><b>Q6.</b> Estimate 51 x 29. <i>Ans: 50 x 30 = 1,500.</i></li>
+              <li><b>Q7.</b> List the prime numbers between 20 and 40. <i>Ans: 23, 29, 31, 37.</i></li>
+              <li><b>Q8.</b> Find the LCM and HCF of 12 and 18. <i>Ans: LCM 36; HCF 6.</i></li>
+              <li><b>Q9.</b> Which is greater: -3 or -8? <i>Ans: -3 (it lies to the right of -8 on the number line).</i></li>
+              <li><b>Q10.</b> Work out (-6) + (+10) and (-4) - (-9). <i>Ans: +4 and +5.</i></li>
+              <li><b>Q11.</b> Convert 10110 (base 2) to base 10. <i>Ans: 16 + 4 + 2 = 22.</i></li>
+              <li><b>Q12.</b> Convert 25 to base 2. <i>Ans: 11001 (16 + 8 + 1).</i></li>
+            </ul>
+            <div class="formula">SUMMARY: Whole numbers live in a base-10 place-value system, so every digit's position fixes its value; we can write numbers in words, figures, expanded and index forms, compare and round them, and estimate sums and products for everyday checks. Factors, multiples, primes, LCM and HCF describe how numbers are built, while integers extend the number line below zero with simple sign rules — and base 2 shows that computers count using only 0 and 1.</div>
+
+`,
           cards: [
             { q: 'In 4,738, what is the place value of 7, and what is its value?', a: '7 is in the hundreds place, so its value is 700 — place values run units, tens, hundreds, thousands from the right.' },
             { q: 'Write 2,405,032 in words.', a: 'Two million, four hundred and five thousand and thirty-two.' },
@@ -1890,56 +1978,135 @@ const CURRICULUM = {
           tags: ['Equivalent fractions', 'Operations', 'Conversions'],
           summary: 'Adding, subtracting, multiplying and comparing fractions and decimals, and switching between fractions, decimals and percentages.',
           content: `
-            <h3>1. Equivalent fractions and simplifying</h3>
-            <p>Multiply or divide top and bottom by the <b>same number</b>: 6/8 = 3/4. A fraction is in lowest terms when top and bottom share no common factor except 1.</p>
-            <h3>2. Adding and subtracting</h3>
-            <div class="formula">Different denominators? Find the LCM first.<br>3/4 + 1/6 → LCM 12 → 9/12 + 2/12 = 11/12</div>
-            <h3>3. Multiplying and dividing</h3>
+            <h3>1. What a fraction means</h3>
+            <p>A <b>fraction</b> is an equal share of a whole. In 3/4, the bottom number (the <b>denominator</b>) says how many EQUAL parts the whole is cut into, and the top number (the <b>numerator</b>) says how many of those parts we take. 3/4 of a garri cake means: cut it into 4 equal pieces and carry 3.</p>
             <ul>
-              <li>Multiply straight across: 2/3 × 3/5 = 6/15 = 2/5.</li>
-              <li>Divide by flipping the second fraction: 3/4 ÷ 2 = 3/4 × 1/2 = <b>3/8</b>.</li>
-              <li>"of" means multiply: 2/5 of ₦2,500 = (2,500 ÷ 5) × 2 = <b>₦1,000</b>.</li>
+              <li><b>Proper fraction</b> — numerator smaller than denominator: 2/3, 5/8.</li>
+              <li><b>Improper fraction</b> — numerator equal to or bigger than denominator: 7/4, 12/12.</li>
+              <li><b>Mixed number</b> — a whole number plus a proper fraction: 1 3/4.</li>
+              <li>Changing mixed to improper: 2 3/5 = (2 x 5 + 3)/5 = 11/5. Changing improper to mixed: 11/5 = 2 1/5 (11 ÷ 5 = 2 remainder 1).</li>
             </ul>
-            <h3>4. Decimals</h3>
+            <svg viewBox="0 0 460 130" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Four circles cut into equal parts: one whole shaded 4 quarters showing 4/4 equals 1, a circle with 3 of 4 quarters shaded showing 3/4, a circle with 5 of 8 eighths shaded showing 5/8, and a circle with 7 of 4-parts impossible demonstrating an improper fraction as one whole plus 3/4">
+              <circle cx="60" cy="55" r="38" fill="#eef2ff" stroke="#6366f1" stroke-width="2"/>
+              <path d="M60 17 A38 38 0 0 1 98 55 L60 55 Z" fill="#6366f1"/>
+              <path d="M98 55 A38 38 0 0 1 60 93 L60 55 Z" fill="#6366f1"/>
+              <path d="M60 93 A38 38 0 0 1 22 55 L60 55 Z" fill="#6366f1"/>
+              <path d="M22 55 A38 38 0 0 1 60 17 L60 55 Z" fill="#6366f1"/>
+              <path d="M60 17 L60 93 M22 55 L98 55" stroke="#ffffff" stroke-width="2"/>
+              <text x="60" y="115" text-anchor="middle" font-size="12" font-weight="700" fill="#334155">4/4 = 1 whole</text>
+              <circle cx="175" cy="55" r="38" fill="#eef2ff" stroke="#6366f1" stroke-width="2"/>
+              <path d="M175 17 A38 38 0 0 1 213 55 L175 55 Z" fill="#6366f1"/>
+              <path d="M213 55 A38 38 0 0 1 175 93 L175 55 Z" fill="#6366f1"/>
+              <path d="M175 93 A38 38 0 0 1 137 55 L175 55 Z" fill="#6366f1"/>
+              <path d="M175 17 L175 93 M137 55 L213 55" stroke="#ffffff" stroke-width="2"/>
+              <text x="175" y="115" text-anchor="middle" font-size="12" font-weight="700" fill="#334155">3/4 shaded</text>
+              <circle cx="290" cy="55" r="38" fill="#eef2ff" stroke="#6366f1" stroke-width="2"/>
+              <path d="M290 17 A38 38 0 0 1 328 55 L290 55 Z" fill="#6366f1"/>
+              <path d="M328 55 A38 38 0 0 1 290 93 L290 55 Z" fill="#6366f1"/>
+              <path d="M290 93 A38 38 0 0 1 252 55 L290 55 Z" fill="#6366f1"/>
+              <path d="M290 17 L290 93 M252 55 L328 55 M263 28 L317 82 M317 28 L263 82" stroke="#ffffff" stroke-width="2"/>
+              <path d="M317 28 A38 38 0 0 1 328 55 L290 55 Z" fill="#6366f1"/>
+              <path d="M263 28 A38 38 0 0 1 290 17 L290 55 Z" fill="#6366f1"/>
+              <text x="290" y="115" text-anchor="middle" font-size="12" font-weight="700" fill="#334155">5/8 shaded</text>
+              <circle cx="400" cy="55" r="38" fill="#eef2ff" stroke="#6366f1" stroke-width="2"/>
+              <path d="M400 17 A38 38 0 0 1 438 55 L400 55 Z" fill="#6366f1"/>
+              <path d="M438 55 A38 38 0 0 1 400 93 L400 55 Z" fill="#6366f1"/>
+              <path d="M400 93 A38 38 0 0 1 362 55 L400 55 Z" fill="#6366f1"/>
+              <path d="M362 55 A38 38 0 0 1 400 17 L400 55 Z" fill="#c7d2fe"/>
+              <path d="M400 17 L400 93 M362 55 L438 55" stroke="#ffffff" stroke-width="2"/>
+              <text x="400" y="115" text-anchor="middle" font-size="12" font-weight="700" fill="#334155">7/4 = 1 3/4</text>
+            </svg>
+
+            <h3>2. Equivalent fractions and lowest terms</h3>
+            <p>Multiply (or divide) the top and bottom of a fraction by the SAME number and its value does not change: 1/2 = 2/4 = 4/8 = 50/100. These are <b>equivalent fractions</b> — the same amount wearing different clothes.</p>
             <ul>
-              <li>Multiply: count total decimal places. 1.25 × 0.4 → 125 × 4 = 500, three places → <b>0.500 = 0.5</b>.</li>
-              <li>Compare by lining up decimal points: 0.4 &lt; 0.5 &lt; 0.6, i.e. 0.4 &lt; 1/2 &lt; 3/5.</li>
+              <li><b>Reducing to lowest terms:</b> divide top and bottom by their HCF. 18/24: HCF is 6, so 18/24 = 3/4.</li>
+              <li>A fraction is in lowest terms when top and bottom have no common factor except 1.</li>
             </ul>
-            <h3>5. Fraction ↔ decimal ↔ percentage</h3>
-            <table>
-              <tr><th>Fraction</th><th>Decimal</th><th>Percentage</th></tr>
-              <tr><td>1/4</td><td>0.25</td><td>25%</td></tr>
-              <tr><td>3/4</td><td>0.75</td><td>75%</td></tr>
-              <tr><td>7/8</td><td>0.875</td><td>87.5%</td></tr>
-              <tr><td>3/20</td><td>0.15</td><td>15%</td></tr>
-            </table>
-            <div class="worked"><b>Worked example:</b> A pupil sleeps 9 hours a day. What fraction of the day is that?<br>
-            9/24, divide top and bottom by 3 → <b>3/8</b> (and 3/8 = 0.375 = 37.5%).</div>
-            <h3>Common mistakes</h3>
+            <div class="formula">EXAM LINE: unless a question says otherwise, answers must be in LOWEST TERMS. An unreduced correct fraction can lose the mark.</div>
+
+            <h3>3. Comparing and ordering fractions</h3>
+            <p>To compare fractions with DIFFERENT denominators, rewrite them over the LCM of the denominators, then compare the numerators.</p>
+            <div class="worked"><b>Worked example:</b> arrange 2/3, 3/4, 5/6 in ascending order. LCM of 3, 4, 6 = 12. 2/3 = 8/12; 3/4 = 9/12; 5/6 = 10/12. So 2/3 &lt; 3/4 &lt; 5/6.</div>
+
+            <h3>4. Adding and subtracting fractions</h3>
             <ul>
-              <li>Adding tops and bottoms: 1/2 + 1/3 is <b>not</b> 2/5.</li>
-              <li>Forgetting to simplify the final answer.</li>
-              <li>Miscounting decimal places after multiplying.</li>
+              <li><b>Same denominator:</b> add or subtract the numerators only: 2/7 + 3/7 = 5/7.</li>
+              <li><b>Different denominators:</b> change to equivalent fractions over the LCM first: 1/2 + 1/3 = 3/6 + 2/6 = 5/6.</li>
+              <li><b>Mixed numbers:</b> add the wholes and the fractions separately: 1 1/4 + 2 1/2 = 3 + (1/4 + 2/4) = 3 3/4.</li>
+              <li><b>Subtraction with borrowing:</b> 3 1/4 - 1 3/4: borrow 1 (that is 4/4) → 2 5/4 - 1 3/4 = 1 2/4 = 1 1/2.</li>
             </ul>
-            <h3>Deep dive: fractions, decimals and percents are one family</h3>
-            <div class="formula">1/2 = 0.5 = 50% &nbsp;·&nbsp; 1/4 = 0.25 = 25% &nbsp;·&nbsp; 1/5 = 0.2 = 20% &nbsp;·&nbsp; 1/8 = 0.125 = 12.5%</div>
-            <p>A <b>proper</b> fraction has top &lt; bottom (3/4); an <b>improper</b> fraction has top >= bottom (7/4); a <b>mixed number</b> mixes a whole with a fraction (13/4). Convert mixed → improper: multiply the whole by the denominator and add the top: 13/4 = (1×4 + 3)/4 = 7/4.</p>
-            <h3>The four operations, cleanly</h3>
+            <div class="formula">TRAP: NEVER add the denominators. 1/2 + 1/2 is 1, not 2/4. The denominator names the size of the pieces; you only count pieces (numerators) once the pieces are the same size.</div>
+
+            <h3>5. Multiplying and dividing fractions</h3>
             <ul>
-              <li><b>Add/subtract</b>: same denominator first (LCM). 2/3 + 3/4 = 8/1(base 2) + 9/1(base 2) = <b>17/12 = 1 5/12</b>.</li>
-              <li><b>Multiply</b>: tops × tops, bottoms × bottoms. 2/3 × 3/4 = 6/1(base 2) = 1/2.</li>
-              <li><b>Divide</b>: flip the second fraction and multiply. 2/3 ÷ 3/4 = 2/3 × 4/3 = 8/9.</li>
-              <li><b>Fraction → decimal</b>: divide top by bottom (3/4 = 3 ÷ 4 = 0.75). <b>Decimal → fraction</b>: use the place value (0.75 = 75/100 = 3/4).</li>
+              <li><b>Multiplication:</b> multiply straight across, top x top and bottom x bottom: 2/3 x 3/5 = 6/15 = 2/5. Better: CANCEL across before multiplying: 2/3 x 3/5 = 2/5 (the 3s cancel).</li>
+              <li>Multiplying by a whole number: 4 x 2/7 = 8/7 = 1 1/7.</li>
+              <li><b>Division:</b> KEEP - CHANGE - FLIP: keep the first fraction, change ÷ to x, flip (invert) the second: 2/3 ÷ 4/5 = 2/3 x 5/4 = 10/12 = 5/6.</li>
+              <li>Dividing by a whole number: 3/4 ÷ 6 = 3/4 x 1/6 = 3/24 = 1/8.</li>
             </ul>
-            <h3>Worked example</h3>
-            <p><b>Share ₦900 so Ada gets 2/5 and Bola gets the rest.</b> Ada: 2/5 × 900 = (900 × 2)/5 = <b>₦360</b>. Bola: 900 - 360 = <b>₦540</b> (which is 3/5 of 900 ✓).</p>
-            <h3>Exam watch</h3>
+            <div class="worked"><b>Worked example:</b> 2 1/2 ÷ 1 1/4. Change to improper: 5/2 ÷ 5/4 = 5/2 x 4/5 = 20/10 = 2. Mixed numbers must ALWAYS become improper fractions before multiplying or dividing.</div>
+
+            <h3>6. Fractions of quantities</h3>
+            <p>'Fraction OF a quantity' means multiply: 3/5 of ₦2,000 = (₦2,000 ÷ 5) x 3 = ₦400 x 3 = ₦1,200. Divide by the denominator first (it usually gives a friendly number), then multiply by the numerator.</p>
             <ul>
-              <li>Never add the denominators: 1/2 + 1/4 != 2/6 — find the common denominator (3/4).</li>
-              <li>"Of" means multiply: 1/2 of 80 = 1/2 × 80 = 40.</li>
-              <li>Always cancel to lowest terms — 6/1(base 2) and 1/2 are the same number, but examiners ask for lowest terms.</li>
+              <li>3/4 of 48 kg = (48 ÷ 4) x 3 = 12 x 3 = 36 kg.</li>
+              <li>2/3 of 1 hour = (60 ÷ 3) x 2 = 40 minutes.</li>
+              <li><b>What fraction of ...?</b> — put the part over the whole and reduce: 15 minutes is 15/60 = 1/4 of an hour.</li>
             </ul>
-            `,
+            <div class="worked"><b>Market example:</b> a trader sells 3/8 of her 240 oranges in the morning and 1/4 of them in the afternoon. Morning: 240 ÷ 8 x 3 = 90. Afternoon: 240 ÷ 4 = 60. Sold = 150; left = 90 oranges.</div>
+
+            <h3>7. Decimals — place value after the point</h3>
+            <p>A <b>decimal</b> is a fraction written in base-10 form using a decimal point. The first place right of the point is <b>tenths</b>, then <b>hundredths</b>, then <b>thousandths</b>: in 27.365 the 3 is 3 tenths (0.3), the 6 is 6 hundredths (0.06), the 5 is 5 thousandths (0.005).</p>
+            <ul>
+              <li>Read 0.75 as 'zero point seven five' (digit by digit after the point) or as 'seventy-five hundredths'.</li>
+              <li>Compare decimals by padding with zeros to equal length: 0.5 vs 0.48 → 0.50 vs 0.48 → 0.5 is bigger. (Yes — 0.5 &gt; 0.48 even though 48 'looks bigger'.)</li>
+            </ul>
+
+            <h3>8. Changing fractions to decimals and back</h3>
+            <ul>
+              <li><b>Fraction to decimal:</b> the line means divide: 3/4 = 3 ÷ 4 = 0.75; 1/8 = 1 ÷ 8 = 0.125.</li>
+              <li>Denominators of 10, 100, 1000 convert instantly: 7/10 = 0.7; 43/100 = 0.43; 9/1000 = 0.009.</li>
+              <li><b>Decimal to fraction:</b> 0.6 = 6/10 = 3/5; 0.25 = 25/100 = 1/4; 0.125 = 125/1000 = 1/8.</li>
+              <li>Memorise the classics: 1/2 = 0.5, 1/4 = 0.25, 3/4 = 0.75, 1/5 = 0.2, 1/8 = 0.125.</li>
+            </ul>
+
+            <h3>9. Operations with decimals</h3>
+            <ul>
+              <li><b>Addition/subtraction:</b> line up the DECIMAL POINTS (pad with zeros): 4.5 + 0.78 = 4.50 + 0.78 = 5.28.</li>
+              <li><b>Multiplication:</b> multiply as whole numbers, then count TOTAL decimal places: 1.2 x 0.3 → 12 x 3 = 36, two places → 0.36.</li>
+              <li>Multiplying by 10, 100, 1000 moves the point RIGHT (0.7 x 100 = 70); dividing moves it LEFT (70 ÷ 100 = 0.7).</li>
+              <li><b>Division:</b> make the divisor a whole number by multiplying both numbers by the same power of 10: 4.5 ÷ 0.3 = 45 ÷ 3 = 15.</li>
+            </ul>
+            <div class="worked"><b>Worked example (naira and kobo):</b> ₦1 = 100 kobo, so ₦2.50 + 75k = ₦2.50 + ₦0.75 = ₦3.25. Money is decimals in disguise — every kobo amount is hundredths of a naira.</div>
+
+            <h3>10. Fractions and decimals in daily life</h3>
+            <ul>
+              <li><b>Sharing:</b> splitting a 1.5-litre bottle of drink equally among 3 children gives 0.5 litre each.</li>
+              <li><b>Recipes:</b> half a cup of milk, 3/4 teaspoon of salt — cooking runs on fractions.</li>
+              <li><b>Measurements:</b> a tailor measures 2 1/2 yards of fabric; a carpenter reads 0.75 m on a tape.</li>
+              <li><b>Scores and discounts:</b> 'half price' means multiply by 1/2; scoring 18/20 in a test is the fraction 9/10.</li>
+            </ul>
+            <div class="formula">TIP: when a word problem mixes fractions and decimals, convert EVERYTHING to one form before calculating. Most students find fractions friendlier for 'of' problems and decimals friendlier for money.</div>
+
+            <h3>11. Try these (with answers)</h3>
+            <ul>
+              <li><b>Q1.</b> Change 2 3/4 to an improper fraction. <i>Ans: 11/4.</i></li>
+              <li><b>Q2.</b> Reduce 24/36 to lowest terms. <i>Ans: 2/3.</i></li>
+              <li><b>Q3.</b> Which is bigger: 5/8 or 2/3? <i>Ans: 2/3 (15/24 vs 16/24).</i></li>
+              <li><b>Q4.</b> 2 1/2 + 1 2/3 = ? <i>Ans: 4 1/6 (2/6 + 4/6 = 5/6 over the wholes... carefully: 1/2 + 2/3 = 3/6 + 4/6 = 7/6 = 1 1/6, plus 3 wholes = 4 1/6).</i></li>
+              <li><b>Q5.</b> 3/5 x 2 1/2 = ? <i>Ans: 3/5 x 5/2 = 15/10 = 1 1/2.</i></li>
+              <li><b>Q6.</b> 2 1/4 ÷ 3/4 = ? <i>Ans: 9/4 x 4/3 = 3.</i></li>
+              <li><b>Q7.</b> Find 3/5 of ₦1,500. <i>Ans: (1,500 ÷ 5) x 3 = ₦900.</i></li>
+              <li><b>Q8.</b> Write 0.375 as a fraction in lowest terms. <i>Ans: 375/1000 = 3/8.</i></li>
+              <li><b>Q9.</b> 6.04 - 2.7 = ? <i>Ans: 3.34.</i></li>
+              <li><b>Q10.</b> 0.8 x 0.5 = ? <i>Ans: 0.40 = 0.4.</i></li>
+              <li><b>Q11.</b> Which is greater: 0.6 or 0.575? <i>Ans: 0.6 (= 0.600).</i></li>
+              <li><b>Q12.</b> A bag of rice weighing 5 1/4 kg is shared equally into 7 containers. Mass per container? <i>Ans: 21/4 ÷ 7 = 21/28 = 3/4 kg.</i></li>
+            </ul>
+            <div class="formula">SUMMARY: A fraction names equal shares of a whole; equivalent fractions, reduction and common denominators let us compare, add and subtract them, while multiplication goes straight across and division uses keep-change-flip. 'Of' means multiply. Decimals are base-10 fractions: line up the points to add and subtract, count decimal places when multiplying, and convert freely between the two forms — money, measurements and recipes are all fractions and decimals in daily dress.</div>
+
+`,
           cards: [
             { q: 'Name the three types of fractions with an example of each.', a: 'Proper: top smaller than bottom (3/5); improper: top larger (7/4); mixed number: a whole plus a fraction (1 3/4).' },
             { q: 'Write three fractions equivalent to 2/3.', a: '4/6, 6/9, 8/12 — multiply top and bottom by the same number; divide both by a common factor to simplify.' },
@@ -1990,50 +2157,133 @@ const CURRICULUM = {
           tags: ['Variables', 'Like terms', 'Simple equations'],
           summary: 'Why letters stand for numbers, how to collect like terms, and solving one-step equations — the gateway into algebra.',
           content: `
-            <h3>1. Why letters?</h3>
-            <p>A letter like <i>x</i> is a <b>variable</b> — a placeholder for a number we don't know yet. "Some number plus 7 gives 12" becomes <b>x + 7 = 12</b>, which we can solve.</p>
-            <h3>2. Like terms</h3>
-            <p>Terms are like terms when they carry the <b>same letter part</b>. 3a and 4a are like; 3a and 3b are not.</p>
-            <div class="formula">3a + 4a - 2a = (3 + 4 - 2)a = 5a<br>2a + 3b - a + 5b = a + 8b</div>
-            <h3>3. From words to symbols</h3>
-            <table>
-              <tr><th>Words</th><th>Algebra</th></tr>
-              <tr><td>Twice a number n</td><td>2n</td></tr>
-              <tr><td>5 more than twice n</td><td>2n + 5</td></tr>
-              <tr><td>Tunde's age in 6 years (he is a now)</td><td>a + 6</td></tr>
-              <tr><td>Half of a number, decreased by 1</td><td>n/2 - 1</td></tr>
-            </table>
-            <h3>4. Solving one-step equations</h3>
+            <h3>1. Why letters? The great idea of algebra</h3>
+            <p>Arithmetic uses known numbers: 5 + 7 = 12. But life keeps asking questions with an UNKNOWN: 'Some number of boys joined the 12 already in class; now there are 20. How many joined?' <b>Algebra</b> solves problems like this by letting a letter (usually <b>x</b>, <b>y</b>, <b>a</b>, <b>n</b>) stand for the unknown number. The letter is called a <b>variable</b>.</p>
             <ul>
-              <li><b>Undo</b> what is done to the letter, doing the same to both sides.</li>
-              <li>y + 7 = 12 → y = 12 - 7 = <b>5</b>.</li>
-              <li>3m = 21 → m = 21 ÷ 3 = <b>7</b>.</li>
-              <li>x - 4 = 9 → x = 9 + 4 = <b>13</b>.</li>
+              <li>'A number added to 12 gives 20' becomes x + 12 = 20.</li>
+              <li>3 x means 3 TIMES x (we leave out the multiplication sign: 3x = 3 x x... careful, 3 x n is written 3n).</li>
+              <li>x/4 or x over 4 means x divided by 4.</li>
+              <li>x^2 means x multiplied by itself (x squared).</li>
             </ul>
-            <h3>5. Algebra in shapes</h3>
-            <div class="worked"><b>Worked example:</b> A rectangle has length (x + 3) cm and width x cm. Find its perimeter.<br>
-            P = 2(length + width) = 2(x + 3 + x) = 2(2x + 3) = <b>4x + 6 cm</b>. If x = 5, P = 26 cm.</div>
-            <h3>Common mistakes</h3>
+            <div class="worked"><b>Think about it:</b> a letter is just a sealed envelope containing a number. Everything we do in algebra is reasoned so that, whatever number is inside the envelope, the statement stays true.</div>
+
+            <h3>2. Expressions, terms and coefficients</h3>
             <ul>
-              <li>Writing 2 + x as 2x — 2x means 2 <b>times</b> x.</li>
-              <li>Collecting unlike terms: 3a + 2b stays 3a + 2b.</li>
-              <li>Forgetting to do the same thing to <b>both sides</b> of an equation.</li>
+              <li>An <b>algebraic expression</b> is a combination of terms: 3x + 2y - 5 has three TERMS (3x, +2y, -5), separated by + or - signs.</li>
+              <li>The <b>coefficient</b> is the number multiplying the letter: in 3x the coefficient is 3; in -5y it is -5; in x it is 1 (understood).</li>
+              <li>A <b>constant</b> is a term with no letter: the -5 above.</li>
+              <li><b>Like terms</b> have exactly the same letter part: 3x and 7x are like; 3x and 3y are NOT like; 2x and 2x^2 are NOT like.</li>
             </ul>
-            <h3>Deep dive: letters are just unknown numbers</h3>
-            <p>In algebra a letter (called a <b>variable</b>) stands for a number we don't know yet. 3a means 3 × a; the × is dropped. a + a = 2a, and 3a + 2a = <b>5a</b> — but 3a + 2b stays as it is, because a and b are <b>unlike terms</b>. Only like terms (same letter, same power) can be added.</p>
-            <h3>Substitution</h3>
-            <p>Replace each letter with its number, then follow BODMAS. If a = 4 and b = 3, then 2a + 5b = (2×4) + (5×3) = 8 + 15 = <b>23</b>. With a minus: 3a - 2b = 12 - 6 = 6.</p>
-            <h3>Solving by balancing</h3>
-            <p>An equation is a balance: whatever you do to one side you must do to the other. Solve x + 7 = 15 → subtract 7 from both sides → x = <b>8</b>. Solve 3x = 21 → divide both sides by 3 → x = <b>7</b>. Always <b>check</b> by substituting your answer back into the original equation.</p>
-            <h3>Worked example</h3>
-            <p><b>Musa is x years old. His father is 3 times his age, and their ages add to 48. Find x.</b> x + 3x = 48 → 4x = 48 → x = 12. Musa is 12, his father 36. Check: 12 + 36 = 48 ✓.</p>
-            <h3>Exam watch</h3>
+
+            <h3>3. Substitution — putting numbers into letters</h3>
+            <p>To <b>substitute</b>, replace each letter with its given value and then calculate, respecting the order of operations (multiply and divide before add and subtract).</p>
+            <div class="worked"><b>Worked example:</b> if a = 4 and b = 3, find (i) 2a + b, (ii) a^2 - 2b, (iii) 3(a + b).<br>(i) 2(4) + 3 = 8 + 3 = 11.<br>(ii) 4^2 - 2(3) = 16 - 6 = 10.<br>(iii) 3(4 + 3) = 3(7) = 21.</div>
+            <div class="formula">TRAP: negative values need brackets when substituting. If x = -2 then x^2 = (-2)^2 = +4, NOT -4. Squaring a negative gives a positive.</div>
+
+            <h3>4. Simplifying — collecting like terms</h3>
             <ul>
-              <li>3a + a = 4a (the lone a counts as 1a).</li>
-              <li>a × a = a^2, but a + a = 2a — adding is not multiplying.</li>
-              <li>Write the units/answer in words at the end — "x = 12 years" scores the full mark.</li>
+              <li>Add or subtract ONLY like terms: 3x + 5x = 8x; 7y - 2y = 5y; 3x + 2y stays as it is.</li>
+              <li>Keep the sign attached to each term: 5a - 2a + 7a = 10a.</li>
             </ul>
-            `,
+            <div class="worked"><b>Worked example:</b> simplify 4x + 3y - 2x + 6 - y.<br>Group: (4x - 2x) + (3y - y) + 6 = 2x + 2y + 6.</div>
+
+            <h3>5. Multiplying terms and opening brackets</h3>
+            <ul>
+              <li><b>Multiplying terms:</b> multiply the numbers, join the letters: 2a x 3b = 6ab; 4x x 2x = 8x^2; -3y x 2y = -6y^2.</li>
+              <li><b>Opening (expanding) brackets:</b> multiply EVERY term inside by what is outside: 3(x + 4) = 3x + 12; 2(3a - 5) = 6a - 10; -2(x - 3) = -2x + 6 (watch the signs!).</li>
+            </ul>
+
+            <h3>6. Translating words into algebra</h3>
+            <ul>
+              <li>'5 more than a number' → x + 5. '5 less than a number' → x - 5.</li>
+              <li>'Twice a number' → 2x. 'Half of a number' → x/2.</li>
+              <li>'The square of a number, increased by 7' → x^2 + 7.</li>
+              <li>'A number multiplied by 4, then 3 subtracted, gives 17' → 4x - 3 = 17 (that is an EQUATION — it has an = sign).</li>
+            </ul>
+            <div class="formula">TRAP: '5 less than x' is x - 5, NOT 5 - x. 'Less than' reverses the order.</div>
+
+            <h3>7. Solving simple equations — the balance idea</h3>
+            <p>An equation is a <b>balance scale</b>: the = sign is the pivot. Whatever you do to ONE side, you must do to the OTHER, and the balance stays level. The goal is to get x ALONE on one side.</p>
+            <ul>
+              <li>x + 5 = 12 → subtract 5 from both sides → x = 7.</li>
+              <li>x - 7 = 4 → add 7 to both sides → x = 11.</li>
+              <li>3x = 21 → divide both sides by 3 → x = 7.</li>
+              <li>x/4 = 5 → multiply both sides by 4 → x = 20.</li>
+            </ul>
+            <svg viewBox="0 0 460 170" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A balance scale: on the left pan two x-boxes plus three small blocks, on the right pan eleven blocks; removing three blocks from each side keeps the scale level and leaves two x-boxes equal to eight blocks, so x is four">
+              <path d="M230 30 L230 130" stroke="#334155" stroke-width="4"/>
+              <path d="M190 135 L270 135 L260 150 L200 150 Z" fill="#64748b"/>
+              <path d="M80 40 L380 40" stroke="#334155" stroke-width="4"/>
+              <circle cx="230" cy="32" r="7" fill="#d97706"/>
+              <path d="M80 40 L60 78 M80 40 L100 78" stroke="#64748b" stroke-width="2"/>
+              <path d="M380 40 L360 78 M380 40 L400 78" stroke="#64748b" stroke-width="2"/>
+              <path d="M50 80 Q80 96 110 80 L104 80 L56 80 Z" fill="#94a3b8"/>
+              <rect x="52" y="78" width="56" height="6" rx="3" fill="#64748b"/>
+              <path d="M350 80 Q380 96 410 80 L404 80 L356 80 Z" fill="#94a3b8"/>
+              <rect x="352" y="78" width="56" height="6" rx="3" fill="#64748b"/>
+              <rect x="56" y="52" width="22" height="24" rx="4" fill="#6366f1"/>
+              <text x="67" y="68" text-anchor="middle" font-size="12" font-weight="700" fill="#ffffff">x</text>
+              <rect x="82" y="52" width="22" height="24" rx="4" fill="#6366f1"/>
+              <text x="93" y="68" text-anchor="middle" font-size="12" font-weight="700" fill="#ffffff">x</text>
+              <g fill="#f59e0b"><rect x="106" y="66" width="8" height="10"/><rect x="116" y="66" width="8" height="10"/><rect x="126" y="66" width="8" height="10"/></g>
+              <g fill="#f59e0b"><rect x="352" y="66" width="8" height="10"/><rect x="362" y="66" width="8" height="10"/><rect x="372" y="66" width="8" height="10"/><rect x="382" y="66" width="8" height="10"/><rect x="392" y="66" width="8" height="10"/><rect x="352" y="54" width="8" height="10"/><rect x="362" y="54" width="8" height="10"/><rect x="372" y="54" width="8" height="10"/><rect x="382" y="54" width="8" height="10"/><rect x="392" y="54" width="8" height="10"/><rect x="367" y="42" width="8" height="10"/></g>
+              <text x="80" y="112" text-anchor="middle" font-size="12" font-weight="700" fill="#334155">2x + 3</text>
+              <text x="380" y="112" text-anchor="middle" font-size="12" font-weight="700" fill="#334155">11</text>
+              <text x="230" y="166" text-anchor="middle" font-size="12" font-weight="700" fill="#047857">Take 3 from BOTH sides: 2x = 8, so x = 4</text>
+            </svg>
+
+            <h3>8. Two-step equations</h3>
+            <p>Undo the operations in REVERSE order: first remove the added/subtracted number, then undo the multiplication/division.</p>
+            <div class="worked"><b>Worked example:</b> solve 2x + 3 = 11.<br>Step 1: subtract 3 from both sides → 2x = 8.<br>Step 2: divide both sides by 2 → x = 4.<br><b>Check:</b> 2(4) + 3 = 11. Correct!</div>
+            <div class="worked"><b>Worked example:</b> solve 3x - 5 = 16.<br>Add 5: 3x = 21. Divide by 3: x = 7. Check: 3(7) - 5 = 16.</div>
+            <ul>
+              <li>Equations with x on both sides: 5x + 2 = 3x + 10 → subtract 3x from both sides → 2x + 2 = 10 → 2x = 8 → x = 4.</li>
+              <li>With brackets: 2(x + 3) = 14 → open: 2x + 6 = 14 → 2x = 8 → x = 4.</li>
+            </ul>
+            <div class="formula">EXAM CODE: ALWAYS check your answer by putting it back into the original equation. It costs ten seconds and catches almost every mistake.</div>
+
+            <h3>9. Equations from word problems</h3>
+            <div class="worked"><b>Worked example (ages):</b> Ada is 3 years older than Bola. Together their ages are 21. How old is Bola?<br>Let Bola's age = x. Ada's age = x + 3. Equation: x + (x + 3) = 21 → 2x + 3 = 21 → 2x = 18 → x = 9. Bola is 9, Ada is 12. Check: 9 + 12 = 21.</div>
+            <div class="worked"><b>Worked example (money):</b> Tunde buys 4 identical notebooks and gets ₦200 change from ₦1,000. Cost of one notebook?<br>Amount spent = 1,000 - 200 = 800. Equation: 4x = 800 → x = ₦200.</div>
+            <ul>
+              <li>Step 1: choose the letter for the UNKNOWN the question asks about.</li>
+              <li>Step 2: translate every other quantity using that letter.</li>
+              <li>Step 3: write the equation, solve it, and answer IN A FULL SENTENCE with units.</li>
+            </ul>
+
+            <h3>10. Formulae and function machines</h3>
+            <p>A <b>formula</b> is a ready-made equation for a rule. Perimeter of a rectangle: P = 2(l + b). If l = 7 cm and b = 4 cm then P = 2(7 + 4) = 22 cm. A <b>function machine</b> chains operations on an input: 'multiply by 3, then add 1' turns input x into output 3x + 1. Feeding in 5 gives 16.</p>
+            <div class="formula">EXAM LINE: 'construct a formula' questions want you to turn a word rule into symbols: 'take a number, double it, subtract 5' → y = 2x - 5.</div>
+
+            
+            <h3>11. Algebra everywhere — Nigerian daily life</h3>
+            <p>Algebra is not a classroom game; it is the grammar of everyday reasoning. Anywhere a rule repeats with changing numbers, algebra is the shortest way to say it.</p>
+            <ul>
+              <li><b>Keke fare:</b> flag fall ₦100 plus ₦50 per stop. After n stops the fare is 100 + 50n. Six stops: 100 + 300 = ₦400.</li>
+              <li><b>Data bundle:</b> a plan gives 1.5 GB per day; in d days you get 1.5d GB. For 12 GB you need d = 8 days.</li>
+              <li><b>Trading:</b> a trader buys a bag of rice at x naira and sells it at x + 2,500. Her profit per bag is exactly 2,500 — whatever x is.</li>
+              <li><b>Savings:</b> saving ₦w weekly, after 12 weeks you have 12w; to reach ₦24,000 you need w = ₦2,000.</li>
+            </ul>
+            <div class="worked"><b>Worked example (age puzzle):</b> 'Papa is three times as old as Ada. In 10 years he will be twice as old as her. How old is Ada now?' Let Ada = x, Papa = 3x. In 10 years: 3x + 10 = 2(x + 10) → 3x + 10 = 2x + 20 → x = 10. Ada is 10, Papa 30. Check: in 10 years, 40 = 2 x 20. Correct!</div>
+
+            <h3>12. Try these (with answers)</h3>
+            <ul>
+              <li><b>Q1.</b> Simplify 7a + 3b - 2a + b. <i>Ans: 5a + 4b.</i></li>
+              <li><b>Q2.</b> If x = 5, find 3x^2 - 4. <i>Ans: 3(25) - 4 = 71.</i></li>
+              <li><b>Q3.</b> Expand 4(2y - 3). <i>Ans: 8y - 12.</i></li>
+              <li><b>Q4.</b> Multiply 3p x 4p. <i>Ans: 12p^2.</i></li>
+              <li><b>Q5.</b> Write '6 less than twice a number' in symbols. <i>Ans: 2x - 6.</i></li>
+              <li><b>Q6.</b> Solve x + 9 = 15. <i>Ans: x = 6.</i></li>
+              <li><b>Q7.</b> Solve 5x = 45. <i>Ans: x = 9.</i></li>
+              <li><b>Q8.</b> Solve 3x - 7 = 20. <i>Ans: 3x = 27, x = 9.</i></li>
+              <li><b>Q9.</b> Solve 4x + 5 = 2x + 17. <i>Ans: 2x = 12, x = 6.</i></li>
+              <li><b>Q10.</b> A number tripled and increased by 4 gives 25. Find it. <i>Ans: 3x + 4 = 25 → 3x = 21 → x = 7.</i></li>
+              <li><b>Q11.</b> The perimeter of a square is 36 cm. Find its side using P = 4s. <i>Ans: s = 9 cm.</i></li>
+              <li><b>Q12.</b> A machine multiplies by 2 then adds 3. The output is 17. What was the input? <i>Ans: 2x + 3 = 17 → x = 7.</i></li>
+            </ul>
+            <div class="formula">SUMMARY: Algebra replaces unknown numbers with letters so we can reason about them. We substitute values, collect like terms, expand brackets and translate word statements into symbols. An equation is a balance: doing the same to both sides keeps it true, and reversing operations step by step isolates the unknown — a method that solves age problems, money problems and formula questions alike. Always check by substitution.</div>
+
+`,
           cards: [
             { q: 'Why do we use letters in algebra?', a: 'Letters stand for numbers we do not know yet (variables) or any number in a rule — they let us write general formulas and solve for unknowns.' },
             { q: 'What does 3x mean, and why is x3 not used?', a: '3x means 3 multiplied by x — the multiplication sign is left out in algebra to avoid confusion with the letter x; the number always comes first.' },
@@ -2084,69 +2334,143 @@ const CURRICULUM = {
           tags: ['Types of angles', 'Angle facts', 'Perimeter & area'],
           summary: 'Naming and measuring angles, the angle facts for triangles and straight lines, and perimeter and area of basic figures.',
           content: `
-            <div class="diagram">
-              <div class="diagram-title">The four families of angles</div>
-              <svg viewBox="0 0 380 160" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Acute, right, obtuse and reflex angles drawn from a common vertex">
-                <rect x="6" y="6" width="368" height="148" rx="12" fill="#fdf4ff"/>
-                <g stroke="#0f172a" stroke-width="2.5">
-                  <line x1="40" y1="120" x2="86" y2="50"/><line x1="40" y1="120" x2="96" y2="120"/>
-                  <line x1="150" y1="120" x2="150" y2="52"/><line x1="150" y1="120" x2="206" y2="120"/>
-                  <line x1="260" y1="120" x2="238" y2="54"/><line x1="260" y1="120" x2="316" y2="120"/>
-                </g>
-                <rect x="150" y="106" width="14" height="14" fill="none" stroke="#7e22ce" stroke-width="2"/>
-                <path d="M62 120 A22 22 0 0 0 53 102" fill="none" stroke="#7e22ce" stroke-width="2"/>
-                <path d="M282 120 A22 22 0 0 0 253 100" fill="none" stroke="#7e22ce" stroke-width="2"/>
-                <text x="66" y="140" text-anchor="middle" font-size="10" fill="#7e22ce">acute &lt; 90°</text>
-                <text x="176" y="140" text-anchor="middle" font-size="10" fill="#7e22ce">right = 90°</text>
-                <text x="288" y="140" text-anchor="middle" font-size="10" fill="#7e22ce">obtuse 90°–180°</text>
-                <text x="344" y="60" font-size="10" fill="#7e22ce">reflex &gt; 180°</text>
-                <text x="190" y="26" text-anchor="middle" font-size="11" fill="#581c87">straight line = 180° · full turn = 360°</text>
-              </svg>
-            </div>
-            <h3>1. Angle facts to memorise</h3>
+            <h3>1. What is an angle?</h3>
+            <p>An <b>angle</b> is the amount of TURN between two lines (rays) that meet at a point. The lines are the <b>arms</b>; the meeting point is the <b>vertex</b>. Angles are measured in <b>degrees (deg)</b> — one full turn is 360 deg.</p>
             <ul>
-              <li>Angles on a <b>straight line</b> add to 180°.</li>
-              <li>Angles at a <b>point</b> (full turn) add to 360°.</li>
-              <li><b>Vertically opposite</b> angles are equal.</li>
-              <li>Angles in a <b>triangle</b> add to 180°; in a <b>quadrilateral</b>, 360°.</li>
-              <li>Complementary pair = 90°; supplementary pair = 180°.</li>
+              <li>Think of a door opening on its hinges: the wider the door opens, the bigger the angle. The LENGTH of the arms does not matter — only the amount of turn.</li>
+              <li>Angles are named with three letters (angle ABC, vertex letter in the middle) or one letter at the vertex (angle B), or a small letter like x inside the opening.</li>
             </ul>
-            <div class="worked"><b>Worked example:</b> Two angles on a straight line are x and 2x. Find x.<br>
-            x + 2x = 180° → 3x = 180° → x = <b>60°</b> (the other is 120°).</div>
-            <h3>2. Perimeter and area basics</h3>
-            <table>
-              <tr><th>Figure</th><th>Perimeter</th><th>Area</th></tr>
-              <tr><td>Square (side s)</td><td>4s</td><td>s^2</td></tr>
-              <tr><td>Rectangle (l × w)</td><td>2(l + w)</td><td>l × w</td></tr>
-              <tr><td>Triangle</td><td>sum of 3 sides</td><td>1/2 × base × height</td></tr>
-            </table>
-            <div class="worked"><b>Worked example:</b> Each angle of an equilateral triangle = 180° ÷ 3 = <b>60°</b>.</div>
-            <h3>Common mistakes</h3>
+
+            <h3>2. Measuring and drawing angles with a protractor</h3>
             <ul>
-              <li>Confusing complement (makes 90°) with supplement (makes 180°).</li>
-              <li>Using the slant side instead of the <b>height</b> in the triangle area formula.</li>
-              <li>Forgetting that "vertically opposite" needs two crossing straight lines.</li>
+              <li>Place the protractor's centre exactly on the VERTEX, with its baseline along one arm.</li>
+              <li>Read from the ZERO that lies on that arm — protractors have two scales (inner and outer); choosing the wrong one gives 180 - angle instead of the angle.</li>
+              <li>Acute angles read less than 90, obtuse between 90 and 180 — use this as a sanity check on your reading.</li>
+              <li>To DRAW an angle: draw one arm, centre the protractor on the vertex, mark the required degree, remove the protractor and join vertex to mark.</li>
             </ul>
-            <h3>Deep dive: the angle facts that unlock every geometry question</h3>
+
+            <h3>3. Types of angles</h3>
             <ul>
-              <li><b>Acute</b> &lt; 90° · <b>right</b> = 90° · <b>obtuse</b> 90–180° · <b>straight</b> = 180° · <b>reflex</b> 180–360°.</li>
-              <li>Angles on a straight line sum to <b>180°</b>; angles at a point sum to <b>360°</b>.</li>
-              <li>Angles of a triangle sum to <b>180°</b>; angles of a quadrilateral sum to <b>360°</b>.</li>
-              <li>Triangles by sides: <b>equilateral</b> (3 equal, all angles 60°), <b>isosceles</b> (2 equal sides, 2 equal base angles), <b>scalene</b> (no equals).</li>
+              <li><b>Acute</b> — between 0 deg and 90 deg.</li>
+              <li><b>Right angle</b> — exactly 90 deg (the corner of a book; marked with a little square).</li>
+              <li><b>Obtuse</b> — between 90 deg and 180 deg.</li>
+              <li><b>Straight angle</b> — exactly 180 deg (a straight line).</li>
+              <li><b>Reflex</b> — between 180 deg and 360 deg.</li>
             </ul>
-            <h3>Worked examples</h3>
-            <ol>
-              <li><b>A triangle has angles 65° and 50°. Find the third.</b> 180 - 65 - 50 = <b>65°</b> — and because two angles are equal, the triangle is isosceles.</li>
-              <li><b>Two angles on a straight line are x and 3x. Find x.</b> x + 3x = 180 → 4x = 180 → x = <b>45°</b>.</li>
-              <li><b>A quadrilateral has angles 90°, 90° and 70°. Find the fourth.</b> 360 - 250 = <b>110°</b>.</li>
-            </ol>
-            <h3>Exam watch</h3>
+            <div class="formula">EXAM CODE: remember the ladder — acute &lt; right (90) &lt; obtuse &lt; straight (180) &lt; reflex &lt; full turn (360). Questions love 'classify 135 deg'.</div>
+
+            <h3>4. Angles on a line and at a point</h3>
             <ul>
-              <li>An exterior angle of a triangle equals the sum of the two opposite interior angles — a fast shortcut.</li>
-              <li>Reflex angles are the ones most students forget exist (&gt; 180°).</li>
-              <li>Show every step: the method marks are worth more than the final number.</li>
+              <li><b>Angles on a straight line add up to 180 deg.</b> If one angle on a line is 115 deg, its neighbour is 180 - 115 = 65 deg.</li>
+              <li><b>Angles at a point add up to 360 deg.</b> Three angles at a point measure 100 deg and 140 deg; the third is 360 - 240 = 120 deg.</li>
             </ul>
-            `,
+            <div class="worked"><b>Worked example:</b> on a straight line, angles x, 2x and 3x sit side by side. x + 2x + 3x = 180 → 6x = 180 → x = 30. The angles are 30 deg, 60 deg and 90 deg.</div>
+
+            <h3>5. Complementary and supplementary angles</h3>
+            <ul>
+              <li><b>Complementary</b> angles add up to 90 deg: the complement of 35 deg is 55 deg.</li>
+              <li><b>Supplementary</b> angles add up to 180 deg: the supplement of 105 deg is 75 deg.</li>
+              <li>Memory hook: C comes before S, and 90 comes before 180.</li>
+            </ul>
+            <div class="worked"><b>Worked example:</b> an angle is 20 deg more than its complement. Find it. Let the angle = x; its complement = 90 - x. Equation: x = (90 - x) + 20 → 2x = 110 → x = 55. (Its complement is 35; indeed 55 = 35 + 20.)</div>
+
+            <h3>6. Vertically opposite angles</h3>
+            <p>When two straight lines CROSS, they make four angles. The angles OPPOSITE each other (facing across the vertex) are <b>vertically opposite angles</b>, and they are <b>EQUAL</b>.</p>
+            <div class="worked"><b>Worked example:</b> two lines cross; one angle is 70 deg. Then the angle vertically opposite it is 70 deg, and the two angles on the straight line beside it are each 180 - 70 = 110 deg. All four angles: 70, 110, 70, 110.</div>
+
+            <h3>7. Triangles — the 180 deg rule</h3>
+            <ul>
+              <li><b>The angles of any triangle add up to 180 deg.</b> Tear off the three corners of a paper triangle and they fit together on a straight line.</li>
+              <li><b>By sides:</b> equilateral (3 equal sides, all angles 60 deg), isosceles (2 equal sides and 2 equal base angles), scalene (no equal sides).</li>
+              <li><b>By angles:</b> acute-angled (all acute), right-angled (one 90 deg), obtuse-angled (one obtuse).</li>
+            </ul>
+            <svg viewBox="0 0 460 150" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A triangle with its three angles labelled a, b and c, next to the same three angles placed together on a straight line at one point, showing that a plus b plus c equals a straight angle of 180 degrees">
+              <path d="M60 120 L140 30 L200 120 Z" fill="#eef2ff" stroke="#6366f1" stroke-width="2.5"/>
+              <text x="82" y="110" font-size="12" font-weight="700" fill="#3730a3">a</text>
+              <text x="138" y="52" font-size="12" font-weight="700" fill="#3730a3">b</text>
+              <text x="176" y="110" font-size="12" font-weight="700" fill="#3730a3">c</text>
+              <path d="M230 120 L430 120" stroke="#334155" stroke-width="2.5"/>
+              <path d="M230 120 L300 40" stroke="#059669" stroke-width="2"/>
+              <path d="M300 40 L360 120" stroke="#d97706" stroke-width="0"/>
+              <path d="M230 120 L300 40 L360 120 Z" fill="#ecfdf5" stroke="#059669" stroke-width="0"/>
+              <path d="M258 88 A40 40 0 0 1 292 80 L230 120 Z" fill="#a7f3d0"/>
+              <path d="M300 40 L360 120 L420 60" stroke="none"/>
+              <path d="M360 120 L300 40" stroke="#d97706" stroke-width="2"/>
+              <path d="M420 55 L360 120" stroke="#6366f1" stroke-width="2"/>
+              <text x="270" y="105" font-size="12" font-weight="700" fill="#047857">a</text>
+              <text x="315" y="90" font-size="12" font-weight="700" fill="#b45309">b</text>
+              <text x="372" y="105" font-size="12" font-weight="700" fill="#3730a3">c</text>
+              <text x="330" y="140" text-anchor="middle" font-size="12" font-weight="700" fill="#334155">a + b + c = 180 deg (straight line)</text>
+            </svg>
+            <div class="worked"><b>Worked example:</b> a triangle has angles 55 deg and 65 deg. Third angle = 180 - (55 + 65) = 180 - 120 = 60 deg.</div>
+            <div class="worked"><b>Worked example (isosceles):</b> the two equal base angles of an isosceles triangle are 70 deg each. The vertex angle = 180 - 140 = 40 deg.</div>
+
+            <h3>8. Quadrilaterals — the 360 deg rule</h3>
+            <ul>
+              <li><b>The angles of any quadrilateral add up to 360 deg</b> (a diagonal splits it into two triangles: 180 + 180).</li>
+              <li><b>Square</b> — 4 equal sides, 4 right angles. <b>Rectangle</b> — opposite sides equal, 4 right angles.</li>
+              <li><b>Parallelogram</b> — opposite sides parallel and equal; opposite angles equal.</li>
+              <li><b>Rhombus</b> — 4 equal sides, opposite angles equal. <b>Trapezium</b> — exactly one pair of parallel sides. <b>Kite</b> — two pairs of adjacent equal sides.</li>
+            </ul>
+            <div class="worked"><b>Worked example:</b> three angles of a quadrilateral are 95 deg, 110 deg and 80 deg. Fourth = 360 - 285 = 75 deg.</div>
+
+            <h3>9. Other polygons and the angle-sum rule</h3>
+            <p>A <b>polygon</b> is a closed figure with straight sides: pentagon (5), hexagon (6), octagon (8)... The angle sum of an n-sided polygon is <b>(n - 2) x 180 deg</b>, because it splits into (n - 2) triangles from one vertex.</p>
+            <ul>
+              <li>Pentagon: (5 - 2) x 180 = 540 deg. Hexagon: 720 deg. Octagon: 1,080 deg.</li>
+              <li>Each angle of a REGULAR pentagon: 540 ÷ 5 = 108 deg.</li>
+            </ul>
+            <div class="formula">EXAM LINE: the formula (n - 2) x 180 answers every 'angle sum' and 'each angle of a regular polygon' question. Memorise it cold.</div>
+
+            <h3>10. Perimeter — distance around</h3>
+            <ul>
+              <li><b>Perimeter</b> = total distance around a figure (add all sides).</li>
+              <li>Square: P = 4s. Rectangle: P = 2(l + b). Triangle: add the three sides.</li>
+              <li>Circle: <b>circumference</b> C = 2πr (or πd), taking π as 22/7 or 3.142.</li>
+            </ul>
+            <div class="worked"><b>Worked example:</b> a rectangular farm is 120 m by 80 m. P = 2(120 + 80) = 400 m. Fencing it with wire at ₦250 per metre costs 400 x 250 = ₦100,000.</div>
+
+            <h3>11. Area — surface covered</h3>
+            <ul>
+              <li><b>Area</b> measures the surface a figure covers, in square units (cm2, m2).</li>
+              <li>Square: A = s x s = s^2. Rectangle: A = l x b.</li>
+              <li>Triangle: A = 1/2 x base x height (the height is measured PERPENDICULAR to the base).</li>
+              <li>Circle: A = πr^2.</li>
+            </ul>
+            <div class="worked"><b>Worked example:</b> a triangle has base 10 cm and height 6 cm. A = 1/2 x 10 x 6 = 30 cm2.<br>A room 5 m by 4 m has area 20 m2; carpet at ₦3,000 per m2 costs ₦60,000.</div>
+            <div class="formula">TRAP: perimeter and area use DIFFERENT units — cm (or m) versus cm2 (or m2). Writing 'area = 24 cm' loses a mark even when 24 is right.</div>
+
+            <h3>12. Line symmetry</h3>
+            <p>A figure has <b>line symmetry</b> if a line (mirror line) can fold it onto itself exactly. A square has 4 lines of symmetry; a rectangle 2; an isosceles triangle 1; an equilateral triangle 3; a circle — infinitely many.</p>
+
+            
+            <h3>13. Clock angles — time as geometry</h3>
+            <p>A clock face is a circle of 360 deg divided into 12 hour-marks, so each hour gap is 30 deg. The minute hand sweeps 6 deg every minute (360 ÷ 60); the hour hand creeps 0.5 deg every minute (30 ÷ 60).</p>
+            <ul>
+              <li>At 3:00 the hands are 3 hour-gaps apart: 3 x 30 = 90 deg (a right angle). At 6:00 they form a straight angle (180 deg).</li>
+              <li>At 2:00 the angle is 60 deg (acute); at 4:00 it is 120 deg (obtuse).</li>
+              <li>At 3:30 the minute hand points at 6 (180 deg from 12) while the hour hand has moved half an hour-gap past 3: 3 x 30 + 15 = 105 deg. The angle between them is 180 - 105 = 75 deg — NOT 90 deg!</li>
+            </ul>
+            <div class="formula">TIP: 'half past' never gives the 'obvious' angle because the hour hand keeps moving. Compute both hands from 12 o'clock and subtract.</div>
+
+            <h3>14. Try these (with answers)</h3>
+            <ul>
+              <li><b>Q1.</b> Classify 160 deg. <i>Ans: obtuse.</i></li>
+              <li><b>Q2.</b> Find the complement of 62 deg and the supplement of 62 deg. <i>Ans: 28 deg and 118 deg.</i></li>
+              <li><b>Q3.</b> Two angles on a straight line are x and x + 40. Find x. <i>Ans: 2x + 40 = 180 → x = 70.</i></li>
+              <li><b>Q4.</b> Two lines cross and one angle is 108 deg. Give the other three. <i>Ans: 72 deg, 108 deg, 72 deg.</i></li>
+              <li><b>Q5.</b> A triangle has angles 2x, 3x and 5x. Find x and the largest angle. <i>Ans: 10x = 180 → x = 18; largest = 90 deg.</i></li>
+              <li><b>Q6.</b> The vertex angle of an isosceles triangle is 44 deg. Find each base angle. <i>Ans: (180 - 44) ÷ 2 = 68 deg.</i></li>
+              <li><b>Q7.</b> Three angles of a quadrilateral are equal; the fourth is 90 deg. Find each equal angle. <i>Ans: 3x = 270 → x = 90 deg (it is a rectangle-type case).</i></li>
+              <li><b>Q8.</b> Find the angle sum of a hexagon and one angle of a regular hexagon. <i>Ans: 720 deg; 120 deg.</i></li>
+              <li><b>Q9.</b> A square has perimeter 48 cm. Find its side and area. <i>Ans: s = 12 cm; A = 144 cm2.</i></li>
+              <li><b>Q10.</b> Find the circumference of a circle of radius 7 cm (π = 22/7). <i>Ans: 2 x 22/7 x 7 = 44 cm.</i></li>
+              <li><b>Q11.</b> Find the area of a triangle with base 12 cm and height 9 cm. <i>Ans: 54 cm2.</i></li>
+              <li><b>Q12.</b> How many lines of symmetry has a rectangle? <i>Ans: 2.</i></li>
+            </ul>
+            <div class="formula">SUMMARY: An angle is a turn measured in degrees; acute, right, obtuse, straight and reflex classify it. Angles on a line sum to 180 deg, at a point to 360 deg, and vertically opposite angles are equal. Triangles sum to 180 deg and quadrilaterals to 360 deg, generalising to (n - 2) x 180 for any polygon. Perimeter measures the boundary, area the surface (square units), and symmetry folds figures onto themselves — the tool kit for every JSS geometry question.</div>
+
+`,
           cards: [
             { q: 'Name the types of angles: less than 90, exactly 90, between 90 and 180, exactly 180, and between 180 and 360.', a: 'Acute, right angle, obtuse, straight angle, and reflex respectively.' },
             { q: 'What do angles on a straight line and angles at a point add up to?', a: 'Angles on a straight line sum to 180 deg; angles at a point sum to 360 deg.' },
@@ -2197,49 +2521,126 @@ const CURRICULUM = {
           tags: ['Sharing ratios', 'Direct proportion', 'Percentage change'],
           summary: 'How to share quantities in a given ratio and move fluently between fractions, decimals and percentages.',
           content: `
-            <h3>1. Sharing in a given ratio</h3>
-            <p>Add the parts of the ratio to find the total number of shares, divide the quantity by that total, then multiply by each part.</p>
-            <div class="worked"><b>Worked example:</b> Share ₦8400 between Ada and Bola in the ratio 3 : 4.<br>
-            Total parts = 3 + 4 = 7. One part = 8400 ÷ 7 = ₦1200.<br>
-            Ada = 3 × 1200 = <b>₦3600</b>, Bola = 4 × 1200 = <b>₦4800</b>. Check: 3600 + 4800 = 8400 ✓</div>
-            <h3>2. Direct and inverse proportion</h3>
-            <p><b>Direct:</b> as one quantity increases the other increases at the same rate (y = kx).<br>
-            <b>Inverse:</b> as one increases the other decreases (y = k/x).</p>
-            <div class="worked"><b>Worked example:</b> If 6 notebooks cost ₦900, what do 15 cost?<br>
-            k = 900/6 = 150 per book, so 15 × 150 = <b>₦2250</b>.</div>
-            <h3>3. Percentage change</h3>
-            <div class="formula">% increase = (change ÷ original) × 100<br>
-            New value after a rise of p% = original × (1 + p/100)</div>
-            <div class="worked"><b>Worked example:</b> A shirt rises from ₦4000 to ₦4600.<br>
-            % increase = (600/4000) × 100 = <b>15%</b>.</div>
-            <h3>Common mistakes</h3>
+            <h3>1. What a ratio means</h3>
+            <p>A <b>ratio</b> compares two or more quantities of the SAME kind by showing how many times one contains the other. It is written with a colon: if a class has 12 boys and 18 girls, the ratio of boys to girls is 12 : 18, which simplifies (dividing by 6) to <b>2 : 3</b> — 'for every 2 boys there are 3 girls'.</p>
             <ul>
-              <li>Dividing by one part of the ratio instead of the <b>total</b> number of parts.</li>
-              <li>Calculating a percentage increase from the <b>new</b> value instead of the original.</li>
-              <li>Forgetting that a 20% rise followed by a 20% fall does <b>not</b> return you to the start: 100 → 120 → 96.</li>
+              <li>Order matters: boys : girls = 2 : 3, but girls : boys = 3 : 2. Always compare in the order the question asks.</li>
+              <li>A ratio has NO units once simplified — it is just a comparison of sizes.</li>
+              <li>Simplifying a ratio works exactly like simplifying a fraction: divide every part by the HCF. 20 : 35 : 15 → ÷5 → 4 : 7 : 3.</li>
+              <li>Ratios containing decimals or fractions are cleaned by multiplying every part by the same number: 1/2 : 1/3 → x6 → 3 : 2; 0.5 : 2 → x2 → 1 : 4.</li>
             </ul>
-            <div class="tip"><b>Exam tip:</b> always add your final shares back together — if they do not equal the original quantity, you have made a slip.</div>
-            <h3>Deep dive: sharing in a ratio</h3>
-            <p>A ratio compares quantities: "2 : 3" means every 5 parts, 2 belong to one side and 3 to the other. To share, <b>add the parts, divide, then multiply</b>:</p>
-            <h3>Worked example</h3>
-            <p><b>Share ₦6,000 between Chidi and Amaka in the ratio 2 : 3.</b></p>
-            <ol>
-              <li>Total parts = 2 + 3 = 5.</li>
-              <li>One part = 6,000 ÷ 5 = ₦1,200.</li>
-              <li>Chidi = 2 × 1,200 = <b>₦2,400</b>; Amaka = 3 × 1,200 = <b>₦3,600</b>. Check: 2,400 + 3,600 = 6,000 ✓.</li>
-            </ol>
-            <h3>Percentages: of, and change</h3>
-            <div class="formula">percentage of a quantity = (percent ÷ 100) × quantity &nbsp;·&nbsp; % change = (change ÷ original) × 100</div>
-            <p><b>35% of 240</b> = 0.35 × 240 = <b>84</b>. <b>A phone's price rises from ₦800 to ₦1,000. Find the percentage increase.</b> Change = 200; % increase = (200 ÷ 800) × 100 = <b>25%</b> — note the division is by the <b>original</b> 800, not the new 1,000.</p>
-            <h3>Unitary method (proportion)</h3>
-            <p>If 4 exercise books cost ₦600, then 1 book = ₦150, so 7 books = <b>₦1,050</b>. Find the value of ONE first — that single habit solves almost every proportion question.</p>
-            <h3>Exam watch</h3>
+            <div class="formula">TRAP: a ratio compares PART to PART. The fraction compares PART to WHOLE. In a 2 : 3 boys-to-girls class, boys are 2/5 (not 2/3) of the whole class. Mixing these up is the classic ratio mistake.</div>
+
+            <h3>2. Same units first!</h3>
+            <p>Before writing a ratio, convert all quantities to the SAME unit.</p>
             <ul>
-              <li>Ratio order matters: sharing 2 : 3 is different from 3 : 2 — match names to numbers carefully.</li>
-              <li>Percent means "per hundred": 40% = 40/100 = 0.4.</li>
-              <li>A 20% increase followed by a 20% decrease does NOT return the original price — percentages act on different bases.</li>
+              <li>40 minutes to 2 hours → 40 min : 120 min → 1 : 3.</li>
+              <li>50 kobo to ₦2 → 50k : 200k → 1 : 4.</li>
+              <li>250 g to 1 kg → 250 : 1000 → 1 : 4.</li>
             </ul>
-            `,
+
+            <h3>3. Sharing a quantity in a given ratio</h3>
+            <p>To share a quantity in a ratio: (1) ADD the ratio parts to find the total number of equal shares; (2) divide the quantity by that total to find ONE share; (3) multiply each ratio part by the share.</p>
+            <div class="worked"><b>Worked example:</b> share ₦20,000 between Ada and Bola in the ratio 2 : 3.<br>Total shares = 2 + 3 = 5. One share = 20,000 ÷ 5 = ₦4,000.<br>Ada = 2 x 4,000 = ₦8,000. Bola = 3 x 4,000 = ₦12,000.<br><b>Check:</b> 8,000 + 12,000 = 20,000 and 8,000 : 12,000 = 2 : 3.</div>
+            <svg viewBox="0 0 460 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A bar model of 20,000 naira divided into five equal blocks of 4,000 each: two indigo blocks labelled Ada 8,000 and three green blocks labelled Bola 12,000, showing the ratio 2 to 3">
+              <g stroke="#334155" stroke-width="1.5">
+                <rect x="20" y="30" width="80" height="40" fill="#6366f1"/>
+                <rect x="100" y="30" width="80" height="40" fill="#6366f1"/>
+                <rect x="180" y="30" width="80" height="40" fill="#10b981"/>
+                <rect x="260" y="30" width="80" height="40" fill="#10b981"/>
+                <rect x="340" y="30" width="80" height="40" fill="#10b981"/>
+              </g>
+              <g font-size="11" fill="#ffffff" text-anchor="middle" font-weight="700">
+                <text x="60" y="54">4k</text><text x="140" y="54">4k</text><text x="220" y="54">4k</text><text x="300" y="54">4k</text><text x="380" y="54">4k</text>
+              </g>
+              <text x="100" y="92" text-anchor="middle" font-size="12" font-weight="700" fill="#3730a3">Ada: 2 shares = 8,000</text>
+              <text x="300" y="92" text-anchor="middle" font-size="12" font-weight="700" fill="#047857">Bola: 3 shares = 12,000</text>
+              <text x="230" y="18" text-anchor="middle" font-size="12" font-weight="700" fill="#334155">Total 20,000 in the ratio 2 : 3 (five equal shares of 4,000)</text>
+            </svg>
+            <div class="worked"><b>Worked example (three-way share):</b> ₦54,000 is shared among three children in the ratio 1 : 2 : 3.<br>Shares = 6; one share = 9,000. The children get ₦9,000, ₦18,000 and ₦27,000.</div>
+            <div class="worked"><b>Worked example (finding the total):</b> in a ratio share of 3 : 5, the smaller part is ₦12,000. One share (3 parts' worth is 12,000? no — the smaller PART is 3 shares) → 3 shares = 12,000, so 1 share = 4,000; total = 8 shares = ₦32,000.</div>
+
+            <h3>4. Ratios in real life</h3>
+            <ul>
+              <li><b>Maps and scale:</b> a scale of 1 : 50,000 means 1 cm on the map stands for 50,000 cm (500 m) on the ground. 4 cm on the map = 2 km in real life.</li>
+              <li><b>Recipes and mixes:</b> mortar mix of cement : sand = 1 : 3; a drink concentrate mixed 1 : 4 with water.</li>
+              <li><b>Screens:</b> a 16 : 9 screen ratio describes shape, not size.</li>
+              <li><b>Sport:</b> a team's wins : losses = 7 : 2 summarises a season at a glance.</li>
+            </ul>
+
+            <h3>5. Proportion and direct proportion</h3>
+            <p>A <b>proportion</b> says two ratios are EQUAL: 2 : 3 = 4 : 6 (or 2/3 = 4/6). Two quantities are in <b>direct proportion</b> when multiplying one by a number multiplies the other by the SAME number — doubling the pens doubles the cost.</p>
+            <div class="worked"><b>Worked example:</b> 5 books cost ₦3,500. What do 8 books cost?<br>Unitary step: 1 book = 3,500 ÷ 5 = ₦700. Then 8 books = 8 x 700 = ₦5,600.</div>
+            <div class="worked"><b>Worked example (ratio box):</b> a car uses 9 litres of fuel for 108 km. How far on 15 litres? 1 litre → 108 ÷ 9 = 12 km; 15 litres → 15 x 12 = 180 km.</div>
+
+            <h3>6. Inverse proportion</h3>
+            <p>Two quantities are in <b>inverse proportion</b> when multiplying one DIVIDES the other by the same number: more workers → fewer days; faster speed → less time.</p>
+            <div class="worked"><b>Worked example:</b> 6 labourers weed a farm in 8 days. How long will 4 labourers take (same rate)?<br>Total work = 6 x 8 = 48 'labourer-days'. With 4 labourers: 48 ÷ 4 = 12 days. Fewer workers, MORE days — the product stays 48.</div>
+            <div class="formula">EXAM CODE: direct proportion → divide then multiply (unitary method). Inverse proportion → MULTIPLY the two given values first (the constant product), then divide. Identify the type BEFORE calculating: 'more means more' = direct; 'more means less' = inverse.</div>
+
+            <h3>7. Percentage — 'out of one hundred'</h3>
+            <p><b>Per cent</b> means 'out of 100'; the sign is %. So 45% = 45/100 = 0.45. Percentages are simply fractions (and decimals) wearing a uniform that makes comparisons easy.</p>
+            <ul>
+              <li><b>Fraction to %:</b> multiply by 100: 3/5 = 3/5 x 100% = 60%. 1/8 = 12.5%.</li>
+              <li><b>Decimal to %:</b> multiply by 100: 0.72 = 72%; 0.05 = 5%.</li>
+              <li><b>% to fraction:</b> 35% = 35/100 = 7/20. <b>% to decimal:</b> 8% = 0.08; 125% = 1.25.</li>
+              <li>Memorise: 10% = 1/10, 25% = 1/4, 50% = 1/2, 75% = 3/4, 20% = 1/5, 12 1/2% = 1/8.</li>
+              <li><b>One quantity as a % of another:</b> write as a fraction then x100: 15 as a % of 60 = 15/60 x 100% = 25%.</li>
+            </ul>
+
+            <h3>8. Percentage of a quantity</h3>
+            <div class="worked"><b>Worked examples:</b><br>30% of ₦5,000 = 30/100 x 5,000 = ₦1,500 (quick way: 10% = 500, so 30% = 3 x 500).<br>45% of 240 pupils = 0.45 x 240 = 108 pupils.<br>7 1/2% of 80 kg = 7.5/100 x 80 = 6 kg.</div>
+            <div class="worked"><b>Exam-style:</b> in a class of 40, 60% are girls. Number of boys = 40% of 40 = 16.</div>
+
+            <h3>9. Percentage increase and decrease</h3>
+            <ul>
+              <li><b>Increase:</b> new = original + (percent of original). A ₦800 fare increased by 25% rises by 200 to ₦1,000. Shortcut: multiply by 1.25.</li>
+              <li><b>Decrease:</b> a ₦2,400 shirt discounted by 15% falls by 360 to ₦2,040. Shortcut: multiply by 0.85.</li>
+              <li><b>Percentage change</b> = (change ÷ original) x 100%: from 80 to 100 is a rise of 20 → 20/80 x 100% = 25% increase.</li>
+            </ul>
+            <div class="worked"><b>TRAP worked example:</b> a price rises 50% then falls 50%. Start at ₦100 → rise to ₦150 → fall by 50% OF 150 (= 75) → ₦75. You did NOT return to ₦100! Successive percentages act on the CURRENT value, not the original.</div>
+
+            <h3>10. Profit and loss percentage</h3>
+            <ul>
+              <li><b>Cost price (CP)</b> — what the trader paid. <b>Selling price (SP)</b> — what the customer paid.</li>
+              <li><b>Profit</b> = SP - CP (when SP &gt; CP). <b>Loss</b> = CP - SP (when SP &lt; CP).</li>
+              <li><b>Profit %</b> = (profit ÷ CP) x 100%. <b>Loss %</b> = (loss ÷ CP) x 100%. Percentages of profit and loss are ALWAYS on the COST price.</li>
+            </ul>
+            <div class="worked"><b>Worked example:</b> a trader buys a phone for ₦40,000 and sells it for ₦46,000. Profit = ₦6,000. Profit % = 6,000/40,000 x 100% = 15%.<br>Another trader buys a bag for ₦25,000 and sells at a 10% loss: loss = 2,500, SP = ₦22,500.</div>
+
+            <h3>11. Simple interest — percentage in the bank</h3>
+            <p><b>Simple interest</b> I = (P x R x T) ÷ 100, where P = principal (money saved or borrowed), R = rate per year (%), T = time in years.</p>
+            <div class="worked"><b>Worked example:</b> ₦50,000 is saved at 6% per year simple interest for 3 years. I = (50,000 x 6 x 3) ÷ 100 = ₦9,000. Total amount = P + I = ₦59,000.</div>
+            <div class="formula">TIP: if T is given in months, change to years first (18 months = 1.5 years). Forgetting this is the standard interest mistake.</div>
+
+            
+            <h3>12. Percentage challenges from the Nigerian market</h3>
+            <div class="worked"><b>Worked example (NEPA bill):</b> a household's electricity bill was ₦18,000 last month and ₦21,600 this month. Change = 3,600. Percentage increase = 3,600 ÷ 18,000 x 100% = 20%.</div>
+            <div class="worked"><b>Worked example (exam scores):</b> Chidi scored 42 out of 60 in Maths and 28 out of 40 in English. As percentages: 42/60 = 70%; 28/40 = 70%. Same percentage — the raw scores only become comparable after converting to 'out of 100'. That is exactly what percentages are for.</div>
+            <div class="worked"><b>Worked example (population growth):</b> a school's enrolment rose from 250 to 300 pupils. Increase = 50; percentage increase = 50 ÷ 250 x 100% = 20%. If next year it falls by 20%, the new number is 300 - 60 = 240 — NOT back to 250 (the successive-percentage trap again).</div>
+            <ul>
+              <li><b>VAT and levies:</b> adding 7.5% VAT to a ₦4,000 purchase adds 7.5/100 x 4,000 = ₦300 → total ₦4,300.</li>
+              <li><b>Scholarship discounts:</b> a 25% fee discount on ₦60,000 saves ₦15,000; the parent pays ₦45,000.</li>
+            </ul>
+
+            <h3>13. Try these (with answers)</h3>
+            <ul>
+              <li><b>Q1.</b> Simplify 24 : 36. <i>Ans: 2 : 3.</i></li>
+              <li><b>Q2.</b> Express 45 minutes to 2 hours as a ratio. <i>Ans: 45 : 120 = 3 : 8.</i></li>
+              <li><b>Q3.</b> Share 60 books between two classes in the ratio 2 : 3. <i>Ans: 24 and 36.</i></li>
+              <li><b>Q4.</b> ₦45,000 is shared in the ratio 1 : 2 : 6. The largest share is? <i>Ans: one share = 5,000; largest = ₦30,000.</i></li>
+              <li><b>Q5.</b> If 6 pens cost ₦540, what do 10 pens cost? <i>Ans: 1 pen ₦90 → ₦900.</i></li>
+              <li><b>Q6.</b> 8 machines finish a job in 9 hours. How long will 6 machines take? <i>Ans: 8 x 9 = 72; 72 ÷ 6 = 12 hours.</i></li>
+              <li><b>Q7.</b> Change 7/8 to a percentage. <i>Ans: 87.5%.</i></li>
+              <li><b>Q8.</b> What is 35% of ₦8,000? <i>Ans: ₦2,800.</i></li>
+              <li><b>Q9.</b> Express 18 as a percentage of 72. <i>Ans: 25%.</i></li>
+              <li><b>Q10.</b> A ₦1,200 dress is sold at 10% discount. Sale price? <i>Ans: 1,200 - 120 = ₦1,080.</i></li>
+              <li><b>Q11.</b> A bag bought for ₦16,000 is sold for ₦20,000. Profit %? <i>Ans: 4,000/16,000 x 100% = 25%.</i></li>
+              <li><b>Q12.</b> Find the simple interest on ₦24,000 at 5% per year for 2 1/2 years. <i>Ans: (24,000 x 5 x 2.5) ÷ 100 = ₦3,000.</i></li>
+            </ul>
+            <div class="formula">SUMMARY: A ratio compares like quantities part-to-part and simplifies like a fraction; sharing in a ratio means dividing into equal shares. Proportion links equal ratios — direct proportion grows together (unitary method), inverse proportion trades one quantity against the other. Percentages express anything 'out of 100' and convert freely with fractions and decimals; they measure change, discount, profit, loss and interest — the arithmetic of the market, the bank and the exam hall alike.</div>
+
+`,
           cards: [
             { q: 'Share ₦4,500 between Ada and Bola in the ratio 2 : 3.', a: 'Total parts = 5; one part = ₦900; Ada = 2 x 900 = ₦1,800, Bola = 3 x 900 = ₦2,700.' },
             { q: 'Write two ratios equivalent to 4 : 6 and reduce it to its simplest form.', a: '8 : 12 and 2 : 3 are equivalent; simplest form is 2 : 3 (divide by the HCF 2) — order matters in a ratio.' },

@@ -361,17 +361,23 @@ check('every JSS1-3 topic has at least 15 quiz questions', (() => {
         for (const t of ts) if ((t.quiz || []).length < 15) return false;
   return true;
 })());
-check('deep-lesson batches: all deepened Basic Science lessons reach textbook depth', (() => {
+check('deep-lesson batches: all deepened lessons reach textbook depth', (() => {
   const spec = {
-    JSS1: ['Living Things & Health', 'Matter, Its Properties & Changes', 'Energy: Forms & Sources', 'Introduction to Science: Measurement & Laboratory Safety'],
-    JSS2: ['Acids, Bases & Salts in Everyday Life', 'Energy: Forms, Transformation & Simple Machines', 'Human Body Systems'],
-    JSS3: ['Reproduction, Growth & Drug Abuse', 'Light, Sound & Basic Electricity']
-  };
-  for (const [lv, titles] of Object.entries(spec))
-    for (const title of titles) {
-      const t = T.CURRICULUM['Basic Science'].topics[lv].find(x => x.title === title);
-      if (!t || (t.content || '').length < 12000 || !t.content.includes('<svg')) return false;
+    'Basic Science': {
+      JSS1: ['Living Things & Health', 'Matter, Its Properties & Changes', 'Energy: Forms & Sources', 'Introduction to Science: Measurement & Laboratory Safety'],
+      JSS2: ['Acids, Bases & Salts in Everyday Life', 'Energy: Forms, Transformation & Simple Machines', 'Human Body Systems'],
+      JSS3: ['Reproduction, Growth & Drug Abuse', 'Light, Sound & Basic Electricity']
+    },
+    'Mathematics': {
+      JSS1: ['Whole Numbers, Place Value & Estimation', 'Fractions & Decimals', 'Introduction to Algebra: Letters & Simple Equations', 'Angles & Plane Figures', 'Ratio, Proportion & Percentages']
     }
+  };
+  for (const [subj, levels] of Object.entries(spec))
+    for (const [lv, titles] of Object.entries(levels))
+      for (const title of titles) {
+        const t = T.CURRICULUM[subj].topics[lv].find(x => x.title === title);
+        if (!t || (t.content || '').length < 12000 || !t.content.includes('<svg')) return false;
+      }
   return true;
 })());
 check('every topic in every subject has at least 15 flashcards', (() => {
