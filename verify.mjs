@@ -360,12 +360,16 @@ check('every JSS1-3 topic has at least 15 quiz questions', (() => {
         for (const t of ts) if ((t.quiz || []).length < 15) return false;
   return true;
 })());
-check('deep-lesson batches: all JSS1 Basic Science lessons reach textbook depth', (() => {
-  const ts = T.CURRICULUM['Basic Science'].topics.JSS1;
-  for (const title of ['Living Things & Health', 'Matter, Its Properties & Changes', 'Energy: Forms & Sources', 'Introduction to Science: Measurement & Laboratory Safety']) {
-    const t = ts.find(x => x.title === title);
-    if (!t || (t.content || '').length < 12000 || !t.content.includes('<svg')) return false;
-  }
+check('deep-lesson batches: all deepened Basic Science lessons reach textbook depth', (() => {
+  const spec = {
+    JSS1: ['Living Things & Health', 'Matter, Its Properties & Changes', 'Energy: Forms & Sources', 'Introduction to Science: Measurement & Laboratory Safety'],
+    JSS2: ['Acids, Bases & Salts in Everyday Life', 'Energy: Forms, Transformation & Simple Machines', 'Human Body Systems']
+  };
+  for (const [lv, titles] of Object.entries(spec))
+    for (const title of titles) {
+      const t = T.CURRICULUM['Basic Science'].topics[lv].find(x => x.title === title);
+      if (!t || (t.content || '').length < 12000 || !t.content.includes('<svg')) return false;
+    }
   return true;
 })());
 check('every topic in every subject has at least 15 flashcards', (() => {
