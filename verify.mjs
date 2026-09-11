@@ -363,7 +363,8 @@ check('every JSS1-3 topic has at least 15 quiz questions', (() => {
 check('deep-lesson batches: all deepened Basic Science lessons reach textbook depth', (() => {
   const spec = {
     JSS1: ['Living Things & Health', 'Matter, Its Properties & Changes', 'Energy: Forms & Sources', 'Introduction to Science: Measurement & Laboratory Safety'],
-    JSS2: ['Acids, Bases & Salts in Everyday Life', 'Energy: Forms, Transformation & Simple Machines', 'Human Body Systems']
+    JSS2: ['Acids, Bases & Salts in Everyday Life', 'Energy: Forms, Transformation & Simple Machines', 'Human Body Systems'],
+    JSS3: ['Reproduction, Growth & Drug Abuse', 'Light, Sound & Basic Electricity']
   };
   for (const [lv, titles] of Object.entries(spec))
     for (const title of titles) {
