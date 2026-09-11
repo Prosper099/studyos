@@ -253,8 +253,8 @@ function burstScreen() {
     bit.style.background = colors[i % colors.length];
     bit.style.width = (5 + Math.random() * 5) + 'px';
     bit.style.height = (8 + Math.random() * 6) + 'px';
-    bit.style['--dx'] = (Math.cos(ang) * dist) + 'px';
-    bit.style['--dy'] = (Math.sin(ang) * dist) + 'px';
+    bit.style.setProperty('--dx', (Math.cos(ang) * dist) + 'px');
+    bit.style.setProperty('--dy', (Math.sin(ang) * dist) + 'px');
     bit.style.animationDelay = (Math.random() * 0.25) + 's';
     bit.style.animationDuration = (1.1 + Math.random() * 0.9) + 's';
     layer.appendChild(bit);

@@ -9,7 +9,7 @@ const store = {};
 let confettiLayers = 0;
 global.document = {
   getElementById: id => (store[id] ||= { innerHTML: '', textContent: '', className: '' }),
-  createElement: tag => ({ style: {}, className: '', children: [], appendChild(c) { this.children.push(c); }, remove() {} }),
+  createElement: tag => ({ style: { setProperty(k, v) { this[k] = v; } }, className: '', children: [], appendChild(c) { this.children.push(c); }, remove() {} }),
   body: { appendChild(el) { if (el.className === 'pconfetti') { confettiLayers++; global.lastBurst = el; } } }
 };
 global.window = { scrollTo: () => {} };
