@@ -6,7 +6,12 @@ const s = fs.readFileSync('/home/user/preview.html', 'utf8');
 const js = s.match(/<script>([\s\S]*?)<\/script>/)[1];
 
 const store = {};
-global.document = { getElementById: id => (store[id] ||= { innerHTML: '', textContent: '', className: '' }) };
+let confettiLayers = 0;
+global.document = {
+  getElementById: id => (store[id] ||= { innerHTML: '', textContent: '', className: '' }),
+  createElement: tag => ({ style: {}, className: '', children: [], appendChild(c) { this.children.push(c); }, remove() {} }),
+  body: { appendChild(el) { if (el.className === 'pconfetti') confettiLayers++; } }
+};
 global.window = { scrollTo: () => {} };
 global.location = { href: 'https://studyos.test/preview.html' };
 global.navigator = {};
@@ -67,6 +72,7 @@ for (let i = 0; i < 10; i++) { mod.pick(mod.paper[i].c); mod.next(); }
 mod.confirmFinish();
 ok('perfect paper scores 100%', store.app.innerHTML.includes('>100%'));
 ok('perfect paper celebrates', store.app.innerHTML.includes('Perfect paper'));
+ok('80%+ score explodes confetti on screen', confettiLayers >= 1, 'layers=' + confettiLayers);
  ok('perfect paper analysis says flawless', store.app.innerHTML.includes('flawless across every subject') && !store.app.innerHTML.split('flawless')[1].includes('Needs attention:'));
 
 console.log(`PREVIEW SMOKE OK — ${passed} assertions passed`);

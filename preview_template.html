@@ -68,6 +68,9 @@
   .exp { border:1px solid var(--line); border-radius:13px; padding:12px 14px; margin-bottom:9px; background:#fff; }
   .exp .qq { font-size:12.5px; font-weight:700; } .exp .aa { font-size:12px; color:#047857; font-weight:700; margin-top:4px; } .exp .ee { font-size:11.5px; color:#475569; margin-top:5px; line-height:1.5; }
   .hidden { display:none !important; }
+  @keyframes pConfetti { 0% { transform: translateY(-12vh) rotate(0deg); opacity: 1; } 85% { opacity: 1; } 100% { transform: translateY(108vh) rotate(720deg); opacity: 0; } }
+  .pconfetti { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 60; }
+  .pconfetti i { position: absolute; top: 0; width: 6px; height: 10px; border-radius: 2px; animation: pConfetti 1.7s ease-in forwards; }
   .share-tip { font-size:11px; color:var(--mut); margin-top:8px; text-align:center; }
 </style>
 </head>
@@ -180,6 +183,7 @@ function finish() {
   var strong = subs[0], weak = subs[subs.length - 1];
   var secs = Math.round((Date.now() - startedAt) / 1000);
   lastStats = { pct: pct, correct: correct, wrong: wrong, blank: blank, strong: strong.s, weak: weak.s };
+  if (pct >= 80) burstScreen();
   var verdict = pct >= 80 ? '🏆 Exam-ready! Sharp work.' : pct >= 60 ? '🎉 Solid — a little polishing and you are set.' : pct >= 40 ? '💪 Good start — your weak spots are now visible.' : '📈 Everyone starts somewhere. This is your baseline.';
 
   var mistakes = paper.map(function (q, i) { return { q: q, a: answers[i], i: i }; }).filter(function (m) { return m.a !== m.q.c; });
@@ -236,6 +240,23 @@ function finish() {
   window.scrollTo({ top: 0 });
 }
 
+function burstScreen() {
+  var layer = document.createElement('div');
+  layer.className = 'pconfetti';
+  var colors = ['#22c55e', '#4ade80', '#facc15', '#f472b6', '#38bdf8', '#a78bfa', '#fb923c', '#4f46e5'];
+  for (var i = 0; i < 90; i++) {
+    var bit = document.createElement('i');
+    bit.style.left = (Math.random() * 100) + '%';
+    bit.style.background = colors[i % colors.length];
+    bit.style.width = (5 + Math.random() * 5) + 'px';
+    bit.style.height = (8 + Math.random() * 6) + 'px';
+    bit.style.animationDelay = (Math.random() * 0.6) + 's';
+    bit.style.animationDuration = (1.3 + Math.random() * 1.2) + 's';
+    layer.appendChild(bit);
+  }
+  document.body.appendChild(layer);
+  setTimeout(function () { layer.remove(); }, 3200);
+}
 var lastStats = null;
 function shareWhatsApp() {
   var st = lastStats; if (!st) return;
