@@ -49,6 +49,9 @@ check('all 7 nav pages present', ['home', 'study', 'resources', 'flashcards', 'q
   .every(p => html.includes(`data-page="${p}"`)));
 check('sidebar drawer markup', html.includes('id="sidebar"') && html.includes('id="sidebar-overlay"'));
 check('browser Back (popstate) handler registered', /addEventListener\('popstate'/.test(code));
+check('got-it swipe, green border flash and card-in styles present',
+  /@keyframes gotSwipe/.test(html) && /@keyframes gotBorder/.test(html) && /@keyframes cardIn/.test(html)
+  && /\.flash-got \.flashcard-face/.test(html) && /confetti-layer[^}]*z-index: 40/.test(html));
 
 // --- stub out only the network imports, keep ALL app code -------------------
 const stubDir = path.join(root, '.verify');
@@ -924,6 +927,9 @@ T.recordTask('quiz', { percent: 80 });
 check('stale streak resets on the next study activity (no freeze banked)',
   globalThis.__FS_STORE.get('users/test-uid-2').streak === 1,
   'streak=' + globalThis.__FS_STORE.get('users/test-uid-2').streak);
+
+w.navigate('home');
+check('mission shows a live progress counter', /\d\/3 done/.test(page()) || page().includes('COMPLETE 3/3'));
 
 // ---------- CBT exam hall ----------
 w.backToQuizList();
