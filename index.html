@@ -117,7 +117,7 @@
   .pop-in { animation: popIn .5s cubic-bezier(.2, 1.4, .4, 1); }
   .bounce-big { animation: bounceBig .6s cubic-bezier(.2, 1.4, .4, 1); }
   .confetti-layer { pointer-events: none; position: absolute; inset: 0; overflow: hidden; z-index: 40; }
-  .confetti-bit { position: absolute; top: 0; width: 8px; height: 12px; border-radius: 2px; animation: confettiFall 1.05s ease-in forwards; }
+  .confetti-bit { position: absolute; top: 0; width: 5px; height: 8px; border-radius: 1.5px; opacity: .9; animation: confettiFall 1.05s ease-in forwards; }
 
   /* Streak & badge celebration animations */
   @keyframes celebPop { 0% { transform: scale(.35) rotate(-6deg); opacity: 0; } 60% { transform: scale(1.12) rotate(2deg); } 100% { transform: scale(1) rotate(0deg); opacity: 1; } }
@@ -12137,8 +12137,8 @@ function burstConfettiInto(layer) {
     bit.className = 'confetti-bit';
     bit.style.left = (3 + Math.random() * 94) + '%';
     bit.style.background = colors[i % colors.length];
-    bit.style.width = (9 + Math.random() * 6) + 'px';
-    bit.style.height = (13 + Math.random() * 8) + 'px';
+    bit.style.width = (4 + Math.random() * 3.5) + 'px';
+    bit.style.height = (6 + Math.random() * 5) + 'px';
     bit.style.animationDelay = (Math.random() * 0.35) + 's';
     bit.style.animationDuration = (0.9 + Math.random() * 0.8) + 's';
     layer.appendChild(bit);
@@ -13649,8 +13649,8 @@ function confettiBurst() {
     bit.className = 'confetti-bit';
     bit.style.left = (4 + Math.random() * 92) + '%';
     bit.style.background = colors[i % colors.length];
-    bit.style.width = (9 + Math.random() * 6) + 'px';
-    bit.style.height = (13 + Math.random() * 8) + 'px';
+    bit.style.width = (4 + Math.random() * 3.5) + 'px';
+    bit.style.height = (6 + Math.random() * 5) + 'px';
     bit.style.animationDelay = (Math.random() * 0.3) + 's';
     bit.style.animationDuration = (1.0 + Math.random() * 0.8) + 's';
     layer.appendChild(bit);
