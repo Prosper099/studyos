@@ -383,6 +383,9 @@ check('deep-lesson batches: all deepened lessons reach textbook depth', (() => {
       JSS1: ['Sentence Structure & Composition', 'Oral English: Vowels, Consonants & Stress', 'Comprehension & Summary Basics', 'Parts of Speech'],
       JSS2: ['Verb Tenses Made Simple'],
       JSS3: ['Summary Writing & précis']
+    },
+    'Basic Technology': {
+      JSS1: ['Technology in Everyday Life', 'Common Tools & Their Uses']
     }
   };
   for (const [subj, levels] of Object.entries(spec))
