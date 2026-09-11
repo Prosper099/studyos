@@ -10,7 +10,7 @@ let confettiLayers = 0;
 global.document = {
   getElementById: id => (store[id] ||= { innerHTML: '', textContent: '', className: '' }),
   createElement: tag => ({ style: {}, className: '', children: [], appendChild(c) { this.children.push(c); }, remove() {} }),
-  body: { appendChild(el) { if (el.className === 'pconfetti') confettiLayers++; } }
+  body: { appendChild(el) { if (el.className === 'pconfetti') { confettiLayers++; global.lastBurst = el; } } }
 };
 global.window = { scrollTo: () => {} };
 global.location = { href: 'https://studyos.test/preview.html' };
@@ -73,6 +73,12 @@ mod.confirmFinish();
 ok('perfect paper scores 100%', store.app.innerHTML.includes('>100%'));
 ok('perfect paper celebrates', store.app.innerHTML.includes('Perfect paper'));
 ok('80%+ score explodes confetti on screen', confettiLayers >= 1, 'layers=' + confettiLayers);
+{
+  const bits = (global.lastBurst || {}).children || [];
+  ok('burst fires from the centre like fireworks', bits.length === 110 && bits.every(b => b.style['--dx'] && b.style['--dy']), 'bits=' + bits.length);
+  const angles = bits.slice(0, 20).map(b => Math.atan2(parseFloat(b.style['--dy']), parseFloat(b.style['--dx'])));
+  ok('pieces fly in all directions (not just down)', new Set(angles.map(a => Math.round(a / (Math.PI / 4)))).size >= 4, 'dirs=' + new Set(angles.map(a => Math.round(a / (Math.PI / 4)))).size);
+}
  ok('perfect paper analysis says flawless', store.app.innerHTML.includes('flawless across every subject') && !store.app.innerHTML.split('flawless')[1].includes('Needs attention:'));
 
 console.log(`PREVIEW SMOKE OK — ${passed} assertions passed`);
