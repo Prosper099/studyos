@@ -1,4 +1,4 @@
-STUDYOS — WHATSAPP COPY (human edition)
+STUDYOS — WHATSAPP COPY (built-by-me edition)
 ==================================================
 Send these two messages, in this order. Link first, always.
 
@@ -7,13 +7,13 @@ MESSAGE 1 — link first + hook
 --------------------------------------------------
 https://studyos-academic.vercel.app/preview.html
 
-Look, I just took this 10-question brain check and I'm still thinking about my score 😂 10 minutes, it marks you instantly, and it's free. It's a small project some guys are building, so try it and send me your score. Winner buys nothing, it's just for bragging rights.
+I have been quietly building something and it is finally ready to show 😅 It is called StudyOS, and this is the Brain Check — 10 questions, 10 minutes, instant score, totally free. Take it and chat me up with your reviews: what you liked, what to fix, what to add next. I read every single message.
 
 --------------------------------------------------
-MESSAGE 2 — what is StudyOS + help it grow
+MESSAGE 2 — what is StudyOS + chat me up
 --------------------------------------------------
-For those asking what StudyOS is:
+WHAT IS STUDYOS?
 
-It's a free study app for Nigerian students, still being built. The stuff already inside is actually crazy — full lessons with diagrams from JSS1 to SS3, over 1,000 exam questions, flashcards, and a mock exam hall that looks like the real JAMB CBT screen.
+It is my preview project — a free study app for Nigerian students. I already packed it: full textbook-style lessons with diagrams from JSS1 to SS3, over 1,000 exam questions, 1,200+ flashcards, and a mock exam hall that looks like the real JAMB CBT screen.
 
-It's free while they build it, and the only thing they ask is that if you like it, you share it. So I'm sharing it to you 😌 Drop it in one group chat — that's how it grows.
+It is 100% free while I build it. If you like it, do two small things for me: share it in one group chat, and chat me up with your review. That is the only payment I am asking for 😌
