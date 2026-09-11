@@ -5,6 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>StudyOS — Free JAMB Readiness Check (10 questions, 10 minutes)</title>
 <meta name="description" content="Take the free 10-minute StudyOS readiness check: real JAMB/WAEC-style questions, instant score, subject breakdown. No sign-up needed." />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="StudyOS" />
+<meta property="og:title" content="Free JAMB Readiness Check — 10 questions, 10 minutes" />
+<meta property="og:description" content="Take the free StudyOS readiness check: instant score, subject breakdown and a WhatsApp share button. No sign-up. 100% free." />
+<meta property="og:url" content="https://studyos-academic.vercel.app/preview.html" />
+<meta property="og:image" content="https://studyos-academic.vercel.app/og.png" />
 <style>
   :root { --ink:#0f172a; --mut:#64748b; --line:#e2e8f0; --ind:#4f46e5; --grn:#10b981; --amb:#f59e0b; --rose:#f43f5e; }
   * { box-sizing:border-box; margin:0; padding:0; }
@@ -202,7 +208,11 @@ function finish() {
       '<div style="margin-top:12px">' + subs.map(function (x) {
         return '<div class="srow"><div class="lbl"><span>' + esc(x.s) + '</span><span style="color:' + (x.p >= 60 ? 'var(--grn)' : 'var(--amb)') + '">' + x.p + '% (' + x.c + '/' + x.t + ')</span></div><div class="bar"><i style="width:' + x.p + '%;background:' + (x.p >= 60 ? 'var(--grn)' : 'var(--amb)') + '"></i></div></div>';
       }).join('') + '</div>' +
-      '<p style="font-size:12.5px;line-height:1.6;color:#334155;margin-top:6px">🧠 <b>StudyOS analysis:</b> your strongest area is <b>' + esc(strong.s) + '</b> (' + strong.p + '%). Needs attention: <b>' + esc(weak.s) + '</b> (' + weak.p + '%).</p>' +
+      '<p style="font-size:12.5px;line-height:1.6;color:#334155;margin-top:6px">🧠 <b>StudyOS analysis:</b> ' + (weak.p === 100
+        ? 'flawless across every subject — nothing to fix! 💯'
+        : strong.p === weak.p
+          ? 'even scores across the board — keep every subject warm 🔥'
+          : 'your strongest area is <b>' + esc(strong.s) + '</b> (' + strong.p + '%). Needs attention: <b>' + esc(weak.s) + '</b> (' + weak.p + '%).') + '</p>' +
     '</div>' +
     '<div class="card" style="margin-top:12px">' +
       (mistakes.length

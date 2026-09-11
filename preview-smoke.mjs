@@ -67,5 +67,6 @@ for (let i = 0; i < 10; i++) { mod.pick(mod.paper[i].c); mod.next(); }
 mod.confirmFinish();
 ok('perfect paper scores 100%', store.app.innerHTML.includes('>100%'));
 ok('perfect paper celebrates', store.app.innerHTML.includes('Perfect paper'));
+ ok('perfect paper analysis says flawless', store.app.innerHTML.includes('flawless across every subject') && !store.app.innerHTML.split('flawless')[1].includes('Needs attention:'));
 
 console.log(`PREVIEW SMOKE OK — ${passed} assertions passed`);

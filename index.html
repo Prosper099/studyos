@@ -6,6 +6,12 @@
 <title>StudyOS — Intelligent Study Companion for JAMB &amp; WAEC</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg viewBox='0 0 48 48' fill='none' xmlns='http://www.w3.org/2000/svg' aria-hidden='true'%3E %3Crect x='3' y='3' width='42' height='42' rx='12' fill='url(%23lg-book)'/%3E %3Cpath d='M24 15.4c-2.6-2.1-6-3.2-9.6-3.2-1.3 0-2.4 1.1-2.4 2.4v16.6c0 1.3 1.1 2.4 2.4 2.4 3.6 0 7 1.1 9.6 3.2 2.6-2.1 6-3.2 9.6-3.2 1.3 0 2.4-1.1 2.4-2.4V14.6c0-1.3-1.1-2.4-2.4-2.4-3.6 0-7 1.1-9.6 3.2Z' fill='%23fff' fill-opacity='.95'/%3E %3Cpath d='M24 15.4v21.4' stroke='%236366f1' stroke-width='1.6' stroke-linecap='round'/%3E %3Cpath d='M16.4 19.2h4.4M16.4 23.2h4.4M16.4 27.2h4.4M27.2 19.2h4.4M27.2 23.2h4.4M27.2 27.2h4.4' stroke='%236366f1' stroke-width='1.5' stroke-linecap='round' stroke-opacity='.55'/%3E %3Cpath d='M33.5 8.5v11l-2.6-2-2.6 2v-11h5.2Z' fill='%23f59e0b'/%3E %3Cdefs%3E%3ClinearGradient id='lg-book' x1='3' y1='3' x2='45' y2='45' gradientUnits='userSpaceOnUse'%3E %3Cstop stop-color='%234f46e5'/%3E%3Cstop offset='1' stop-color='%23312e81'/%3E%3C/linearGradient%3E%3C/defs%3E %3C/svg%3E" />
 <meta name="description" content="StudyOS: an intelligent study companion and learning hub for secondary school students preparing for JAMB UTME, WAEC WASSCE, NECO and Post-UTME." />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="StudyOS" />
+<meta property="og:title" content="StudyOS — Nigeria's study companion" />
+<meta property="og:description" content="Free CBT exam hall, 1,000+ questions, flashcards, streaks and study plans for JAMB, WAEC, NECO, Post-UTME & BECE." />
+<meta property="og:url" content="https://studyos-academic.vercel.app/" />
+<meta property="og:image" content="https://studyos-academic.vercel.app/og.png" />
 
 <!-- Tailwind CSS (CDN) -->
 <script src="https://cdn.tailwindcss.com"></script>
@@ -14034,7 +14040,11 @@ function renderQuiz(el) {
           <h3 class="mb-2 text-sm font-bold text-indigo-900">🧠 StudyOS Analysis</h3>
           <ul class="space-y-1.5 text-xs font-semibold text-indigo-900">
             <li>💪 Your strongest area: <b>${strongest ? strongest.sub : '—'}${strongest ? ' (' + strongest.pct + '%)' : ''}</b></li>
-            <li>🎯 Needs attention: <b>${weakest ? weakest.sub : '—'}${weakTopic ? ' — ' + weakTopic : ''}</b></li>
+            <li>${weakest && weakest.pct === 100
+              ? '💯 Flawless across every subject — nothing to fix!'
+              : strongest && weakest && strongest.pct === weakest.pct
+                ? '🎯 Even scores across subjects — keep every topic warm.'
+                : `🎯 Needs attention: <b>${weakest ? weakest.sub : '—'}${weakTopic ? ' — ' + weakTopic : ''}</b>`}</li>
             <li>${r.unanswered ? `⚠️ ${r.unanswered} question${r.unanswered > 1 ? 's' : ''} left blank — practise pacing with the timer.` : '✅ You attempted every question — great pacing.'}</li>
           </ul>
           <div class="mt-4 flex flex-wrap gap-2">
