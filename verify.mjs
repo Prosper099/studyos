@@ -388,6 +388,10 @@ check('deep-lesson batches: all deepened lessons reach textbook depth', (() => {
       JSS1: ['Technology in Everyday Life', 'Common Tools & Their Uses', 'Technical Drawing: Instruments, Lines & Lettering', 'Safety in the Workshop'],
       JSS2: ['Geometrical Construction & Plane Figures', 'Building Materials & Simple Structures'],
       JSS3: ['Machines, Mechanisms & Maintenance']
+    },
+    'Physics': {
+      SS1: ['Measurement, Units & Vectors', 'Motion & Newton’s Laws', 'Work, Energy & Power', 'Equilibrium of Forces & Moments'],
+      SS2: ['Heat Energy & Thermal Expansion', 'Gravitational Field & Weightlessness']
     }
   };
   for (const [subj, levels] of Object.entries(spec))
