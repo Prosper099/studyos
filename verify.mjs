@@ -493,7 +493,8 @@ check('a JSS student is never offered Physics, Chemistry or Biology',
   'JSS2 -> ' + T.subjectsForLevel('JSS2').join(', '));
 
 check('an SS student is offered the three sciences',
-  ['SS1','SS2','SS3'].every(l => T.subjectsForLevel(l).join('|') === SENIOR.join('|'))
+  ['SS1','SS2','SS3'].every(l => SENIOR.every(x => T.subjectsForLevel(l).includes(x)))
+  && ['SS2','SS3'].every(l => T.subjectsForLevel(l).join('|') === SENIOR.join('|'))
   && T.topicsFor('Physics','SS3').length > 0,
   'SS3 -> ' + T.subjectsForLevel('SS3').join(', '));
 

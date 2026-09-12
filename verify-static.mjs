@@ -98,7 +98,7 @@ const feature = [
   ['hydrateFromDoc clears an exam invalid for the level', /!examsForLevel\(state\.profile\.classLevel\)\.some\(e => e\.id === state\.profile\.targetExam\)/],
   ['onboarding step 3 lists all seven subjects', /'Mathematics', 'English Language', 'Basic Science', 'Basic Technology',[\s\S]*'Physics', 'Chemistry', 'Biology'/],
   ['level catalogue maps JSS to junior subjects', /JSS1: \['Mathematics', 'English Language', 'Basic Science', 'Basic Technology'\]/],
-  ['level catalogue maps SS to senior subjects', /SS1:\s+\['Mathematics', 'English Language', 'Physics', 'Chemistry', 'Biology'\]/],
+  ['level catalogue maps SS to senior subjects', /SS1:\s+\['Mathematics', 'English Language', 'Physics', 'Chemistry', 'Biology', 'Government', 'Literature in English', 'History', 'Economics', 'Commerce', 'Financial Accounting'\]/],
   ['subjectsForLevel falls back to every subject', /function subjectsForLevel\(classLevel\) \{[\s\S]*Object\.keys\(CURRICULUM\)/],
   ['onboarding uses selectableSubjects()', /selectableSubjects\(\)\.map\(s =>/],
   ['onboarding drops subjects unavailable at the level', /o\.subjects\.filter\(x => subjectsForLevel\(o\.classLevel\)\.includes\(x\)\)/],
