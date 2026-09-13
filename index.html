@@ -13482,7 +13482,8 @@ function scoreKb(qRaw) {
   const q = normalise(qRaw);
   if (!q) return [];
   const words = q.split(' ').filter(w => w.length > 2);
-  const scored = BUDDY_KB.map(entry => {
+  const isJSS = String(state.profile.classLevel || '').startsWith('JSS');
+  const scored = BUDDY_KB.filter(e => !isJSS || !/JAMB|WAEC/.test(e.title)).map(entry => {
     let score = 0;
     entry.keywords.forEach(kw => {
       const k = kw.toLowerCase();
@@ -15052,6 +15053,7 @@ function pastFor(subject) {
 }
 
 function startPastQuiz() {
+  if (String(state.profile.classLevel || '').startsWith('JSS')) { toast('The real-paper drill opens from SS1 — topic quizzes are your gym for now!'); return; }
   state.quiz = { answers: {}, submitted: false, score: 0, result: null, mode: 'past', level: '', topicIdx: 0, topicTitle: '',
     questions: buildQuiz(state.selectedSubject, 'past'), deadline: quizDeadline(), examIdx: 0 };
   state.page = 'quiz';
@@ -15205,7 +15207,7 @@ function startCbtExam() {
       (t.quiz || []).forEach((q, qi) => pool.push({ ...q, id: `cbt-${sub.slice(0, 3).toLowerCase()}-t${ti}q${qi}`, subject: sub, topic: t.title }));
     });
     (quizFor(sub) || []).forEach((q, i) => pool.push({ ...q, id: `cbt-${sub.slice(0, 3).toLowerCase()}-m${i}`, subject: sub, topic: 'Mixed practice' }));
-    (pastFor(sub) || []).forEach((q, i) => pool.push({ ...q, id: `cbt-${sub.slice(0, 3).toLowerCase()}-p${i}`, subject: sub, topic: 'Past questions' }));
+    if (!String(p.classLevel || '').startsWith('JSS')) (pastFor(sub) || []).forEach((q, i) => pool.push({ ...q, id: `cbt-${sub.slice(0, 3).toLowerCase()}-p${i}`, subject: sub, topic: 'Past questions' }));
     const pick = shuffled(pool).slice(0, want);
     pick.forEach(q => questions.push(q));
     seq += pick.length;
@@ -15306,7 +15308,7 @@ function buildQuiz(subject, mode, level, topicIdx) {
   let pool = [];
   if (mode === 'topic') {
     pool = topicQuiz(subject, level, topicIdx);
-    if (pool.length < count) pool = pool.concat(shuffled(quizFor(subject).concat(pastFor(subject))));
+    if (pool.length < count) pool = pool.concat(shuffled(quizFor(subject).concat(String(state.profile.classLevel || '').startsWith('JSS') ? [] : pastFor(subject))));
   } else if (mode === 'mock') {
     pool = shuffled(quizFor(subject));
   } else {
@@ -15737,6 +15739,12 @@ const SHELF = {
   ]
 };
 
+const JUNIOR_COMMON = [
+  { cat: 'Past questions', title: 'Myschool — BECE past questions', url: 'https://myschool.ng/classroom', note: 'Year-by-year junior school past questions with answers.' },
+  { cat: 'Official body', title: 'WAEC Nigeria — BECE home', url: 'https://www.waecnigeria.org/', note: 'The body that runs the BECE: syllabus, timetables and results.' },
+  { cat: 'Official body', title: 'NERDC — national curriculum', url: 'https://nerdc.org.ng/', note: 'The official K-12 curriculum: what every JSS class should cover.' },
+  { cat: 'Textbook', title: 'Internet Archive — free books', url: 'https://archive.org/', note: 'Free digital library: junior secondary textbooks and revision guides.' }
+];
 function juniorLink(r) {
   const fix = t => String(t)
     .replace('WAEC Chemistry — redox reactions & oxidation numbers', 'BECE Basic Science — redox & oxidation numbers')
@@ -15754,7 +15762,7 @@ function renderResources(el) {
   const links = (CURRICULUM[subject].resources || []).map(r =>
     String(state.profile.classLevel || '').startsWith('JSS') ? juniorLink(r) : r);
   const iconFor = cat => ({ 'Video lesson': '▶️', 'Structured course': '🎓', 'Past questions': '🗂️', 'Reference': '📚', 'Dictionary': '🔤', 'Formula sheet': '🧾', 'Simulation': '🧪', 'Diagrams': '🧫', 'Textbook': '📖', 'Official body': '🏛️' }[cat] || '🔗');
-  const shelf = (SHELF[subject] || []).concat(SHELF._common);
+  const shelf = (SHELF[subject] || []).concat(String(state.profile.classLevel || '').startsWith('JSS') ? JUNIOR_COMMON : SHELF._common);
   el.innerHTML = `
     ${pageHeader('Web Resources', 'Curated, subject-mapped links — open them in a new tab and revise along.')}
     ${subjectSelector('resources')}
@@ -16057,7 +16065,11 @@ function renderQuiz(el) {
             <p class="mb-4 mt-1 flex-1 text-xs leading-relaxed text-indigo-700">${quizFor(subject).length} exam-style questions mixing every ${subject} topic — the closest thing to a JAMB/WASSCE drill.</p>
             <button type="button" onclick="startMockQuiz()" class="self-start rounded-xl bg-indigo-600 px-4 py-2 text-xs font-bold text-white transition hover:bg-indigo-500">Start mixed quiz</button>
           </article>` : ''}
-        ${pastFor(subject).length ? `
+        ${String(state.profile.classLevel || '').startsWith('JSS') ? `
+          <article class="flex flex-col rounded-2xl border border-amber-200 bg-amber-50/60 p-5 shadow-card animate-fadeUp md:col-span-2">
+            <h3 class="text-sm font-bold text-amber-900">📜 Real past-question drill</h3>
+            <p class="mb-4 mt-1 flex-1 text-xs leading-relaxed text-amber-700"><strong>The real-paper drill unlocks from SS1</strong> — it drills actual WAEC, NECO and JAMB questions, and that is not your fight yet. Your BECE gym is right here: topic quizzes and flashcards with the same timer and instant marking.</p>
+          </article>` : pastFor(subject).length ? `
           <article class="flex flex-col rounded-2xl border border-amber-200 bg-amber-50/60 p-5 shadow-card animate-fadeUp md:col-span-2">
             <h3 class="text-sm font-bold text-amber-900">📜 Real WAEC/JAMB past questions</h3>
             <p class="mb-4 mt-1 flex-1 text-xs leading-relaxed text-amber-700"><strong>${pastFor(subject).length} actual questions</strong> lifted from published WAEC, NECO and JAMB papers (1988–2025) and embedded offline in StudyOS — every question keeps its exam-body + year attribution, and each answer comes with a worked explanation after you submit.</p>
