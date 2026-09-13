@@ -569,8 +569,9 @@ check('JSS students may only target General or BECE',
   && T.examsForLevel('JSS3').map(e => e.id).join('|') === 'General|BECE',
   'JSS2 -> ' + T.examsForLevel('JSS2').map(e => e.id).join(', '));
 
-check('SS students target JAMB, WAEC, NECO, Post-UTME or General',
-  T.examsForLevel('SS1').map(e => e.id).join('|') === 'JAMB UTME|WAEC WASSCE|NECO|Post-UTME|General'
+check('SS1/SS2 target WAEC/NECO/General; SS3 adds JAMB & Post-UTME',
+  T.examsForLevel('SS1').map(e => e.id).join('|') === 'WAEC WASSCE|NECO|General'
+  && T.examsForLevel('SS2').map(e => e.id).join('|') === 'WAEC WASSCE|NECO|General'
   && T.examsForLevel('SS3').map(e => e.id).join('|') === 'JAMB UTME|WAEC WASSCE|NECO|Post-UTME|General',
   'SS1 -> ' + T.examsForLevel('SS1').map(e => e.id).join(', '));
 
@@ -583,10 +584,13 @@ check('onboarding step 2 shows only junior exams for a JSS class', (() => {
   const junior = /BECE/.test(html) && /General/.test(html) && !/JAMB UTME/.test(html) && !/WAEC WASSCE/.test(html);
   st.onboard = { step: 2, classLevel: 'SS2', targetExam: '', subjects: [] };
   T.renderOnboardStep();
+  const ss2Calm = /WAEC WASSCE/.test(byId('step-2').innerHTML) && !/JAMB UTME/.test(byId('step-2').innerHTML);
+  st.onboard = { step: 2, classLevel: 'SS3', targetExam: '', subjects: [] };
+  T.renderOnboardStep();
   const senior = /JAMB UTME/.test(byId('step-2').innerHTML) && /Post-UTME/.test(byId('step-2').innerHTML) && !/BECE</.test(byId('step-2').innerHTML);
   st.onboard = saved;
   T.renderOnboardStep();
-  return junior && senior;
+  return junior && ss2Calm && senior;
 })(), 'JSS2 step2: ' + (() => { const st = T.getState(); const sv = { ...st.onboard }; st.onboard = { step: 2, classLevel: 'JSS2', targetExam: '', subjects: [] }; T.renderOnboardStep(); const ids = [...byId('step-2').innerHTML.matchAll(/font-bold [^"]*">([^<]+)</g)].map(m => m[1]).join(', '); st.onboard = sv; return ids; })());
 
 check('hydrateFromDoc clears an exam that is invalid for the saved level', (() => {
@@ -594,11 +598,13 @@ check('hydrateFromDoc clears an exam that is invalid for the saved level', (() =
   T.hydrateFromDoc({ name: 'Ada', classLevel: 'JSS2', targetExam: 'JAMB UTME', subjects: ['Mathematics'] });
   const cleared = st.profile.targetExam === '';
   T.hydrateFromDoc({ name: 'Ada', classLevel: 'SS2', targetExam: 'JAMB UTME', subjects: ['Mathematics'] });
+  const ss2Cleared = st.profile.targetExam === '';
+  T.hydrateFromDoc({ name: 'Ada', classLevel: 'SS3', targetExam: 'JAMB UTME', subjects: ['Mathematics'] });
   const kept = st.profile.targetExam === 'JAMB UTME';
   T.hydrateFromDoc({ name: 'Ada', classLevel: 'JSS3', targetExam: 'BECE', subjects: ['Mathematics'] });
   const beceKept = st.profile.targetExam === 'BECE';
   resetHarness();
-  return cleared && kept && beceKept;
+  return cleared && ss2Cleared && kept && beceKept;
 })(), 'JSS2 + JAMB UTME -> ' + (() => { const st = T.getState(); T.hydrateFromDoc({ classLevel: 'JSS2', targetExam: 'JAMB UTME' }); const r = JSON.stringify(st.profile.targetExam); resetHarness(); return r; })());
 
 check('every topic has tags, summary and content',
@@ -726,8 +732,10 @@ check('mdToHtml escapes then bolds', T.mdToHtml('**hi** <img src=x>').includes('
 check('fmtQuad renders 2x^2 + 3x - 5 (ASCII-safe math)', T.fmtQuad(2, 3, -5) === '2x^2 + 3x - 5');
 check('OPTIONS cover the brief', JSON.stringify(T.OPTIONS.classes) === JSON.stringify(['SS1','SS2','SS3','JSS1','JSS2','JSS3'])
   && T.OPTIONS.exams.map(e => e.id).join('|') === 'JAMB UTME|WAEC WASSCE|NECO|Post-UTME|General'
-  && T.OPTIONS.subjects.length === 7
-  && Object.keys(T.OPTIONS.icons).length === 7
+  && T.OPTIONS.subjects.length === 13
+  && Object.keys(T.OPTIONS.icons).length === 13
+  && T.OPTIONS.icons['Government'] === '🏛️'
+  && T.OPTIONS.icons['Financial Accounting'] === '🧾'
   && T.OPTIONS.icons['Basic Science'] === '🔬'
   && T.OPTIONS.icons['Basic Technology'] === '🛠️');
 
@@ -786,6 +794,9 @@ w.toggleOnboardSubject('Physics');
 w.toggleOnboardSubject('Physics');
 check('subject chips toggle on and off', true);
 await w.onboardNext();
+check('step 3 refuses an SS student without a department', !byId('onboard-error').classList.contains('hidden'));
+w.pickDept('Science');
+await w.onboardNext();
 check('step 3 → step 4 (target score)', byId('onboard-kicker').textContent === 'Step 4 of 6');
 await w.onboardNext();
 check('step 4 refuses without a target score', !byId('onboard-error').classList.contains('hidden'));
@@ -806,6 +817,7 @@ check('onboarding persisted class + exam + subjects + target + preference to Fir
   docAfterOnboard.classLevel === 'SS3' && docAfterOnboard.targetExam === 'JAMB UTME'
   && docAfterOnboard.targetScore === '300+' && docAfterOnboard.studyPref === 'balanced'
   && JSON.stringify(docAfterOnboard.subjects) === JSON.stringify(['Mathematics', 'Physics'])
+  && docAfterOnboard.dept === 'Science'
   && docAfterOnboard.onboarded === true, JSON.stringify(docAfterOnboard));
 check('onboarding modal closed after finish', byId('onboarding-modal').classList.contains('hidden'));
 

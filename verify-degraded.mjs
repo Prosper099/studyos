@@ -125,6 +125,7 @@ w.pickOnboardOption('classLevel', 'SS3');
 await w.onboardNext();
 w.pickOnboardOption('targetExam', 'WAEC WASSCE');
 await w.onboardNext();
+w.pickDept('Science');
 w.toggleOnboardSubject('Chemistry');
 await w.onboardNext();
 w.pickOnboardOption('targetScore', 'Mostly A1-B3');

@@ -579,17 +579,44 @@ const OPTIONS = {
   classes: ['SS1', 'SS2', 'SS3', 'JSS1', 'JSS2', 'JSS3'],
   exams: EXAM_OPTIONS.SS,
   subjects: ['Mathematics', 'English Language', 'Basic Science', 'Basic Technology',
-             'Physics', 'Chemistry', 'Biology'],
+             'Physics', 'Chemistry', 'Biology', 'Government', 'Literature in English',
+             'History', 'Economics', 'Commerce', 'Financial Accounting'],
   icons: {
     'Mathematics': '🧮', 'English Language': '📝',
     'Basic Science': '🔬', 'Basic Technology': '🛠️',
-    'Physics': '⚛️', 'Chemistry': '⚗️', 'Biology': '🧬'
+    'Physics': '⚛️', 'Chemistry': '⚗️', 'Biology': '🧬',
+    'Government': '🏛️', 'Literature in English': '📖', 'History': '🏺',
+    'Economics': '📈', 'Commerce': '🛒', 'Financial Accounting': '🧾'
   }
 };
 
 /** Exams a student at a given class level may realistically target. */
 function examsForLevel(classLevel) {
-  return String(classLevel || '').startsWith('JSS') ? EXAM_OPTIONS.JSS.slice() : EXAM_OPTIONS.SS.slice();
+  const c = String(classLevel || '');
+  if (c.startsWith('JSS')) return EXAM_OPTIONS.JSS.slice();
+  if (c === 'SS3') return EXAM_OPTIONS.SS.slice();
+  return EXAM_OPTIONS.SS.filter(e => ['WAEC WASSCE', 'NECO', 'General'].includes(e.id));
+}
+
+/** SS streams: core subjects plus the electives of the chosen department. */
+const DEPT_LABELS = { Science: '🔬 Science', Arts: '🎭 Arts', Commercial: '💼 Commercial' };
+const DEPARTMENTS = {
+  Science: ['Physics', 'Chemistry', 'Biology'],
+  Arts: ['Government', 'Literature in English', 'History'],
+  Commercial: ['Economics', 'Commerce', 'Financial Accounting']
+};
+
+function examStrategyChip() {
+  return String(state.profile.classLevel || '').startsWith('JSS') ? 'BECE exam strategy' : 'JAMB exam strategy';
+}
+function examTipsChip() {
+  return String(state.profile.classLevel || '').startsWith('JSS') ? 'BECE exam tips' : 'WAEC exam tips';
+}
+function buddyExamLine() {
+  const c = String(state.profile.classLevel || '');
+  if (c.startsWith('JSS')) return 'the BECE (Junior WAEC)';
+  if (c === 'SS1' || c === 'SS2') return 'WAEC WASSCE and NECO';
+  return 'JAMB UTME and WAEC WASSCE';
 }
 
 /* ==================================================================
@@ -6017,7 +6044,7 @@ const CURRICULUM = {
               <li><b>Q13.</b> Which syllable carries the schwa in "banana"? <i>Ans: the 1st and 3rd (bə-NA-nə).</i></li>
               <li><b>Q14.</b> Rising or falling: "Who told you that?" <i>Ans: falling (WH-question).</i></li>
             </ul>
-            <div class="formula">SUMMARY: letters are not sounds — English squeezes about 44 sounds out of 26 letters; vowel sounds (including gliding diphthongs) and voiced/voiceless consonant pairs are the raw material of oral exams; word stress follows friendly rules (nouns first, verbs second, -tion before the ending) and can switch a word's meaning; sentences stress their content words and fall for statements and WH-questions but rise for yes/no questions; and curing classic traps like "aks", "wor-ld" and five-clap "probably" is free marks in every BECE and JAMB oral paper.</div>
+            <div class="formula">SUMMARY: letters are not sounds — English squeezes about 44 sounds out of 26 letters; vowel sounds (including gliding diphthongs) and voiced/voiceless consonant pairs are the raw material of oral exams; word stress follows friendly rules (nouns first, verbs second, -tion before the ending) and can switch a word's meaning; sentences stress their content words and fall for statements and WH-questions but rise for yes/no questions; and curing classic traps like "aks", "wor-ld" and five-clap "probably" is free marks in every BECE oral paper.</div>
 
 `,
           cards: [
@@ -6418,7 +6445,7 @@ const CURRICULUM = {
               <li>Negatives/questions use <b>did</b> + base form: "She <b>did not go</b>", never "did not went".</li>
               <li>Signal words: yesterday, last week, ago, in 2020, when I was young.</li>
             </ul>
-            <div class="formula">Watch out — TRAP: after <i>did/didn't</i> the verb ALWAYS returns to base form: "Did you eat?" not "Did you ate?" This single error appears in almost every weak script in WAEC history.</div>
+            <div class="formula">Watch out — TRAP: after <i>did/didn't</i> the verb ALWAYS returns to base form: "Did you eat?" not "Did you ate?" This single error appears in almost every weak BECE script.</div>
 
             <h3>5. Past continuous: the background music of a story</h3>
             <ul>
@@ -6549,7 +6576,7 @@ const CURRICULUM = {
           summary: 'How to read a passage, strip it to its essentials, and write the exact number of sentences or words the examiner asked for.',
           content: `
             <h3>1. Summary vs précis vs paraphrase — know your task</h3>
-            <p>A <b>summary</b> retells the main points of a passage briefly; a <b>précis</b> does the same job but under a strict word limit and usually in one flowing paragraph; a <b>paraphrase</b> goes the opposite way — it restates the same ideas in different words at about the SAME length. BECE and Post-UTME papers usually phrase the task as "Summarise in your own words in not more than N words", and the marking scheme deducts for both <b>copying</b> and <b>over-length</b>. So this lesson is about precision, not beauty.</p>
+            <p>A <b>summary</b> retells the main points of a passage briefly; a <b>précis</b> does the same job but under a strict word limit and usually in one flowing paragraph; a <b>paraphrase</b> goes the opposite way — it restates the same ideas in different words at about the SAME length. BECE papers usually phrase the task as "Summarise in your own words in not more than N words", and the marking scheme deducts for both <b>copying</b> and <b>over-length</b>. So this lesson is about precision, not beauty.</p>
             <ul>
               <li>Summary/Précis: compress the main points and
 use your own words, obey the word limit.</li>
@@ -12767,7 +12794,10 @@ function subjectsForLevel(classLevel) {
 
 /** Subjects a student may choose in onboarding, given the class they picked. */
 function selectableSubjects() {
-  return subjectsForLevel(state.onboard.classLevel);
+  const lvl = String(state.onboard.classLevel || '');
+  if (!lvl.startsWith('SS')) return subjectsForLevel(state.onboard.classLevel);
+  const core = ['Mathematics', 'English Language'];
+  return state.onboard.dept ? core.concat(DEPARTMENTS[state.onboard.dept] || []) : subjectsForLevel(lvl);
 }
 
 /** True when the chosen subject is valid for the student's class level. */
@@ -13376,6 +13406,19 @@ Summary point: "Excessive use of social media reduces young people's study time.
 <p>Divide the paper time by the number of questions you must answer, and stop when your time for a question is up — even mid-answer. Attempting everything scores more than perfecting three questions.</p>`
   },
   {
+    subject: 'Study skills', title: 'BECE Exam Strategy',
+    keywords: ['bece', 'junior waec', 'exam strategy', 'how to pass bece', 'jss3', 'junior school certificate'],
+    body: `
+<h4>How the BECE works</h4>
+<ul><li>The Junior WAEC, sat at the end of JSS 3 — objectives plus theory papers in your subjects.</li>
+<li>It covers JSS 1 to 3 work, so <b>steady revision beats last-minute cramming</b>.</li></ul>
+<h4>Winning habits</h4>
+<ul><li>Practise past BECE objectives against a timer — speed is half the marks.</li>
+<li>In theory, answer in full sentences; show every step in Maths and Basic Science.</li>
+<li>Label every diagram in Basic Science and Basic Technology — unlabeled diagrams lose marks.</li>
+<li>English paper: comprehension answers live IN the passage — underline as you read.</li></ul>`
+  },
+  {
     subject: 'Study skills', title: 'Building a Study Plan & Keeping Your Streak',
     keywords: ['study plan', 'timetable', 'revision plan', 'how to study', 'study tips', 'streak', 'schedule', 'motivation', 'motivated', 'procrastinate', 'focus'],
     body: `
@@ -13533,20 +13576,20 @@ function buddyReply(rawInput) {
   if (/^(hi|hello|hey|good (morning|afternoon|evening)|howdy|sup)\b/.test(raw)) {
     return {
       html: mdToHtml(`Hello${state.profile.name ? ' **' + state.profile.name.split(' ')[0] + '**' : ''}! 👋 Buddy here.\n\nI can explain any topic in **Mathematics, English, Basic Science and Basic Technology**, or **Physics, Chemistry and Biology** for senior students, solve a quadratic or a pair of simultaneous equations step by step, or help you plan your revision.\n\nWhat are we working on today?`),
-      chips: ['Explain centripetal force', 'Solve x^2 - 5x + 6', 'Redox reactions', 'WAEC exam tips']
+      chips: ['Explain centripetal force', 'Solve x^2 - 5x + 6', 'Redox reactions', examTipsChip()]
     };
   }
   if (/\b(thanks?|thank you|well done|good job|appreciate)\b/.test(raw)) {
     return {
       html: mdToHtml("You're very welcome! 🎯 Consistency beats intensity — keep the streak alive and the grades will follow.\n\nAnything else you want to go over?"),
-      chips: ['Next topic in my subject', 'Give me a study plan', 'JAMB exam strategy']
+      chips: ['Next topic in my subject', 'Give me a study plan', examStrategyChip()]
     };
   }
   if (/^(help|what can you do|who are you|menu|commands)\b/.test(q)) {
     const subjects = Object.keys(CURRICULUM).join(', ');
     return {
-      html: mdToHtml(`**Buddy can help you with:**\n\n• **Explanations** across ${subjects} — definitions, formulas, worked examples and the traps examiners set.\n• **Algebra** — ask me to *solve x^2 - 5x + 6* or *solve 2x + y = 11 and x - y = 1* and I will show every step.\n• **Exam technique** for JAMB UTME and WAEC WASSCE.\n• **Revision planning** and how to keep your study streak.\n\nTap a suggestion or type your own question.`),
-      chips: ['Explain the mole concept', 'Solve 2x + y = 11 and x - y = 1', 'JAMB exam strategy', 'Build me a study plan']
+      html: mdToHtml(`**Buddy can help you with:**\n\n• **Explanations** across ${subjects} — definitions, formulas, worked examples and the traps examiners set.\n• **Algebra** — ask me to *solve x^2 - 5x + 6* or *solve 2x + y = 11 and x - y = 1* and I will show every step.\n• **Exam technique** for ${buddyExamLine()}.\n• **Revision planning** and how to keep your study streak.\n\nTap a suggestion or type your own question.`),
+      chips: ['Explain the mole concept', 'Solve 2x + y = 11 and x - y = 1', examStrategyChip(), 'Build me a study plan']
     };
   }
 
@@ -13607,7 +13650,7 @@ function buddyReply(rawInput) {
     const related = findRelated(top);
     const chips = [...related.slice(0, 2).map(e => `Explain ${e.title.toLowerCase()}`)];
     if (CURRICULUM[top.subject]) chips.push(`Practice quiz: ${top.subject}`);
-    else chips.push('JAMB exam strategy');
+    else chips.push(examStrategyChip());
 
     let extra = '';
     if (others.length) {
@@ -13638,7 +13681,7 @@ function buddyReply(rawInput) {
   // Nothing matched — be honest and helpful
   const suggestions = BUDDY_KB.slice(0, 3).map(e => e.title);
   return {
-    html: mdToHtml(`I do not have a prepared lesson on that yet — I would rather say so than guess. 🤔\n\nTry asking about one of my strong topics: **centripetal force**, **redox reactions**, **quadratic equations**, **genetics**, **reported speech** or **JAMB exam strategy**. You can also ask me to *solve* an equation step by step.`),
+    html: mdToHtml(`I do not have a prepared lesson on that yet — I would rather say so than guess. 🤔\n\nTry asking about one of my strong topics: **centripetal force**, **redox reactions**, **quadratic equations**, **genetics**, **reported speech** or **${examStrategyChip()}**. You can also ask me to *solve* an equation step by step.`),
     chips: suggestions.map(t => `Explain ${t.toLowerCase()}`)
   };
 }
@@ -13771,7 +13814,7 @@ async function geminiAnswer(question, context) {
   const key = (state.settings.geminiApiKey || '').trim();
   if (!key) return null;
   const prompt = [
-    'You are Buddy, a friendly Nigerian secondary-school tutor preparing a student for JAMB UTME and WAEC WASSCE.',
+    `You are Buddy, a friendly Nigerian secondary-school tutor preparing a ${state.profile.classLevel || 'secondary'} student for ${buddyExamLine()}.`,
     'If the student is greeting you, making small talk or asking plain arithmetic, answer naturally and briefly like a friendly person — never use the definition/formula/example structure for those.',
     'For genuine study questions, use this structure: a one-sentence definition, the key formula or rule, one worked example with numbers, and one common exam trap.',
     'Never use LaTeX or code markup: no dollar signs, no backslash commands, no curly braces around powers. Write plain readable text like x^2, 3/4, sqrt(x), pi, × and ÷, and write naira amounts as N500.',
@@ -15482,7 +15525,7 @@ function renderHome(el) {
   const name = state.profile.name || 'Student';
   const first = name.split(' ')[0];
   const cls = state.profile.classLevel || 'SS3';  // topicsFor returns [] for a level a subject does not cover
-  const exam = state.profile.targetExam || 'JAMB UTME';
+  const exam = state.profile.targetExam || (String(cls).startsWith('JSS') ? 'BECE' : 'WAEC WASSCE');
   const accuracy = state.quizStats.total ? Math.round((state.quizStats.correct / state.quizStats.total) * 100) : 0;
   const topics = topicsFor(state.selectedSubject, cls);
   const greeting = (() => { const h = new Date().getHours(); return h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening'; })();
@@ -15694,9 +15737,22 @@ const SHELF = {
   ]
 };
 
+function juniorLink(r) {
+  const fix = t => String(t)
+    .replace('WAEC Chemistry — redox reactions & oxidation numbers', 'BECE Basic Science — redox & oxidation numbers')
+    .replace('Myschool — Chemistry past questions', 'Myschool — Basic Science past questions')
+    .replace('JAMB Use of English — lexis & structure masterclass', 'BECE English — lexis & structure masterclass')
+    .replace('JAMB Mathematics — full topic-by-topic revision', 'BECE Mathematics — full topic-by-topic revision')
+    .replace('Myschool — JAMB/WAEC Maths past questions', 'Myschool — BECE Maths past questions')
+    .replace(/JAMB\/WAEC/g, 'BECE').replace(/UTME and WASSCE/g, 'BECE').replace(/WASSCE and UTME/g, 'BECE')
+    .replace(/JAMB/g, 'BECE').replace(/WAEC/g, 'BECE').replace(/UTME/g, 'BECE').replace(/WASSCE/g, 'BECE')
+    .replace(/jamb\+/g, 'bece+').replace(/waec\+/g, 'bece+');
+  return { cat: r.cat, title: fix(r.title), url: fix(r.url), note: fix(r.note) };
+}
 function renderResources(el) {
   const subject = state.selectedSubject;
-  const links = CURRICULUM[subject].resources;
+  const links = (CURRICULUM[subject].resources || []).map(r =>
+    String(state.profile.classLevel || '').startsWith('JSS') ? juniorLink(r) : r);
   const iconFor = cat => ({ 'Video lesson': '▶️', 'Structured course': '🎓', 'Past questions': '🗂️', 'Reference': '📚', 'Dictionary': '🔤', 'Formula sheet': '🧾', 'Simulation': '🧪', 'Diagrams': '🧫', 'Textbook': '📖', 'Official body': '🏛️' }[cat] || '🔗');
   const shelf = (SHELF[subject] || []).concat(SHELF._common);
   el.innerHTML = `
@@ -17003,6 +17059,7 @@ async function saveProfile(patch) {
       studyPref: state.profile.studyPref || '',
       subjects: state.profile.subjects || [],
       onboarded: !!state.profile.onboarded,
+      dept: state.profile.dept || '',
       streak: state.streak || 0,
       lastActiveDate: state.lastActiveDate || '',
       streakFreezes: state.streakFreezes || 0,
@@ -17077,7 +17134,8 @@ function hydrateFromDoc(data) {
     subjects: Array.isArray(data.subjects) && data.subjects.length ? data.subjects : [],
     onboarded: !!data.onboarded,
     targetScore: data.targetScore || '',
-    studyPref: data.studyPref || ''
+    studyPref: data.studyPref || '',
+    dept: data.dept || ''
   };
   // A saved exam that does not exist for the class (e.g. JAMB UTME for a JSS1 student) resets.
   if (state.profile.classLevel && state.profile.targetExam &&
@@ -17262,6 +17320,8 @@ async function handleLogout() {
 function openOnboarding() {
   state.onboard = {
     step: 1,
+    name: state.profile.name || '',
+    dept: state.profile.dept || '',
     classLevel: state.profile.classLevel || '',
     targetExam: state.profile.targetExam || '',
     subjects: (state.profile.subjects || []).slice(),
@@ -17299,7 +17359,12 @@ function renderOnboardStep() {
   $('#onboard-next').textContent = o.step === 5 ? 'Generate my study plan ✨' : o.step === 6 ? 'Save & start studying →' : 'Continue';
 
   if (o.step === 1) {
-    $('#step-1').innerHTML = OPTIONS.classes.map(c => `
+    $('#step-1').innerHTML = `
+      <label class="mb-1 block text-[11px] font-bold uppercase tracking-wide text-slate-400" for="onboard-name">What should we call you?</label>
+      <input id="onboard-name" type="text" maxlength="40" value="${escapeHtml(o.name || '')}" placeholder="Your name — e.g. Ada"
+        oninput="state.onboard.name = this.value"
+        class="mb-4 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-900 outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100" />` +
+      OPTIONS.classes.map(c => `
       <button type="button" onclick="pickOnboardOption('classLevel','${c}')"
         class="rounded-xl border px-3 py-4 text-sm font-bold transition-all ${o.classLevel === c ? 'border-indigo-500 bg-indigo-50 text-indigo-700 ring-2 ring-indigo-100' : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300'}">${c}</button>`).join('');
     o.subjects = o.subjects.filter(x => subjectsForLevel(o.classLevel).includes(x));
@@ -17316,7 +17381,15 @@ function renderOnboardStep() {
       </button>`).join('');
     if (o.targetExam && !(SCORE_TIERS[o.targetExam] || []).includes(o.targetScore)) o.targetScore = '';
   } else if (o.step === 3) {
-    $('#step-3').innerHTML = selectableSubjects().map(s => {
+    const isSS = String(o.classLevel).startsWith('SS');
+    const deptBar = isSS ? `
+      <div class="mb-2 grid grid-cols-3 gap-2">
+        ${Object.keys(DEPARTMENTS).map(dp => `
+          <button type="button" onclick="pickDept('${dp}')"
+            class="rounded-xl border px-2 py-2.5 text-xs font-bold transition-all ${o.dept === dp ? 'border-indigo-500 bg-indigo-50 text-indigo-700 ring-2 ring-indigo-100' : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300'}">${DEPT_LABELS[dp]}</button>`).join('')}
+      </div>
+      <p class="mb-3 text-[11px] text-slate-500">Pick your department — Maths &amp; English stay core for everybody.</p>` : '';
+    $('#step-3').innerHTML = deptBar + selectableSubjects().map(s => {
       const on = o.subjects.includes(s);
       return `
         <button type="button" onclick="toggleOnboardSubject('${s}')"
@@ -17345,6 +17418,13 @@ function renderOnboardStep() {
   }
 }
 
+function pickDept(d) {
+  const o = state.onboard;
+  o.dept = o.dept === d ? '' : d;
+  const keep = selectableSubjects();
+  o.subjects = o.subjects.filter(x => keep.includes(x));
+  renderOnboardStep();
+}
 function pickOnboardOption(key, value) {
   state.onboard[key] = value;
   renderOnboardStep();
@@ -17363,6 +17443,7 @@ async function onboardNext() {
   const err = $('#onboard-error');
   const invalid =
     (o.step === 1 && !o.classLevel) || (o.step === 2 && !o.targetExam) ||
+    (o.step === 3 && (String(o.classLevel).startsWith('SS') ? !o.dept : false)) ||
     (o.step === 3 && o.subjects.length === 0) || (o.step === 4 && !o.targetScore) ||
     (o.step === 5 && !o.studyPref);
   if (invalid) {
@@ -17375,6 +17456,8 @@ async function onboardNext() {
   const btn = $('#onboard-next');
   btn.disabled = true;
   btn.textContent = 'Saving…';
+  if ((o.name || '').trim()) state.profile.name = o.name.trim();
+  state.profile.dept = o.dept || '';
   state.profile.classLevel = o.classLevel;
   state.profile.targetExam = o.targetExam;
   state.profile.subjects = o.subjects.slice();
@@ -17561,7 +17644,7 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeDrawe
 Object.assign(window, {
   navigate, changeSubject, openTopic, toggleDrawer, closeDrawer,
   handleGoogleSignIn, handleLogout, startDemoMode,
-  openOnboarding, reopenOnboarding, pickOnboardOption, toggleOnboardSubject,
+  openOnboarding, reopenOnboarding, pickOnboardOption, pickDept, toggleOnboardSubject,
   onboardBack, onboardNext, markLessonDone, openSetup, closeSetup, copyRules,
   startCbtExam, toggleCustomExam, setExamClass, setExamType, toggleExamSubject, setExamCount, setExamDefaultCount, exitCbtExam,
   setExamMinutes, toggleMarkReview, reviewMistakesScroll, planFromExam, quizTimerTick,
