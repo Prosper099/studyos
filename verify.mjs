@@ -286,6 +286,25 @@ check('every subject has flashcards, quiz and resources',
 check('flashcards all have q + a', subjects.every(s => T.flashFor(s).every(c => c.q && c.a)));
 check('all resource URLs are https', subjects.every(s => T.CURRICULUM[s].resources.every(r => /^https:\/\//.test(r.url))));
 
+check('mergeQuizStats accumulates per-topic stats', (() => {
+  const s1 = T.mergeQuizStats(null, 'Mathematics', { correct: 3, total: 10, percent: 30, byTopic: { 'Mathematics | Algebra': { correct: 1, total: 5 } } });
+  const s2 = T.mergeQuizStats(s1, 'Mathematics', { correct: 6, total: 10, percent: 60, byTopic: { 'Mathematics | Algebra': { correct: 4, total: 5 } } });
+  const b = (s2.byTopic || {})['Mathematics | Algebra'];
+  return !!b && b.correct === 5 && b.total === 10;
+})());
+check('study plan targets the weakest topic, not a rotation', (() => {
+  const st = T.getState();
+  const savedStats = st.quizStats, savedProfile = { ...st.profile };
+  st.profile.classLevel = 'SS2'; st.profile.subjects = ['Mathematics', 'Physics'];
+  st.quizStats = { attempts: 2, correct: 40, total: 80, bestPercent: 0,
+    bySubject: { Mathematics: { attempts: 1, correct: 30, total: 40 }, Physics: { attempts: 1, correct: 10, total: 40 } },
+    byTopic: { 'Physics | Waves': { correct: 2, total: 10 }, 'Physics | Optics': { correct: 8, total: 10 } } };
+  const p = T.buildStudyPlan();
+  const ok = p.focus === 'Physics' && p.focusTopic === 'Waves' && p.focusTopicPct === 20;
+  st.quizStats = savedStats; st.profile = savedProfile;
+  return ok;
+})());
+
 // ---------- per-topic quizzes & flashcards (new contract) ----------
 const JUNIOR_SUBS = ['Mathematics', 'English Language', 'Basic Science', 'Basic Technology'];
 const JUNIOR_LEVELS = ['JSS1', 'JSS2', 'JSS3'];

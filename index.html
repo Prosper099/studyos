@@ -606,6 +606,72 @@ const DEPARTMENTS = {
   Commercial: ['Economics', 'Commerce', 'Financial Accounting']
 };
 
+function weakestTopicInfo() {
+  const lvl = state.profile.classLevel || 'SS3';
+  const subs = (state.profile.subjects || []).length ? state.profile.subjects : subjectsForLevel(lvl);
+  const bs = (state.quizStats && state.quizStats.bySubject) || {};
+  let weakSub = null, weakPct = null, strongSub = null, strongPct = null;
+  for (const sub of subs) {
+    const b = bs[sub];
+    if (!b || !b.total) continue;
+    const p = Math.round((b.correct / b.total) * 100);
+    if (weakPct === null || p < weakPct) { weakPct = p; weakSub = sub; }
+    if (strongPct === null || p > strongPct) { strongPct = p; strongSub = sub; }
+  }
+  const bt = (state.quizStats && state.quizStats.byTopic) || {};
+  let weakTop = null, topPct = null;
+  for (const [key, b] of Object.entries(bt)) {
+    if (!b.total || b.total < 3) continue;
+    if (weakSub && !key.startsWith(weakSub + ' | ')) continue;
+    const p = Math.round((b.correct / b.total) * 100);
+    if (topPct === null || p < topPct) { topPct = p; weakTop = key.split(' | ')[1]; }
+  }
+  return { weakSub, weakPct, strongSub, strongPct, weakTop, topPct };
+}
+function smartCoachReply() {
+  const w = weakestTopicInfo();
+  if (!w.weakSub) {
+    return {
+      html: mdToHtml("No stats on you yet — and that is fine, diagnostic week is how I learn your strengths. 🕵️\n\nTake **two or three topic quizzes** in any of your subjects and I will start coaching you personally: weakest topic first, strongest topic for confidence."),
+      chips: ['Next topic in my subject', 'Give me a study plan', examTipsChip()]
+    };
+  }
+  const lines = [`Your growth edge right now is **${w.weakSub} at ${w.weakPct}%**.`];
+  if (w.weakTop) lines.push(`Inside it, **${w.weakTop} (${w.topPct}%)** is the one topic that moves your score fastest — start there.`);
+  else lines.push('A couple more quizzes will tell me exactly which topic to send you to first.');
+  if (w.strongSub && w.strongSub !== w.weakSub) lines.push(`Warm up with **${w.strongSub} (${w.strongPct}%)** when you want a confidence win.`);
+  lines.push('');
+  lines.push(String(state.profile.classLevel || '').startsWith('JSS')
+    ? 'Steady small wins now are exactly how BECE champions are made. 🔥'
+    : 'Weak-topic-first is how the big exams are actually won. 🔥');
+  return {
+    html: mdToHtml(lines.join('\n')),
+    chips: ['Explain ' + (w.weakTop || w.weakSub), 'Give me a study plan', examTipsChip()]
+  };
+}
+function progressReportReply() {
+  const qs = state.quizStats || {};
+  if (!qs.attempts) {
+    return {
+      html: mdToHtml("Your report card is empty for now — your first quiz writes line one. 📊\n\nTry a topic quiz in any subject and ask me again."),
+      chips: ['Next topic in my subject', 'Give me a study plan']
+    };
+  }
+  const w = weakestTopicInfo();
+  const acc = qs.total ? Math.round((qs.correct / qs.total) * 100) : 0;
+  const lines = [
+    `**${state.profile.name ? state.profile.name.split(' ')[0] + ', here' : 'Here'} is your report:**`,
+    '',
+    `• Quizzes taken: **${qs.attempts}** · overall accuracy **${acc}%** · best score **${qs.bestPercent || 0}%**`,
+    `• Strongest: **${w.strongSub || '—'}${w.strongPct != null ? ' (' + w.strongPct + '%)' : ''}** · growth edge: **${w.weakSub || '—'}${w.weakPct != null ? ' (' + w.weakPct + '%)' : ''}**`,
+    `• Streak: **${state.streak} day${state.streak === 1 ? '' : 's'}** 🔥`,
+    ''
+  ];
+  lines.push(String(state.profile.classLevel || '').startsWith('JSS')
+    ? 'Honest coach note: consistency is beating intensity for you — keep the daily mission green and the BECE takes care of itself.'
+    : 'Honest coach note: attack the growth edge twice this week and watch that percentage climb.');
+  return { html: mdToHtml(lines.join('\n')), chips: ['What should I study?', 'Give me a study plan', examStrategyChip()] };
+}
 function examStrategyChip() {
   return String(state.profile.classLevel || '').startsWith('JSS') ? 'BECE exam strategy' : 'JAMB exam strategy';
 }
@@ -13576,10 +13642,12 @@ function buddyReply(rawInput) {
   // Small talk / meta
   if (/^(hi|hello|hey|good (morning|afternoon|evening)|howdy|sup)\b/.test(raw)) {
     return {
-      html: mdToHtml(`Hello${state.profile.name ? ' **' + state.profile.name.split(' ')[0] + '**' : ''}! 👋 Buddy here.\n\nI can explain any topic in **Mathematics, English, Basic Science and Basic Technology**, or **Physics, Chemistry and Biology** for senior students, solve a quadratic or a pair of simultaneous equations step by step, or help you plan your revision.\n\nWhat are we working on today?`),
+      html: mdToHtml(`Hello${state.profile.name ? ' **' + state.profile.name.split(' ')[0] + '**' : ''}! 👋 Buddy here.\n\nI can explain any topic across **all your subjects — junior and senior**, solve a quadratic or a pair of simultaneous equations step by step, coach you from your own quiz stats, or help you plan your revision.\n\nWhat are we working on today?`),
       chips: ['Explain centripetal force', 'Solve x^2 - 5x + 6', 'Redox reactions', examTipsChip()]
     };
   }
+  if (/\b(what should i (study|do|revise)|where (do|should) i start|my weak|weakest|recommend|coach me)\b/.test(raw)) return smartCoachReply();
+  if (/\bhow am i doing|my progress|my report|my stats|progress report\b/.test(raw)) return progressReportReply();
   if (/\b(thanks?|thank you|well done|good job|appreciate)\b/.test(raw)) {
     return {
       html: mdToHtml("You're very welcome! 🎯 Consistency beats intensity — keep the streak alive and the grades will follow.\n\nAnything else you want to go over?"),
@@ -14316,6 +14384,11 @@ function mergeQuizStats(prev, subject, result) {
     ...(prev || {})
   };
   stats.bySubject = { ...(stats.bySubject || {}) };
+  stats.byTopic = { ...(stats.byTopic || {}) };
+  for (const [key, b] of Object.entries(result.byTopic || {})) {
+    const t0 = stats.byTopic[key] || { correct: 0, total: 0 };
+    stats.byTopic[key] = { correct: t0.correct + b.correct, total: t0.total + b.total };
+  }
   stats.attempts = (stats.attempts || 0) + 1;
   stats.correct = (stats.correct || 0) + result.correct;
   stats.total = (stats.total || 0) + result.total;
@@ -16455,6 +16528,18 @@ async function submitQuiz(auto) {
     result.timeMs = Date.now() - (state.quiz.startedAt || Date.now());
     result.timeUp = !!state.quiz.timeUp;
   }
+  {
+    const byTopic = {};
+    quiz.forEach(q => {
+      const sub = q.subject || subject;
+      const tp = q.topic || (state.quiz.mode === 'topic' ? state.quiz.topicTitle : '') || 'Mixed practice';
+      const key = sub + ' | ' + tp;
+      const b = byTopic[key] || (byTopic[key] = { correct: 0, total: 0 });
+      b.total++;
+      if (state.quiz.answers[q.id] === q.correct) b.correct++;
+    });
+    result.byTopic = byTopic;
+  }
   state.quiz.submitted = true;
   state.quiz.result = result;
   if (state.quiz.mode === 'cbt') {
@@ -16464,6 +16549,11 @@ async function submitQuiz(auto) {
     qs.total = (qs.total || 0) + result.total;
     qs.bestPercent = Math.max(qs.bestPercent || 0, result.percent);
     qs.bySubject = { ...(qs.bySubject || {}) };
+    qs.byTopic = { ...(qs.byTopic || {}) };
+    for (const [key, b] of Object.entries(result.byTopic || {})) {
+      const t0 = qs.byTopic[key] || { correct: 0, total: 0 };
+      qs.byTopic[key] = { correct: t0.correct + b.correct, total: t0.total + b.total };
+    }
     for (const [sub, b] of Object.entries(result.bySubject)) {
       const s0 = qs.bySubject[sub] || { attempts: 0, correct: 0, total: 0, bestPercent: 0 };
       qs.bySubject[sub] = {
@@ -16826,12 +16916,21 @@ function buildStudyPlan() {
   }
   if (state.examPrefs && state.examPrefs.lastWeak && subs.includes(state.examPrefs.lastWeak)) focus = state.examPrefs.lastWeak;
   const topics = topicsFor(focus, lvl);
-  const dayIdx = Math.floor(Date.now() / 86400000) % Math.max(1, topics.length);
-  const focusTopic = topics.length ? topics[dayIdx].title : '';
+  const bt = (state.quizStats && state.quizStats.byTopic) || {};
+  let focusTopic = '', focusTopicPct = null;
+  for (const [key, b] of Object.entries(bt)) {
+    if (!key.startsWith(focus + ' | ') || !b.total || b.total < 3) continue;
+    const pct = Math.round((b.correct / b.total) * 100);
+    if (focusTopicPct === null || pct < focusTopicPct) { focusTopicPct = pct; focusTopic = key.slice(focus.length + 3); }
+  }
+  if (!focusTopic && topics.length) {
+    const dayIdx = Math.floor(Date.now() / 86400000) % Math.max(1, topics.length);
+    focusTopic = topics[dayIdx].title;
+  }
   const pref = state.profile.studyPref || 'balanced';
   const minutes = pref === 'quick' ? 15 : pref === 'deep' ? 45 : 25;
   const quizCount = pref === 'quick' ? 5 : pref === 'deep' ? 15 : 10;
-  return { focus, focusPct, anyStats, focusTopic, minutes, quizCount, pref };
+  return { focus, focusPct, anyStats, focusTopic, focusTopicPct, minutes, quizCount, pref };
 }
 
 function planPreviewHtml() {
@@ -16871,7 +16970,7 @@ function missionSection() {
         <h3 class="text-sm font-bold text-slate-900">🎯 Today's mission${doneCount === 3
           ? ' <span class="ml-1.5 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-black text-emerald-700">🏆 COMPLETE 3/3</span>'
           : ` <span class="ml-1.5 rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-black text-slate-400">${doneCount}/3 done</span>`}</h3>
-        <span class="text-[11px] font-semibold text-slate-400">${p.minutes} min · ${p.anyStats ? 'focus: ' + p.focus : 'diagnostic week'}</span>
+        <span class="text-[11px] font-semibold text-slate-400">${p.minutes} min · ${p.anyStats ? 'coach: ' + p.focus + (p.focusPct != null ? ' (' + p.focusPct + '%)' : '') + (p.focusTopicPct != null ? ' → ' + p.focusTopic + ' ' + p.focusTopicPct + '%' : '') : 'diagnostic week'}</span>
       </div>
       <div class="grid grid-cols-1 gap-2 md:grid-cols-3">
         <div class="flex items-center justify-between gap-2 rounded-xl border border-slate-100 bg-slate-50 p-3">
@@ -17679,7 +17778,7 @@ window.__STUDYOS_TEST__ = {
   researchOnline, composeAnswer, RESEARCH,
   CURRICULUM, BUDDY_KB, OPTIONS, LEVEL_CATALOGUE, EXAM_OPTIONS,
   subjectsForLevel, selectableSubjects, subjectIsAvailable, hydrateFromDoc,
-  examsForLevel, renderOnboardStep, levelTopics, topicQuiz, cardsFor,
+  examsForLevel, renderOnboardStep, levelTopics, topicQuiz, cardsFor, buildStudyPlan,
   markGot, markLater,
   getState: () => state
 };
