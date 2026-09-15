@@ -209,7 +209,7 @@
         <stop stop-color="#4f46e5"/><stop offset="1" stop-color="#312e81"/></linearGradient></defs>
     </svg></div>
       <div class="text-2xl font-bold tracking-tight text-white">Study<span class="text-indigo-400">OS</span></div>
-      <p class="mt-1 text-xs text-slate-400">Your intelligent study companion for JAMB UTME, WAEC WASSCE, NECO &amp; Post-UTME.</p>
+      <p class="mt-1 text-xs text-slate-400">One system for passing JAMB UTME, WAEC WASSCE, NECO, Post-UTME &amp; BECE — lessons, past questions, quizzes and your AI tutor.</p>
     </div>
 
     <div class="w-full rounded-2xl bg-white p-6 shadow-pop animate-popIn">
@@ -1468,31 +1468,76 @@ const CURRICULUM = {
           tags: ['Constant k', 'Joint variation', 'Partial variation'],
           summary: 'Translating "varies as" statements into equations and finding the constant.',
           content: `
-            <h3>1. The four types</h3>
-            <table>
-              <tr><th>Statement</th><th>Equation</th></tr>
-              <tr><td>y varies directly as x</td><td>y = kx</td></tr>
-              <tr><td>y varies inversely as x</td><td>y = k/x</td></tr>
-              <tr><td>y varies jointly as x and z</td><td>y = kxz</td></tr>
-              <tr><td>y varies directly as x and inversely as z^2</td><td>y = kx/z^2</td></tr>
-            </table>
-            <p>In every case the first step is the same: substitute the given values and <b>find k</b>.</p>
-            <h3>2. Worked practice</h3>
-            <div class="worked"><b>Q1.</b> y varies directly as x and y = 12 when x = 4. Find y when x = 9.<br>
-            k = 12/4 = 3, so y = 3x and y = 3 × 9 = <b>27</b>.</div>
-            <div class="worked"><b>Q2.</b> y varies inversely as x^2 and y = 5 when x = 2. Find y when x = 4.<br>
-            k = y x^2 = 5 × 4 = 20, so y = 20/x^2 = 20/16 = <b>1.25</b>.</div>
-            <div class="worked"><b>Q3 (joint).</b> T varies jointly as P and R. If T = 60 when P = 5 and R = 4, find T when P = 8 and R = 6.<br>
-            k = 60/(5 × 4) = 3, so T = 3 × 8 × 6 = <b>144</b>.</div>
-            <div class="worked"><b>Q4 (partial).</b> y = a + bx, where y = 7 when x = 2 and y = 13 when x = 5.<br>
-            7 = a + 2b and 13 = a + 5b → subtracting gives 3b = 6, so b = 2 and a = 3.<br>
-            Therefore <b>y = 3 + 2x</b>.</div>
-            <h3>3. Common mistakes</h3>
+
+            <h3>1. What variation means</h3>
+            <p>When two quantities change together under a fixed rule, we say one <b>varies</b> as the other. The symbol ∝ reads "is proportional to". Every variation question has the same hidden job: <b>find the constant k</b> from the data given, then reuse k to answer the rest.</p>
+            <div class="formula">y ∝ x → y = kx • y ∝ 1/x → y = k/x • y ∝ xz → y = kxz • y ∝ x + c (partial) → y = kx + c</div>
+            <p>The constant k is called the <b>constant of proportionality</b>. You find it by substituting one complete pair of values (an x and its y) into the equation and solving.</p>
+            <div class="worked"><b>Worked example:</b> y varies directly as x and y = 12 when x = 3. Find k and the equation.<br>
+            y = kx → 12 = k(3) → k = 4, so <b>y = 4x</b>. Now y is known for any x: when x = 7, y = 28.</div>
+
+            <h3>2. Direct variation</h3>
+            <p>y varies <b>directly</b> as x when y = kx. The ratio y/x is always the same number k. Graphically this is a <b>straight line through the origin</b> with gradient k — if a line does not pass through (0, 0), the variation is partial, not direct.</p>
             <ul>
-              <li>Forgetting to square or cube the variable in "varies as the <b>square</b> of x".</li>
-              <li>Solving for k but then using the wrong equation form for the second part.</li>
-              <li>In partial variation, forgetting that <b>a</b> is a constant term that does not change.</li>
-            </ul>`,
+              <li><b>Money:</b> cost of eggs varies directly as the number of crates bought.</li>
+              <li><b>Physics:</b> at constant resistance, voltage varies directly as current (Ohm's law).</li>
+              <li><b>Maps & scale:</b> map distance varies directly as real distance.</li>
+            </ul>
+            <div class="worked"><b>Worked example:</b> If y = 30 when x = 5, find y when x = 9.<br>
+            k = y/x = 30/5 = 6, so y = 6x → y = 6(9) = <b>54</b>.</div>
+            <div class="tip"><b>Exam tip:</b> "y varies directly as x" and "y is directly proportional to x" are the same statement. WAEC loves testing whether you know the graph must pass through the origin.</div>
+
+            <h3>3. Inverse (indirect) variation</h3>
+            <p>y varies <b>inversely</b> as x when y = k/x, i.e. the product xy = k stays constant. When one quantity doubles, the other halves. The graph is a <b>curve (hyperbola)</b> that never touches either axis.</p>
+            <div class="worked"><b>Worked example:</b> y varies inversely as x and y = 8 when x = 3. Find y when x = 6.<br>
+            k = xy = 24, so y = 24/x → y = 24/6 = <b>4</b>. (x doubled, so y halved — a good sanity check.)</div>
+            <div class="worked"><b>Worked example (JAMB style):</b> If y = k/x and y = 5 when x = 2, find x when y = 25.<br>
+            k = 10 → 25 = 10/x → x = 10/25 = <b>0.4</b>.</div>
+            <ul>
+              <li><b>Speed & time:</b> for a fixed distance, time varies inversely as speed.</li>
+              <li><b>Workers & days:</b> for a fixed job, time varies inversely as the number of workers.</li>
+              <li><b>Boyle's law:</b> at constant temperature, gas pressure varies inversely as volume.</li>
+            </ul>
+
+            <h3>4. Joint variation</h3>
+            <p>y varies <b>jointly</b> as x and z when y = kxz — y depends on two quantities at once. Powers can join in too: "y varies directly as x and inversely as the square of z" means y = kx/z^2.</p>
+            <div class="worked"><b>Worked example:</b> y varies jointly as x and z. y = 24 when x = 2 and z = 3. Find y when x = 5, z = 4.<br>
+            24 = k(2)(3) → k = 4. Then y = 4(5)(4) = <b>80</b>.</div>
+            <div class="worked"><b>Worked example with powers:</b> y ∝ x/z^2; y = 9 when x = 12, z = 2. Find y when x = 8, z = 4.<br>
+            9 = k(12)/4 → k = 3. Then y = 3(8)/16 = <b>1.5</b>.</div>
+            <div class="tip"><b>Translation drill:</b> "the square of", "the cube of", "the square root of" become x^2, x^3, √x inside the k-equation. Translate the sentence first, substitute second.</div>
+
+            <h3>5. Partial variation</h3>
+            <p>y varies <b>partially</b> as x when there is a fixed standing charge: y = kx + c. The graph is a straight line that <b>does not</b> pass through the origin — c is the y-intercept. You need <b>two pairs of data</b> to find the two unknowns k and c (simultaneous equations).</p>
+            <div class="worked"><b>Worked example:</b> A taxi fare F = kd + c where d is distance in km. A 4 km trip costs ₦700 and a 9 km trip costs ₦1200. Find the fare for 15 km.<br>
+            700 = 4k + c and 1200 = 9k + c. Subtracting: 500 = 5k → k = 100, c = 700 - 400 = 300.<br>
+            F = 100(15) + 300 = <b>₦1,800</b>. (c = ₦300 is the flag-fall price before moving.)</div>
+            <ul>
+              <li>Salary = basic + commission per sale.</li>
+              <li>Electricity bill = standing charge + cost per unit.</li>
+              <li>Phone plan = monthly fee + charge per minute.</li>
+            </ul>
+
+            <h3>6. Percentage and ratio reasoning</h3>
+            <p>Because direct variation is linear, percentage changes transfer directly: if x increases by 20%, y increases by 20%. For inverse variation, if x becomes <b>n</b> times bigger, y becomes <b>1/n</b> of its value. For y ∝ x^2, doubling x multiplies y by 4; for y ∝ x^3, by 8.</p>
+            <div class="worked"><b>Worked example:</b> y ∝ x^2 and y = 18 when x = 3. Find y when x = 6.<br>
+            x doubled, so y becomes 4 × 18 = <b>72</b>. (Check: k = 18/9 = 2, y = 2(36) = 72 ✓.)</div>
+
+            <h3>7. Common mistakes that cost marks</h3>
+            <ul>
+              <li>Writing y = kx for an <b>inverse</b> statement — always convert the sentence to an equation before substituting.</li>
+              <li>Using one data pair for <b>partial</b> variation — two unknowns (k and c) need two pairs.</li>
+              <li>Forgetting powers: "inversely as the <b>square</b> of x" is y = k/x^2, not k/x.</li>
+              <li>Assuming a straight-line graph means direct variation — only lines <b>through the origin</b> do.</li>
+              <li>Mixing up which value is x and which is y when substituting to find k.</li>
+            </ul>
+
+            <h3>Deep dive: examiner's favourites</h3>
+            <p><b>Favourite 1 — table completion:</b> given y ∝ 1/x with one complete column, complete the table. Find k once (k = xy) and reuse it for every blank.</p>
+            <p><b>Favourite 2 — connecting three variables:</b> "y varies directly as x; x varies inversely as z. How does y vary with z?" Substitute: y = kx and x = m/z, so y = km/z — y varies <b>inversely</b> as z. Chain the equations instead of guessing.</p>
+            <p><b>Favourite 3 — real data:</b> NECO gives a fare/charge story and asks for the constants and a prediction — that is partial variation with simultaneous equations, exactly like the taxi example above.</p>
+            <div class="tip"><b>Speed trick:</b> for direct variation between two states, skip k entirely: y2 = y1 × (x2/x1). For inverse: y2 = y1 × (x1/x2). Ratio methods save a full minute per question.</div>
+          `,
           cards: [
             { q: 'What is direct variation? Write its equation.', a: 'y varies directly as x when y = kx (k is the constant of variation) — doubling x doubles y; the graph is a straight line through the origin.' },
             { q: 'If y varies directly as x and y = 12 when x = 4, find y when x = 7.', a: 'k = 12/4 = 3, so y = 3x and y = 21 when x = 7.' },
@@ -10370,26 +10415,68 @@ Ada eventually saved enough to buy her mother a gift and returned home proud." (
           tags: ['Le Chatelier', 'Collision theory', 'Catalysts'],
           summary: 'Factors affecting rate, and how equilibrium shifts under stress.',
           content: `
-            <h3>Collision theory</h3>
-            <p>Particles must collide with energy >= the <b>activation energy</b> for a reaction to occur. Anything that increases the frequency or the energy of collisions increases the rate.</p>
-            <h3>Factors affecting rate</h3>
-            <ul><li><b>Temperature</b> ↑ → more particles exceed activation energy.</li>
-            <li><b>Concentration / pressure</b> ↑ → more collisions per second.</li>
-            <li><b>Surface area</b> ↑ (powdering a solid) → more collisions.</li>
-            <li><b>Catalyst</b> → provides an alternative path with lower activation energy; it is not consumed.</li></ul>
-            <h3>Le Chatelier's principle</h3>
-            <p>When a system at equilibrium is disturbed, the position of equilibrium shifts to <b>counteract</b> the change.</p>
-            <div class="worked"><b>Worked example (Haber process):</b> N2 + 3H2 ⇌ 2NH3, ΔH = -92 kJ/mol (exothermic).<br>
-            Higher <b>pressure</b> favours the side with fewer moles (2 mol of NH3 vs 4 mol of reactants) → more ammonia.<br>
-            Higher <b>temperature</b> favours the endothermic (reverse) direction → less ammonia, so a compromise of about 450 °C is used with an iron catalyst.</div>
-            <div class="warn"><b>Watch out:</b> A catalyst speeds up both the forward and reverse reactions equally — it changes how fast equilibrium is reached, <b>not</b> the yield.</div>
-            <h3>Common mistakes</h3>
+
+            <h3>1. What rate of reaction means</h3>
+            <p>The <b>rate of a reaction</b> is how fast a reactant is used up or a product is formed per unit time. Because concentration is measured in mol/dm^3 and time in seconds, rate is expressed in mol per dm^3 per second.</p>
+            <div class="formula">rate = change in concentration ÷ time taken (mol/dm^3/s) • or rate = 1/time for clock reactions</div>
+            <div class="worked"><b>Worked example:</b> A reactant's concentration falls from 0.8 mol/dm^3 to 0.2 mol/dm^3 in 30 s. Find the average rate.<br>
+            Change = 0.6 mol/dm^3; rate = 0.6 ÷ 30 = <b>0.02 mol/dm^3/s</b>.</div>
+            <p>For "clock" reactions (e.g. time until a precipitate hides a cross), rate is compared as <b>1/t</b>: a reaction finishing in 10 s is twice as fast as one finishing in 20 s because 1/10 = 2 × 1/20.</p>
+
+            <h3>2. Collision theory</h3>
+            <p>Particles must <b>collide</b> to react, but not every collision works. A collision succeeds only if the particles hit with energy at least equal to the <b>activation energy (Ea)</b> and with the correct orientation. Such a hit is an <b>effective collision</b>. Anything that increases the number of effective collisions per second increases the rate.</p>
             <ul>
-              <li>Saying a catalyst <b>increases the yield</b>. It only speeds up how quickly equilibrium is reached.</li>
-              <li>Confusing <b>rate</b> (how fast) with <b>yield</b> (how much product). Raising temperature speeds up most reactions but can lower the yield of an exothermic one.</li>
-              <li>Applying Le Chatelier to pressure for reactions where the number of gas moles is the same on both sides — there is then no effect on position.</li>
-              <li>Writing that increasing concentration shifts equilibrium without stating <b>which</b> direction; always say the system acts to reduce the change.</li>
-            </ul>`,
+              <li><b>Concentration/pressure:</b> more particles per volume → more frequent collisions.</li>
+              <li><b>Temperature:</b> particles move faster and more of them exceed Ea — roughly, rate <b>doubles for every 10 °C</b> rise.</li>
+              <li><b>Surface area:</b> powdering a solid exposes more particles at the surface for collisions.</li>
+              <li><b>Catalyst:</b> provides an alternative path with a <b>lower Ea</b>; it is not consumed.</li>
+            </ul>
+            <div class="tip"><b>Exam tip:</b> a catalyst does <b>not</b> raise the temperature or get used up; it lowers activation energy. WAEC sets trap options saying "a catalyst increases the energy of particles" — false.</div>
+
+            <h3>3. Reading rate curves</h3>
+            <p>Plot volume of gas (or mass lost) against time: the curve is <b>steepest at the start</b> (reactants most concentrated), gradually flattens, and goes <b>horizontal when the reaction ends</b>. The slope of the tangent at any point is the instantaneous rate at that time.</p>
+            <div class="worked"><b>Worked example:</b> A graph of gas volume against time becomes flat at 60 cm^3 after 90 s. State what the flat portion means.<br>
+            The reaction is <b>complete</b> — no more gas is produced because a reactant is used up; the final volume is 60 cm^3.</div>
+
+            <h3>4. Reversible reactions and dynamic equilibrium</h3>
+            <p>Some reactions proceed in both directions: A + B ⇌ C + D. The forward arrow makes products; the backward arrow reforms reactants. In a <b>closed system</b>, the two rates eventually become equal and concentrations stop changing — this is <b>dynamic equilibrium</b>: reactions continue in both directions at equal speed, so nothing appears to change.</p>
+            <ul>
+              <li>At equilibrium, concentrations are <b>constant, not equal</b>.</li>
+              <li>Equilibrium can only be reached in a <b>closed</b> container (nothing enters or escapes).</li>
+              <li>Adding a catalyst speeds up both directions equally — equilibrium is reached <b>sooner</b> but the position does not shift.</li>
+            </ul>
+
+            <h3>5. Le Chatelier's principle</h3>
+            <p>When a system at equilibrium is disturbed, it shifts to <b>oppose the disturbance</b>. Three disturbances matter in exams:</p>
+            <ul>
+              <li><b>Concentration:</b> add more reactant → system shifts forward (towards products) to remove it.</li>
+              <li><b>Pressure (gases only):</b> increase pressure → system shifts to the side with <b>fewer gas molecules</b>.</li>
+              <li><b>Temperature:</b> increase temperature → system shifts in the <b>endothermic</b> direction to absorb the heat.</li>
+            </ul>
+            <div class="worked"><b>Worked example (JAMB style):</b> N2(g) + 3H2(g) ⇌ 2NH3(g), forward reaction exothermic. How do you maximise ammonia yield?<br>
+            High pressure (4 gas molecules → 2, so forward side has fewer), <b>low</b> temperature (forward is exothermic, so cooling favours it), and remove NH3 as it forms. In industry a compromise temperature (~450 °C) plus an iron catalyst is used so the rate stays practical.</div>
+            <div class="tip"><b>Exam tip:</b> temperature is the only factor that changes the <b>value of the equilibrium constant Kc</b>; concentration and pressure shifts change amounts but not Kc.</div>
+
+            <h3>6. The equilibrium constant Kc</h3>
+            <p>For aA + bB ⇌ cC + dD, the equilibrium constant is the product concentrations over the reactant concentrations, each raised to its balancing coefficient.</p>
+            <div class="formula">Kc = [C]^c [D]^d ÷ [A]^a [B]^b  (concentrations at equilibrium, mol/dm^3)</div>
+            <p>A <b>large Kc</b> means products dominate at equilibrium (reaction "goes nearly to completion"); a <b>tiny Kc</b> means reactants dominate. Kc depends on temperature only.</p>
+
+            <h3>7. Common mistakes that cost marks</h3>
+            <ul>
+              <li>Saying the reaction "stops" at equilibrium — it is <b>dynamic</b>; both directions continue.</li>
+              <li>Claiming a catalyst shifts equilibrium or increases yield — it only speeds up arrival.</li>
+              <li>Applying pressure arguments when there is no gas, or when both sides have equal gas molecules (then pressure causes <b>no shift</b>).</li>
+              <li>Confusing rate with yield: high temperature speeds a reaction up but can lower the equilibrium yield of an exothermic product.</li>
+              <li>Reading the flat part of a rate curve as "fastest reaction" — flat means <b>finished</b>; steepest means fastest.</li>
+            </ul>
+
+            <h3>Deep dive: examiner's favourites</h3>
+            <p><b>Favourite 1 — the thiosulphate clock:</b> Na2S2O3 + HCl turns cloudy as sulphur forms; the time to hide a marked cross measures rate. Increasing thiosulphate concentration or temperature <b>shortens</b> the time (rate = 1/t rises). Expect a table of times and a question on why.</p>
+            <p><b>Favourite 2 — marble chips and acid:</b> compare lumps vs powder of the same mass — powder reacts faster (surface area) but gives the <b>same final gas volume</b> because the amount of marble is unchanged. Graphs show a steeper early curve levelling at the same height.</p>
+            <p><b>Favourite 3 — Haber/Contact process reasoning:</b> state conditions with Le Chatelier plus the rate compromise, and name the catalyst (iron for Haber; vanadium(V) oxide for Contact).</p>
+            <div class="tip"><b>Speed trick:</b> for any equilibrium shift question, ask three quick checks — gas molecules per side? exo or endo direction? is a catalyst mentioned? — then apply "oppose the change". Ninety seconds, every time.</div>
+          `,
           cards: [
             { q: 'Define rate of reaction and name two ways of measuring it.', a: 'Rate of reaction is the change in concentration of a reactant or product per unit time. It can be measured by the volume of gas evolved per second, loss in mass, or the time for a precipitate (turbidity) to appear.' },
             { q: 'State four factors that affect the rate of a reaction.', a: 'Concentration (pressure for gases), temperature, surface area of solid reactants, and catalysts; light also drives photochemical reactions such as photography and photosynthesis.' },
@@ -15735,6 +15822,8 @@ function renderHome(el) {
         </div>
       </section>
 
+      ${examCommandCenter()}
+
       ${missionSection()}
 
       <section class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -17048,6 +17137,130 @@ function planPreviewHtml() {
     </div>`;
 }
 
+/* ---------------- Exam command centre (dashboard) ---------------- */
+const EXAM_MONTH = { 'JAMB UTME': 3, 'WAEC WASSCE': 4, 'NECO': 5, 'Post-UTME': 7, 'BECE': 4 };
+function examSitYear(classLevel) {
+  const c = String(classLevel || 'SS3');
+  const n = parseInt(c.slice(3), 10) || 3;
+  return new Date().getFullYear() + 1 + Math.max(0, 3 - n);
+}
+function examDateEstimate(exam, classLevel) {
+  const m = EXAM_MONTH[exam] === undefined ? 4 : EXAM_MONTH[exam];
+  return new Date(examSitYear(classLevel), m, 15);
+}
+function examCountdown() {
+  const exam = state.profile.targetExam || '';
+  if (!exam || exam === 'General' || !EXAM_MONTH[exam]) return null;
+  const set = state.profile.examDate;
+  const target = set ? new Date(set + 'T00:00:00') : examDateEstimate(exam, state.profile.classLevel);
+  const days = Math.max(0, Math.ceil((target - new Date()) / 86400000));
+  return { days, estimated: !set, date: localISO(target) };
+}
+function subjectReadiness() {
+  const bs = (state.quizStats || {}).bySubject || {};
+  return (state.profile.subjects || []).map(sub => {
+    const b = bs[sub];
+    return { sub, acc: b && b.total ? Math.round((b.correct / b.total) * 100) : null };
+  });
+}
+function gradeBand(p) {
+  return p >= 75 ? 'A1' : p >= 70 ? 'B2' : p >= 65 ? 'B3' : p >= 60 ? 'C4' : p >= 55 ? 'C5' : p >= 50 ? 'C6' : p >= 45 ? 'D7' : p >= 40 ? 'E8' : 'F9';
+}
+function targetNumber() {
+  const t = state.profile.targetScore || '';
+  const exam = state.profile.targetExam || '';
+  if (exam === 'JAMB UTME') { const m = t.match(/(\d+)\+/); return m ? +m[1] : 250; }
+  if (exam === 'Post-UTME') { const m = t.match(/(\d+)%/); return m ? +m[1] : 75; }
+  return 0;
+}
+/** Honest projection: per-subject accuracy, counted over the exam subjects.
+ *  Subjects with no quiz data count as 0 for score exams — labelled as such. */
+function predictedScore() {
+  const exam = state.profile.targetExam || '';
+  const r = subjectReadiness();
+  if (exam === 'JAMB UTME') {
+    const subs = r.slice(0, 4);
+    return { kind: 'score', max: 400, value: subs.reduce((a, x) => a + (x.acc || 0), 0),
+             missing: subs.filter(x => x.acc === null).map(x => x.sub) };
+  }
+  if (exam === 'Post-UTME') {
+    const subs = r.slice(0, 4);
+    return { kind: 'percent', max: 100, value: subs.reduce((a, x) => a + (x.acc || 0), 0) / Math.max(1, Math.min(4, subs.length)),
+             missing: subs.filter(x => x.acc === null).map(x => x.sub) };
+  }
+  if (exam === 'WAEC WASSCE' || exam === 'NECO' || exam === 'BECE') {
+    return { kind: 'grades', graded: r.filter(x => x.acc !== null).map(x => ({ sub: x.sub, grade: gradeBand(x.acc) })),
+             missing: r.filter(x => x.acc === null).map(x => x.sub) };
+  }
+  return { kind: 'none' };
+}
+function examCommandCenter() {
+  const exam = state.profile.targetExam || '';
+  if (!exam) return '';
+  const cd = examCountdown();
+  const plan = buildStudyPlan();
+  const weak = weakestTopicInfo();
+  const rd = subjectReadiness();
+  const rows = rd.filter(x => x.acc !== null).slice(0, 4);
+  const pred = predictedScore();
+  const bar = (x) => `
+      <div class="flex items-center gap-2">
+        <span class="w-24 truncate text-[11px] font-bold text-slate-600">${x.sub}</span>
+        <div class="h-2 flex-1 overflow-hidden rounded-full bg-slate-100">
+          <div class="h-full rounded-full ${x.acc >= 70 ? 'bg-emerald-500' : x.acc >= 50 ? 'bg-amber-500' : 'bg-rose-500'}" style="width:${x.acc}%"></div>
+        </div>
+        <span class="w-9 text-right text-[11px] font-black text-slate-700">${x.acc}%</span>
+      </div>`;
+  const predHtml = pred.kind === 'score' ? `
+        <div class="text-2xl font-black text-slate-900">${pred.value}<span class="text-sm font-bold text-slate-400">/${pred.max}</span></div>
+        <div class="mt-0.5 text-[11px] font-semibold text-slate-500">target ${targetNumber()}+ · if you sat ${exam} today</div>
+        ${pred.missing.length ? `<div class="mt-1 text-[10px] text-slate-400">no quiz data yet: ${pred.missing.join(', ')} (counted as 0)</div>` : ''}`
+    : pred.kind === 'percent' ? `
+        <div class="text-2xl font-black text-slate-900">${Math.round(pred.value)}<span class="text-sm font-bold text-slate-400">%</span></div>
+        <div class="mt-0.5 text-[11px] font-semibold text-slate-500">target ${targetNumber()}%+ · current average</div>
+        ${pred.missing.length ? `<div class="mt-1 text-[10px] text-slate-400">no quiz data yet: ${pred.missing.join(', ')}</div>` : ''}`
+    : pred.kind === 'grades' ? `
+        <div class="flex flex-wrap gap-1.5">${pred.graded.map(g => `<span class="rounded-full ${g.grade <= 'C6' && g.grade >= 'A1' ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-600'} px-2 py-0.5 text-[10px] font-black">${g.sub.split(' ')[0]}: ${g.grade}</span>`).join('') || '<span class="text-[11px] text-slate-400">No quiz data yet.</span>'}</div>
+        <div class="mt-1 text-[11px] font-semibold text-slate-500">predicted grades at current accuracy</div>
+        ${pred.missing.length ? `<div class="mt-1 text-[10px] text-slate-400">not yet quizzed: ${pred.missing.join(', ')}</div>` : ''}`
+    : `
+        <div class="text-2xl font-black text-slate-900">${state.quizStats.total ? Math.round((state.quizStats.correct / state.quizStats.total) * 100) + '%' : '—'}</div>
+        <div class="mt-0.5 text-[11px] font-semibold text-slate-500">overall accuracy</div>`;
+  return `
+    <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-card animate-fadeUp">
+      <div class="mb-4 flex flex-wrap items-center justify-between gap-2">
+        <h3 class="text-sm font-bold text-slate-900">🧭 Your road to ${exam}</h3>
+        ${cd ? `<span class="rounded-full bg-indigo-50 px-3 py-1 text-[11px] font-black text-indigo-700">⏳ ${cd.days} day${cd.days === 1 ? '' : 's'} to go${cd.estimated ? ' · est.' : ''}</span>` : ''}
+      </div>
+      <div class="grid gap-5 md:grid-cols-3">
+        <div>
+          <div class="mb-2 text-[11px] font-black uppercase tracking-wide text-slate-400">Subject readiness</div>
+          ${rows.length ? `<div class="space-y-2">${rows.map(bar).join('')}</div>` : '<p class="text-[11px] text-slate-400">Take a quiz in each subject and your readiness bars appear here.</p>'}
+        </div>
+        <div>
+          <div class="mb-2 text-[11px] font-black uppercase tracking-wide text-slate-400">Today’s session</div>
+          <div class="text-sm font-bold text-slate-800">${plan.minutes} min · ${plan.quizCount} quiz${plan.quizCount === 1 ? '' : 'zes'}</div>
+          <div class="mt-1 text-[11px] leading-relaxed text-slate-500">Focus: <b>${plan.focus}${plan.focusTopic ? ' → ' + plan.focusTopic : ''}</b></div>
+          <div class="mt-2 text-[11px] leading-relaxed text-slate-500">${weak.weakTop ? `Biggest gap: <b class="text-rose-600">${weak.weakSub} → ${weak.weakTop} (${weak.topPct}%)</b>` : weak.weakSub ? `Biggest gap: <b class="text-rose-600">${weak.weakSub} (${weak.weakPct}%)</b>` : 'Take a few quizzes and your weakest topic shows up here.'}</div>
+        </div>
+        <div>
+          <div class="mb-2 text-[11px] font-black uppercase tracking-wide text-slate-400">Projection</div>
+          ${predHtml}
+        </div>
+      </div>
+      ${cd ? `<div class="mt-4 flex items-center gap-2 border-t border-slate-100 pt-3 text-[11px] text-slate-400">
+        <span>${cd.estimated ? 'Exam date estimated —' : 'Exam date:'}</span>
+        <input type="date" value="${state.profile.examDate || ''}" onchange="setExamDate(this.value)"
+          class="rounded-lg border border-slate-200 px-2 py-1 text-[11px] font-semibold text-slate-600" />
+        <span>set your real date for an exact countdown</span>
+      </div>` : ''}
+    </section>`;
+}
+function setExamDate(v) {
+  state.profile.examDate = v || '';
+  saveProfile({ examDate: v || '' });
+  renderPage();
+}
 function missionSection() {
   const p = buildStudyPlan();
   const d = (state.daily && state.daily.date === todayISO()) ? state.daily : { lessons: 0, cards: 0, quizzes: 0, focus: 0, readTopic: '' };
@@ -17266,6 +17479,7 @@ async function saveProfile(patch) {
       subjects: state.profile.subjects || [],
       onboarded: !!state.profile.onboarded,
       dept: state.profile.dept || '',
+      examDate: state.profile.examDate || '',
       streak: state.streak || 0,
       lastActiveDate: state.lastActiveDate || '',
       streakFreezes: state.streakFreezes || 0,
@@ -17341,7 +17555,8 @@ function hydrateFromDoc(data) {
     onboarded: !!data.onboarded,
     targetScore: data.targetScore || '',
     studyPref: data.studyPref || '',
-    dept: data.dept || ''
+    dept: data.dept || '',
+    examDate: data.examDate || ''
   };
   // A saved exam that does not exist for the class (e.g. JAMB UTME for a JSS1 student) resets.
   if (state.profile.classLevel && state.profile.targetExam &&
@@ -17857,7 +18072,7 @@ Object.assign(window, {
   flipFlashcard, nextFlashcard, prevFlashcard, gotoFlashcard,
   markGot, markLater, setFlashFilter, restartFlash, dismissCelebration,
   startTopicQuiz, startMockQuiz, startPastQuiz, backToQuizList, openTopicCards,
-  setQuizCount, setQuizTimer, openFocusModal, closeFocusModal, focusModalBackdrop, startFocus, stopFocus, updateFocusPill,
+  setQuizCount, setQuizTimer, openFocusModal, closeFocusModal, focusModalBackdrop, startFocus, stopFocus, updateFocusPill, setExamDate,
   selectQuizAnswer, submitQuiz, retakeQuiz, examJump, examPrev, examNext, submitExam,
   sendChatMessage, askBuddy, clearChat, setResearch, saveGeminiKey, toggleGeminiPanel,
   setGeminiModel, testGemini,
@@ -17875,6 +18090,7 @@ window.__STUDYOS_TEST__ = {
   subjectsForLevel, selectableSubjects, subjectIsAvailable, hydrateFromDoc,
   examsForLevel, renderOnboardStep, levelTopics, topicQuiz, cardsFor, buildStudyPlan,
   markGot, markLater, pushHistory, progressChartSvg, activityHeatSvg, shuffleOptions, localISO,
+  examCountdown, subjectReadiness, gradeBand, predictedScore, targetNumber, examCommandCenter, examDateEstimate,
   getState: () => state
 };
 

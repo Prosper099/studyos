@@ -957,6 +957,32 @@ w.navigate('home');
 check('dashboard renders greeting, streak and quick-nav cards',
   /Good (morning|afternoon|evening), Joseph/.test(page()) && /day streak/.test(page())
   && page().includes("navigate('study')") && page().includes("navigate('assistant')"), page().slice(0, 120));
+check('exam command centre shows countdown, session and projection', (() => {
+  const h = page();
+  return h.includes('Your road to JAMB UTME') && h.includes('days to go') && h.includes('Projection')
+    && h.includes('Subject readiness') && h.includes('session');
+})());
+check('exam countdown is a sensible SS3 estimate and honours a set date', (() => {
+  const st = T.getState();
+  const cd = T.examCountdown();
+  const saved = st.profile.examDate;
+  st.profile.examDate = '2027-01-01';
+  const cd2 = T.examCountdown();
+  st.profile.examDate = saved;
+  return !!cd && cd.estimated === true && cd.days > 150 && cd.days < 400
+    && !!cd2 && cd2.estimated === false && cd2.days > 100 && cd2.days < 140;
+})());
+check('grade bands follow WAEC cut-offs',
+  T.gradeBand(82) === 'A1' && T.gradeBand(72) === 'B2' && T.gradeBand(52) === 'C6' && T.gradeBand(39) === 'F9');
+check('JAMB projection sums subject accuracy with honest zeros', (() => {
+  const st = T.getState();
+  const savedQ = st.quizStats, savedS = st.profile.subjects;
+  st.profile.subjects = ['Mathematics', 'English Language', 'Physics', 'Chemistry'];
+  st.quizStats = { ...savedQ, bySubject: { Mathematics: { correct: 80, total: 100 }, 'English Language': { correct: 70, total: 100 }, Physics: { correct: 60, total: 100 } } };
+  const p = T.predictedScore();
+  st.quizStats = savedQ; st.profile.subjects = savedS;
+  return p.kind === 'score' && p.max === 400 && p.value === 210 && p.missing.length === 1;
+})());
 w.navigate('study');
 check('study page lists the subject selector and grouped topic cards',
   page().includes('changeSubject(') && page().includes('Centripetal Force')
