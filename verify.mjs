@@ -286,6 +286,16 @@ check('every subject has flashcards, quiz and resources',
 check('flashcards all have q + a', subjects.every(s => T.flashFor(s).every(c => c.q && c.a)));
 check('all resource URLs are https', subjects.every(s => T.CURRICULUM[s].resources.every(r => /^https:\/\//.test(r.url))));
 
+check('pushHistory records results and caps history at 60', (() => {
+  const st = T.getState();
+  const saved = st.quizStats;
+  st.quizStats = { attempts: 0, correct: 0, total: 0, bestPercent: 0, bySubject: {} };
+  for (let i = 0; i < 65; i++) T.pushHistory({ percent: i % 101, correct: 1, total: 2 }, 'Mathematics', 'topic');
+  const day = new Date().toISOString().slice(0, 10);
+  const ok = st.quizStats.history.length === 60 && st.quizStats.history[59].p === 64 && (st.quizStats.days || {})[day] === 65;
+  st.quizStats = saved;
+  return ok;
+})());
 check('mergeQuizStats accumulates per-topic stats', (() => {
   const s1 = T.mergeQuizStats(null, 'Mathematics', { correct: 3, total: 10, percent: 30, byTopic: { 'Mathematics | Algebra': { correct: 1, total: 5 } } });
   const s2 = T.mergeQuizStats(s1, 'Mathematics', { correct: 6, total: 10, percent: 60, byTopic: { 'Mathematics | Algebra': { correct: 4, total: 5 } } });
