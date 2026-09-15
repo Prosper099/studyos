@@ -291,7 +291,7 @@ check('pushHistory records results and caps history at 60', (() => {
   const saved = st.quizStats;
   st.quizStats = { attempts: 0, correct: 0, total: 0, bestPercent: 0, bySubject: {} };
   for (let i = 0; i < 65; i++) T.pushHistory({ percent: i % 101, correct: 1, total: 2 }, 'Mathematics', 'topic');
-  const day = new Date().toISOString().slice(0, 10);
+  const day = T.localISO();
   const ok = st.quizStats.history.length === 60 && st.quizStats.history[59].p === 64 && (st.quizStats.days || {})[day] === 65;
   st.quizStats = saved;
   return ok;
@@ -880,7 +880,7 @@ check('quiz list degrades gracefully when a topic quiz is unwritten (mutated)', 
   w.changeSubject(savedSub);
 }
 w.startMockQuiz();
-const physQuiz = T.quizFor('Physics');
+const physQuiz = T.getState().quiz.questions; // runtime (shuffled) questions, not the raw bank
 physQuiz.forEach(q => w.selectQuizAnswer(q.id, q.correct));
 await w.submitQuiz();
 const docAfterQuiz = globalThis.__FS_STORE.get('users/test-uid-1');
@@ -897,11 +897,12 @@ check('quiz list offers the real past-question drill for banked subjects',
   byId('page-content').innerHTML.includes('startPastQuiz()')
   && byId('page-content').innerHTML.includes('Real WAEC/JAMB past questions'));
 w.startPastQuiz();
-const pastQuiz = T.pastFor('Physics');
+const rawPast = T.pastFor('Physics');
+const pastQuiz = T.getState().quiz.questions; // runtime (shuffled) questions
 check('past drill opens the CBT exam hall with palette and source badge', (() => {
   const h = byId('page-content').innerHTML;
-  const first = T.getState().quiz.questions[0];
-  return pastQuiz.length >= 7 && h.includes('Real past questions (WAEC/JAMB/NECO)')
+  const first = pastQuiz[0];
+  return rawPast.length >= 7 && h.includes('Real past questions (WAEC/JAMB/NECO)')
     && h.includes('Real exam simulation') && h.includes('Question palette')
     && h.includes('Submit exam') && !!first && h.includes(first.src);
 })());
@@ -913,6 +914,42 @@ check('past drill grades and reveals official answers with paper attribution', (
 })());
 w.retakeQuiz();
 w.backToQuizList();
+
+// ---------- progress dashboard: real submit path records history + activity ----------
+{
+  const st = T.getState();
+  const li = T.localISO();
+  check('every quiz submit lands in the results history and the activity day',
+    Array.isArray(st.quizStats.history) && st.quizStats.history.length >= 2
+    && st.quizStats.history.slice(-2).every(e => typeof e.p === 'number' && !!e.s && !!e.m)
+    && (st.quizStats.days || {})[li] >= 2,
+    'hist=' + (st.quizStats.history || []).length + ' dayCount=' + JSON.stringify((st.quizStats.days || {})[li]));
+}
+check('answer options are shuffled — the correct letter is not always A', (() => {
+  let n = 0, zero = 0;
+  for (let i = 0; i < 10; i++) {
+    ['Mathematics', 'Physics', 'Chemistry'].forEach(sub => {
+      T.buildQuiz(sub, 'mock').forEach(q => { n++; if (q.correct === 0) zero++; });
+    });
+  }
+  return n > 200 && (zero / n) < 0.45;
+})());
+check('shuffleOptions keeps the right answer text under the remapped index', (() => {
+  const raw = T.quizFor('Mathematics').slice(0, 5);
+  for (let i = 0; i < 30; i++) {
+    for (const q of raw) {
+      const s2 = T.shuffleOptions(q);
+      if (s2.options === q.options) return false;               // must not mutate the bank
+      if (s2.options[s2.correct] !== q.options[q.correct]) return false;
+    }
+  }
+  return true;
+})());
+check('score chart shows a single first data point instead of a blank box', (() => {
+  const one = T.progressChartSvg([{ d: '2026-09-14', p: 80, s: 'Physics', m: 'topic', c: 8, t: 10 }]);
+  return one.includes('<circle') && one.includes('first data point')
+    && T.progressChartSvg([]).includes('starts growing here');
+})());
 
 // ---------- every page renders real markup ----------
 const page = () => byId('page-content').innerHTML;

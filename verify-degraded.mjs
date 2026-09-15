@@ -144,7 +144,7 @@ w.changeSubject('Chemistry');
 w.navigate('quiz');
 w.startMockQuiz();
 const T = w.__STUDYOS_TEST__;
-const quiz = T.quizFor('Chemistry');
+const quiz = T.getState().quiz.questions; // runtime (shuffled) questions, not the raw bank
 quiz.forEach(q => w.selectQuizAnswer(q.id, q.correct));
 const toastBefore = readToast();
 await w.submitQuiz();
@@ -152,7 +152,9 @@ check('quiz still grades and records stats with no Firestore',
   byId('page-content').innerHTML.includes('100%') || byId('page-content').innerHTML.includes('Score:'));
 const saved2 = JSON.parse(store.get('studyos.demo.v1') || '{}');
 check('quiz stats persisted to localStorage fallback',
-  saved2.quizStats && saved2.quizStats.attempts === 1 && saved2.quizStats.bySubject.Chemistry.correct === quiz.length,
+  saved2.quizStats && saved2.quizStats.attempts === 1 && saved2.quizStats.bySubject.Chemistry.correct === quiz.length
+  && Array.isArray(saved2.quizStats.history) && saved2.quizStats.history.length === 1
+  && (saved2.quizStats.days || {})[T.localISO()] === 1,
   JSON.stringify(saved2.quizStats));
 
 // the warning must not repeat on every failing write
