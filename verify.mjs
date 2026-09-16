@@ -849,6 +849,7 @@ check('onboarding persisted class + exam + subjects + target + preference to Fir
   && docAfterOnboard.dept === 'Science'
   && docAfterOnboard.onboarded === true, JSON.stringify(docAfterOnboard));
 check('onboarding modal closed after finish', byId('onboarding-modal').classList.contains('hidden'));
+T.getState().profile.plan = 'pro'; // main flow runs as Pro so free-tier caps never block it
 
 // quiz flow through the UI handlers (quiz page opens in list mode; pick the mock bank)
 w.changeSubject('Physics');
@@ -983,6 +984,59 @@ check('JAMB projection sums subject accuracy with honest zeros', (() => {
   st.quizStats = savedQ; st.profile.subjects = savedS;
   return p.kind === 'score' && p.max === 400 && p.value === 210 && p.missing.length === 1;
 })());
+
+// ---------- freemium: free caps, upgrade sheet, Pro unlock, parent report ----------
+check('free plan locks Pro parts of the command centre, Pro shows them', (() => {
+  const st = T.getState();
+  const savedPlan = st.profile.plan;
+  st.profile.plan = 'free';
+  w.navigate('home');
+  const freeHtml = page();
+  st.profile.plan = savedPlan;
+  w.navigate('home');
+  const proHtml = page();
+  return freeHtml.includes('Go Pro') && freeHtml.includes('🔒')
+    && proHtml.includes('days to go') && !proHtml.includes('🔒');
+})());
+check('free plan caps quizzes at the daily limit and opens the upgrade sheet', (() => {
+  const st = T.getState();
+  const savedPlan = st.profile.plan, savedDaily = st.daily;
+  st.profile.plan = 'free';
+  st.daily = { date: T.localISO(), lessons: 0, cards: 0, quizzes: T.FREE_DAILY_QUIZZES, focus: 0, readTopic: '', buddy: 0 };
+  const qBefore = st.quiz;
+  w.startMockQuiz();
+  const blocked = st.quiz === qBefore && !byId('upgrade-modal').classList.contains('hidden');
+  T.closeUpgrade();
+  st.profile.plan = savedPlan; st.daily = savedDaily;
+  return blocked;
+})());
+check('free plan caps Buddy questions and keeps the counter honest', (() => {
+  const st = T.getState();
+  const savedPlan = st.profile.plan, savedDaily = st.daily, savedPage = st.page;
+  st.profile.plan = 'free';
+  st.daily = { date: T.localISO(), lessons: 0, cards: 0, quizzes: 0, focus: 0, readTopic: '', buddy: T.FREE_DAILY_BUDDY };
+  w.askBuddy('explain inertia');
+  const limited = !byId('upgrade-modal').classList.contains('hidden') && st.daily.buddy === T.FREE_DAILY_BUDDY;
+  T.closeUpgrade();
+  st.profile.plan = savedPlan; st.daily = savedDaily;
+  w.navigate(savedPage);
+  return limited;
+})());
+check('Pro activation persists to the cloud profile and lifts every gate', (() => {
+  const st = T.getState();
+  const savedPlan = st.profile.plan;
+  T.activatePlan('pack', 'test-ref');
+  const doc = globalThis.__FS_STORE.get('users/test-uid-1');
+  const ok = T.proActive() && st.profile.plan === 'pack' && doc && doc.plan === 'pack' && T.quizGate() === true;
+  st.profile.plan = savedPlan;
+  return ok;
+})());
+check('parent report is plain English with the student\'s real numbers', (() => {
+  const st = T.getState();
+  const r = T.buildParentReport();
+  return r.includes('StudyOS weekly report for Joseph') && r.includes('Active study days this week:')
+    && r.includes('Questions answered so far: ' + (st.quizStats.total || 0)) && r.includes('Streak:');
+})());
 w.navigate('study');
 check('study page lists the subject selector and grouped topic cards',
   page().includes('changeSubject(') && page().includes('Centripetal Force')
@@ -1040,6 +1094,7 @@ check('profile shows per-subject quiz stats', page().includes('Quiz performance'
 globalThis.__FS_STORE.set('users/test-uid-2', { name: 'Amaka', email: 'a@b.c', classLevel: 'SS2', targetExam: 'WAEC WASSCE', subjects: ['Chemistry'], onboarded: true, streak: 7, lastActiveDate: '2020-01-01', quizStats: {} });
 await globalThis.__AUTH_CB({ uid: 'test-uid-2', email: 'a@b.c', displayName: 'Amaka' });
 await new Promise(r => setImmediate(r));
+T.getState().profile.plan = 'pro'; // second account also runs Pro so the CBT flow stays un-gated
 const doc2 = globalThis.__FS_STORE.get('users/test-uid-2');
 check('login never touches the streak (activity-based)', doc2.streak === 7, 'streak=' + doc2.streak);
 T.recordTask('quiz', { percent: 80 });
