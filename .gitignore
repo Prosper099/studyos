@@ -13,3 +13,4 @@ node_modules/
 
 # Build output (Vercel rebuilds on push)
 dist/
+.npm/
