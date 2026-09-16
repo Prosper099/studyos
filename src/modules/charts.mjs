@@ -18,7 +18,15 @@ export function chartSvgCore(h, interactive) {
   const trendPill = `<rect x="${pillX}" y="9" width="${pillW}" height="21" rx="10.5" fill="${up ? '#ecfdf5' : '#fff1f2'}"/><text x="${pillX + pillW / 2}" y="23.5" font-size="10.5" font-weight="800" fill="${up ? '#059669' : '#e11d48'}" text-anchor="middle">${up ? '▲' : '▼'} ${Math.abs(trend)} pts · ${pts.length} quiz${pts.length === 1 ? '' : 'zes'}</text>`;
   const dates = single ? `<text x="${(W2 / 2).toFixed(1)}" y="${H2 - 10}" font-size="10" font-weight="700" fill="#a3b0c2" text-anchor="middle">${escapeHtml(first.d.slice(5))} · ${escapeHtml(first.s)} — first data point. One more quiz draws your trend line.</text>`
     : `<text x="${padL}" y="${H2 - 10}" font-size="10" font-weight="700" fill="#a3b0c2">${escapeHtml(first.d.slice(5))}</text><text x="${W2 - padR}" y="${H2 - 10}" font-size="10" font-weight="700" fill="#a3b0c2" text-anchor="end">${escapeHtml(last.d.slice(5))}</text>`;
-  const dots = interactive ? P.map((p, i) => `<g class="cpg${single ? ' cp-on cp-fix' : ''}"><circle class="cph" cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="9" fill="#7c3aed" opacity="0.18"/><circle class="cpd" cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="4.5" fill="#7c3aed" stroke="#ffffff" stroke-width="2"/><circle class="chart-dot" data-d="${escapeHtml(pts[i].d)}" data-p="${pts[i].p}" data-s="${escapeHtml(pts[i].s)}" cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="11" fill="transparent" style="cursor:pointer"/></g>`).join('') : '';
+  const dots = P.map((p, i) => {
+    const lastPt = i === P.length - 1;
+    const halo = `<circle class="cph" cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="9" fill="#7c3aed" opacity="0.18"/>`;
+    const dot = lastPt
+      ? `<circle class="cpd" cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="5" fill="#7c3aed" stroke="#ffffff" stroke-width="2.4"/>`
+      : `<circle class="cpd" cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="3.4" fill="#ffffff" stroke="#7c3aed" stroke-width="2"/>`;
+    const hit = interactive ? `<circle class="chart-dot" data-d="${escapeHtml(pts[i].d)}" data-p="${pts[i].p}" data-s="${escapeHtml(pts[i].s)}" cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="11" fill="transparent" style="cursor:pointer"/>` : '';
+    return `<g class="cpg${interactive && single ? ' cp-on cp-fix' : ''}">${halo}${dot}${hit}</g>`;
+  }).join('');
   return `<svg viewBox="0 0 ${W2} ${H2}" class="w-full" role="img" aria-label="Quiz score trend">
     ${grid}
     <path d="${line}" fill="none" stroke="#7c3aed" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"/>
