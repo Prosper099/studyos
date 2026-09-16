@@ -986,6 +986,7 @@ check('JAMB projection sums subject accuracy with honest zeros', (() => {
 })());
 
 // ---------- freemium: free caps, upgrade sheet, Pro unlock, parent report ----------
+T.setMonetization(true); // paid plans are hidden during the growth phase — switch on to test them
 check('free plan locks Pro parts of the command centre, Pro shows them', (() => {
   const st = T.getState();
   const savedPlan = st.profile.plan;
@@ -1036,6 +1037,19 @@ check('parent report is plain English with the student\'s real numbers', (() => 
   const r = T.buildParentReport();
   return r.includes('StudyOS weekly report for Joseph') && r.includes('Active study days this week:')
     && r.includes('Questions answered so far: ' + (st.quizStats.total || 0)) && r.includes('Streak:');
+})());
+T.setMonetization(false);
+check('growth phase: monetization hidden — full engine unlocked for free users', (() => {
+  const st = T.getState();
+  const savedPlan = st.profile.plan;
+  st.profile.plan = 'free';
+  w.navigate('home');
+  const h = page();
+  st.profile.plan = savedPlan;
+  w.navigate('profile');
+  const prof = page();
+  w.navigate('home');
+  return !h.includes('🔒') && !h.includes('Go Pro') && h.includes('days to go') && !prof.includes('Upgrade to Pro');
 })());
 w.navigate('study');
 check('study page lists the subject selector and grouped topic cards',
