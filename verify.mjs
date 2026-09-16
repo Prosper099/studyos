@@ -14,7 +14,7 @@ const htmlPath = process.env.STUDYOS_HTML
       : path.join(root, '.verify/placeholder/index.html'));
 const html = fs.readFileSync(htmlPath, 'utf8');
 
-const m = html.match(/<script type="module">([\s\S]*?)<\/script>/);
+const m = html.match(/<script type="module"[^>]*>([\s\S]*?)<\/script>/);
 assert.ok(m, 'index.html must contain a <script type="module"> block');
 let code = m[1];
 
@@ -25,7 +25,7 @@ function check(name, cond, detail = '') {
   if (!cond) console.log(`FAIL  ${name} ${detail}`);
 }
 
-check('imports firebase-app from gstatic', /from 'https:\/\/www\.gstatic\.com\/firebasejs\/10\.\d+\.\d+\/firebase-app\.js'/.test(code));
+check('imports firebase-app from gstatic', /from ['"]https:\/\/www\.gstatic\.com\/firebasejs\/10\.\d+\.\d+\/firebase-app\.js['"]/.test(code));
 check('imports firebase-auth from gstatic', /firebasejs\/10\.\d+\.\d+\/firebase-auth\.js/.test(code));
 check('imports firebase-firestore from gstatic', /firebasejs\/10\.\d+\.\d+\/firebase-firestore\.js/.test(code));
 check('uses onAuthStateChanged', /onAuthStateChanged\s*\(/.test(code));
@@ -33,14 +33,14 @@ check('uses signOut()', /\bsignOut\s*\(/.test(code));
 check('uses Google signInWithPopup', /signInWithPopup\(auth,\s*googleProvider\(\)\)/.test(code));
 check('no email/password auth remains',
   !/signInWithEmailAndPassword|createUserWithEmailAndPassword|switchAuthTab/.test(code));
-check('writes to users/{uid} via doc(db, "users", ...)', /doc\(db,\s*'users'/.test(code));
+check('writes to users/{uid} via doc(db, "users", ...)', /doc\(db,\s*['"]users['"]/.test(code));
 const REAL = process.env.STUDYOS_REAL_CONFIG === '1';
 if (REAL) {
   check('real-config copy has no placeholder key values',
-    !/apiKey:\s*'YOUR_API_KEY'|projectId:\s*'YOUR_PROJECT_ID'/.test(code));
+    !/apiKey:\s*['"]YOUR_API_KEY['"]|projectId:\s*['"]YOUR_PROJECT_ID['"]/.test(code));
 } else {
-  check('placeholder apiKey present', /apiKey:\s*'YOUR_API_KEY'/.test(code));
-  check('placeholder projectId present', /projectId:\s*'YOUR_PROJECT_ID'/.test(code));
+  check('placeholder apiKey present', /apiKey:\s*['"]YOUR_API_KEY['"]/.test(code));
+  check('placeholder projectId present', /projectId:\s*['"]YOUR_PROJECT_ID['"]/.test(code));
   check('placeholder config keeps the app out of Firebase', /isConfigured/.test(code));
 }
 check('Tailwind CDN present', /https:\/\/cdn\.tailwindcss\.com/.test(html));
@@ -48,7 +48,7 @@ check('onboarding steps 1-3 in DOM', ['step-1', 'step-2', 'step-3'].every(id => 
 check('all 7 nav pages present', ['home', 'study', 'resources', 'flashcards', 'quiz', 'assistant', 'profile']
   .every(p => html.includes(`data-page="${p}"`)));
 check('sidebar drawer markup', html.includes('id="sidebar"') && html.includes('id="sidebar-overlay"'));
-check('browser Back (popstate) handler registered', /addEventListener\('popstate'/.test(code));
+check('browser Back (popstate) handler registered', /addEventListener\(['"]popstate['"]/.test(code));
 check('got-it swipe, green border flash and card-in styles present',
   /@keyframes gotSwipe/.test(html) && /@keyframes gotBorder/.test(html) && /@keyframes cardIn/.test(html)
   && /\.flash-got \.flashcard-face/.test(html) && /confetti-layer[^}]*z-index: 40/.test(html));
@@ -83,9 +83,9 @@ const fsStub = stub('fs.mjs', `
 `);
 
 code = code
-  .replace(/from 'https:\/\/www\.gstatic\.com\/firebasejs\/[\d.]+\/firebase-app\.js'/, `from '${appStub}'`)
-  .replace(/from 'https:\/\/www\.gstatic\.com\/firebasejs\/[\d.]+\/firebase-auth\.js'/, `from '${authStub}'`)
-  .replace(/from 'https:\/\/www\.gstatic\.com\/firebasejs\/[\d.]+\/firebase-firestore\.js'/, `from '${fsStub}'`);
+  .replace(/from ['"]https:\/\/www\.gstatic\.com\/firebasejs\/[\d.]+\/firebase-app\.js['"]/, `from '${appStub}'`)
+  .replace(/from ['"]https:\/\/www\.gstatic\.com\/firebasejs\/[\d.]+\/firebase-auth\.js['"]/, `from '${authStub}'`)
+  .replace(/from ['"]https:\/\/www\.gstatic\.com\/firebasejs\/[\d.]+\/firebase-firestore\.js['"]/, `from '${fsStub}'`);
 
 assert.ok(!/gstatic\.com\/firebasejs/.test(code), 'every firebase import should have been rewritten to a stub');
 

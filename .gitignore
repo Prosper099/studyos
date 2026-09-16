@@ -10,3 +10,6 @@ node_modules/
 .DS_Store
 .arena/
 .cache/
+
+# Build output (Vercel rebuilds on push)
+dist/

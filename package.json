@@ -1,0 +1,20 @@
+{
+  "name": "user",
+  "version": "1.0.0",
+  "description": "An intelligent, single-file study companion built for Nigerian secondary-school students — covering **JAMB UTME, WAEC WASSCE, NECO, Post-UTME** (senior) and **BECE** (junior).",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "vite build",
+    "dev": "vite --host",
+    "postbuild": "cp preview.html og.jpg dist/"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "devDependencies": {
+    "vite": "^8.3.0",
+    "vite-plugin-singlefile": "^2.3.3"
+  }
+}
