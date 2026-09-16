@@ -128,7 +128,9 @@ const feature = [
   ['profile badges section', /Badges &amp; streaks|Badges & streaks/],
   ['streak freeze ice-shatter overlay', /id="freeze-overlay"/],
   ['parent report export buttons', /copyParentReport\(\)[\s\S]*downloadParentReport\(\)/],
-  ['passive streak check on app entry', /checkStreakOnEntry\(\);/]
+  ['passive streak check on app entry', /checkStreakOnEntry\(\);/],
+  ['chart dot tooltip markup', /chart-dot[\s\S]*chart-tip/],
+  ['parent report bundle share button', /shareParentBundle\(\)/]
 ];
 for (const [name, re] of feature) check(name, typeof re === 'boolean' ? re : re.test(html));
 

@@ -16560,7 +16560,7 @@ function chartSmoothPath(points) {
   }
   return d;
 }
-function progressChartSvg(h) {
+function chartSvgCore(h, interactive) {
   const pts = (h || []).slice(-20);
   if (pts.length === 0) return '<p class="rounded-xl bg-slate-50 px-3 py-4 text-center text-xs font-semibold text-slate-400">Take a couple of quizzes and your score graph starts growing here. 📈</p>';
   chartIdSeq = (chartIdSeq + 1) % 100000;
@@ -16586,6 +16586,7 @@ function progressChartSvg(h) {
   const trendPill = `<rect x="${pillX}" y="9" width="${pillW}" height="21" rx="10.5" fill="${up ? '#ecfdf5' : '#fff1f2'}"/><text x="${pillX + pillW / 2}" y="23.5" font-size="10.5" font-weight="800" fill="${up ? '#059669' : '#e11d48'}" text-anchor="middle">${up ? '▲' : '▼'} ${Math.abs(trend)} pts · ${pts.length} quiz${pts.length === 1 ? '' : 'zes'}</text>`;
   const dates = single ? `<text x="${(W2 / 2).toFixed(1)}" y="${H2 - 10}" font-size="10" font-weight="700" fill="#a3b0c2" text-anchor="middle">${escapeHtml(first.d.slice(5))} · ${escapeHtml(first.s)} — first data point. One more quiz draws your trend line.</text>`
     : `<text x="${padL}" y="${H2 - 10}" font-size="10" font-weight="700" fill="#a3b0c2">${escapeHtml(first.d.slice(5))}</text><text x="${W2 - padR}" y="${H2 - 10}" font-size="10" font-weight="700" fill="#a3b0c2" text-anchor="end">${escapeHtml(last.d.slice(5))}</text>`;
+  const hits = interactive ? P.map((p, i) => `<circle class="chart-dot" data-d="${escapeHtml(pts[i].d)}" data-p="${pts[i].p}" data-s="${escapeHtml(pts[i].s)}" cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="11" fill="transparent" style="cursor:pointer"/>`).join('') : '';
   return `<svg viewBox="0 0 ${W2} ${H2}" class="w-full" role="img" aria-label="Quiz score trend">
     <defs>
       <linearGradient id="${g}-stroke" x1="0" y1="0" x2="1" y2="0">
@@ -16603,7 +16604,34 @@ function progressChartSvg(h) {
     ${lastDot}
     ${trendPill}
     ${dates}
+    ${hits}
   </svg>`;
+}
+function progressChartSvg(h) {
+  const svg = chartSvgCore(h, true);
+  if (svg.charAt(0) !== '<' || svg.slice(0, 4) !== '<svg') return svg; // empty-state paragraph
+  return `<div class="chart-wrap relative">${svg}<div class="chart-tip pointer-events-none absolute z-10 hidden min-w-[130px] -translate-x-1/2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-left shadow-pop">
+    <div class="chart-tip-date text-[10px] font-black uppercase tracking-wide text-slate-400"></div>
+    <div class="mt-0.5 flex items-center gap-1.5 text-[11px] font-bold text-slate-800"><span class="h-2 w-2 shrink-0 rounded-full bg-violet-600"></span><span class="chart-tip-body"></span></div>
+  </div></div>`;
+}
+function showChartTip(dot) {
+  const wrap = dot.closest('.chart-wrap');
+  if (!wrap) return;
+  const tip = wrap.querySelector('.chart-tip');
+  if (!tip) return;
+  tip.querySelector('.chart-tip-date').textContent = dot.getAttribute('data-d');
+  tip.querySelector('.chart-tip-body').textContent = dot.getAttribute('data-p') + '% · ' + dot.getAttribute('data-s');
+  tip.classList.remove('hidden');
+  const wr = wrap.getBoundingClientRect();
+  const dr = dot.getBoundingClientRect();
+  const x = dr.left - wr.left + dr.width / 2;
+  const y = dr.top - wr.top;
+  tip.style.left = Math.max(70, Math.min(wr.width - 70, x)) + 'px';
+  tip.style.top = Math.max(44, y - 12) + 'px';
+}
+function hideChartTip() {
+  document.querySelectorAll('.chart-tip').forEach(t => t.classList.add('hidden'));
 }
 function activityHeatSvg(days) {
   const weeks = 12, cell = 13, gap = 4;
@@ -19648,38 +19676,94 @@ function computeStudyToDos() {
   todos.push(state.streak > 0 ? `Protect your ${state.streak}-day streak — study something today` : 'Start a new streak — one quiz today sets Day 1');
   return todos.slice(0, 4);
 }
+function wrapLines(text, max) {
+  const words = String(text).split(/\s+/);
+  const out = [];
+  let cur = '';
+  for (const w of words) {
+    if ((cur + ' ' + w).trim().length > max) { if (cur.trim()) out.push(cur.trim()); cur = w; }
+    else cur = cur ? cur + ' ' + w : w;
+  }
+  if (cur.trim()) out.push(cur.trim());
+  return out;
+}
+let lastCardH = 1260;
 function buildParentCardSvg() {
   const s = state.quizStats || {};
   const acc = s.total ? Math.round((s.correct / s.total) * 100) : 0;
   const weak = weakestTopicInfo();
   const todos = computeStudyToDos();
   const bySubject = Object.entries(s.bySubject || {}).slice(0, 5);
-  const W = 750, H = 1080;
+  const now = new Date();
+  const active7 = Object.keys(s.days || {}).filter(d => { const diff = (now - new Date(d + 'T00:00:00')) / 86400000; return diff >= 0 && diff < 7; }).length;
+  const hist = s.history || [];
+  const avg = arr => arr.length ? Math.round(arr.reduce((a, q) => a + q.p, 0) / arr.length) : null;
+  const a1 = avg(hist.slice(-5)), a0 = avg(hist.slice(-10, -5));
+  const trendText = (a1 !== null && a0 !== null)
+    ? (a1 - a0 > 0 ? 'Trend: improving, up ' + (a1 - a0) + ' points across the last five quizzes — keep it going!'
+      : a1 - a0 < 0 ? 'Trend: a tougher stretch, ' + (a1 - a0) + ' points over the last five quizzes — normal while tackling harder topics.'
+      : 'Trend: steady and consistent — reliability is a real strength.')
+    : 'Trend: still building history — a few more quizzes and the line sharpens.';
   const name = escapeHtml(state.profile.name || 'Student');
   const cls = escapeHtml(state.profile.classLevel || '');
   const exam = escapeHtml(state.profile.targetExam || '');
   const esc = t => escapeHtml(String(t));
-  const statTiles = [
+  const W = 750;
+  let y = 182;
+  const parts = [];
+  parts.push(`<text x="40" y="${y}" font-size="15" font-weight="800" fill="#1e293b" letter-spacing="1.5">PERFORMANCE</text>`);
+  const tiles = [
     [acc + '%', 'accuracy', '#eef2ff', '#4338ca'],
     [(s.attempts || 0) + '', 'quizzes', '#ecfdf5', '#047857'],
     [(s.bestPercent || 0) + '%', 'best', '#fffbeb', '#b45309'],
     ['🔥 ' + (state.streak || 0), 'streak', '#fff1f2', '#be123c']
-  ].map((t, i) => {
+  ];
+  tiles.forEach((t, i) => {
     const x = 40 + i * 172;
-    return `<rect x="${x}" y="196" width="152" height="86" rx="18" fill="${t[2]}"/><text x="${x + 76}" y="240" font-size="27" font-weight="800" fill="${t[3]}" text-anchor="middle">${esc(t[0])}</text><text x="${x + 76}" y="262" font-size="12.5" font-weight="700" fill="#64748b" text-anchor="middle">${esc(t[1])}</text>`;
-  }).join('');
-  const bars = bySubject.map(([subj, st], i) => {
-    const p = st.total ? Math.round((st.correct / st.total) * 100) : 0;
-    const y = 560 + i * 44;
-    return `<text x="40" y="${y + 4}" font-size="13.5" font-weight="700" fill="#334155">${esc(subj)}</text><text x="710" y="${y + 4}" font-size="13.5" font-weight="800" fill="#64748b" text-anchor="end">${p}%</text><rect x="40" y="${y + 12}" width="670" height="10" rx="5" fill="#eef2f7"/><rect x="40" y="${y + 12}" width="${(670 * p / 100).toFixed(0)}" height="10" rx="5" fill="${p >= 70 ? '#10b981' : p >= 40 ? '#f59e0b' : '#f43f5e'}"/>`;
-  }).join('');
-  const weakBlock = weak.weakSub
-    ? `<rect x="40" y="800" width="670" height="72" rx="18" fill="#fff7ed" stroke="#fed7aa" stroke-width="1.5"/><text x="64" y="830" font-size="14" font-weight="800" fill="#c2410c">⚠️ Weak area: ${esc(weak.weakSub)}${weak.weakTop ? ' — ' + esc(weak.weakTop) : ''}</text><text x="64" y="854" font-size="13" font-weight="600" fill="#9a3412">Scoring ${weak.topPct || weak.weakPct}% here — the biggest single opportunity for score growth.</text>`
-    : `<rect x="40" y="800" width="670" height="72" rx="18" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1.5"/><text x="64" y="842" font-size="14" font-weight="800" fill="#15803d">✅ No weak areas flagged yet — keep building across subjects.</text>`;
-  const todoLines = todos.map((t, i) => {
-    const y = 916 + i * 30;
-    return `<rect x="40" y="${y - 12}" width="18" height="18" rx="6" fill="#eef2ff" stroke="#c7d2fe" stroke-width="1.5"/><text x="70" y="${y + 2}" font-size="13.5" font-weight="600" fill="#334155">${esc(t)}</text>`;
-  }).join('');
+    parts.push(`<rect x="${x}" y="${y + 14}" width="152" height="86" rx="18" fill="${t[2]}"/><text x="${x + 76}" y="${y + 58}" font-size="27" font-weight="800" fill="${t[3]}" text-anchor="middle">${esc(t[0])}</text><text x="${x + 76}" y="${y + 80}" font-size="12.5" font-weight="700" fill="#64748b" text-anchor="middle">${esc(t[1])}</text>`);
+  });
+  y += 148;
+  parts.push(`<text x="40" y="${y}" font-size="15" font-weight="800" fill="#1e293b" letter-spacing="1.5">IMPROVEMENT LINE</text>`);
+  const chartCore = chartSvgCore(hist, false);
+  const chartOnly = chartCore.slice(0, 4) === '<svg' ? chartCore.replace(/^<svg[^>]*>/, '').replace(/<\/svg>\s*$/, '') : '';
+  parts.push(`<g transform="translate(40, ${y + 14}) scale(1.047)">${chartOnly}</g>`);
+  y += 14 + 245;
+  if (bySubject.length) {
+    parts.push(`<text x="40" y="${y}" font-size="15" font-weight="800" fill="#1e293b" letter-spacing="1.5">BY SUBJECT</text>`);
+    bySubject.forEach(([subj, st], i) => {
+      const p = st.total ? Math.round((st.correct / st.total) * 100) : 0;
+      const yy = y + 26 + i * 44;
+      parts.push(`<text x="40" y="${yy + 4}" font-size="13.5" font-weight="700" fill="#334155">${esc(subj)}</text><text x="710" y="${yy + 4}" font-size="13.5" font-weight="800" fill="#64748b" text-anchor="end">${p}%</text><rect x="40" y="${yy + 12}" width="670" height="10" rx="5" fill="#eef2f7"/><rect x="40" y="${yy + 12}" width="${(670 * p / 100).toFixed(0)}" height="10" rx="5" fill="${p >= 70 ? '#10b981' : p >= 40 ? '#f59e0b' : '#f43f5e'}"/>`);
+    });
+    y += 26 + bySubject.length * 44 + 12;
+  } else {
+    parts.push(`<text x="40" y="${y + 24}" font-size="13.5" font-weight="600" fill="#94a3b8">No subject data yet — a couple of quizzes will fill this in.</text>`);
+    y += 48;
+  }
+  parts.push(`<text x="40" y="${y}" font-size="15" font-weight="800" fill="#1e293b" letter-spacing="1.5">ANALYSIS &amp; WEAK AREAS</text>`);
+  const analysis = [
+    `Overall, ${name} has answered ${s.total || 0} questions at ${acc}% accuracy across ${s.attempts || 0} quiz${(s.attempts || 0) === 1 ? '' : 'zes'}, with a best score of ${s.bestPercent || 0}%.`,
+    trendText,
+    weak.weakSub ? `Weak area: ${weak.weakSub}${weak.weakTop ? ' — ' + weak.weakTop : ''}, currently at ${weak.topPct || weak.weakPct}%. This is the single biggest opportunity for score growth right now.` : 'No weak areas flagged yet — building steadily across subjects.',
+    `Consistency: ${active7} active study day${active7 === 1 ? '' : 's'} this week with a ${state.streak || 0}-day streak and ${state.streakFreezes || 0} freeze${(state.streakFreezes || 0) === 1 ? '' : 's'} banked. A little encouragement goes a long way!`
+  ];
+  let ty = y + 26;
+  analysis.forEach(line => {
+    wrapLines(line, 88).forEach(wl => {
+      parts.push(`<text x="40" y="${ty}" font-size="13.5" font-weight="600" fill="#475569">${esc(wl)}</text>`);
+      ty += 21;
+    });
+    ty += 6;
+  });
+  y = ty + 14;
+  parts.push(`<text x="40" y="${y}" font-size="15" font-weight="800" fill="#1e293b" letter-spacing="1.5">TO-DO THIS WEEK</text>`);
+  todos.forEach((t, i) => {
+    const yy = y + 30 + i * 30;
+    parts.push(`<rect x="40" y="${yy - 13}" width="18" height="18" rx="6" fill="#eef2ff" stroke="#c7d2fe" stroke-width="1.5"/><text x="70" y="${yy + 2}" font-size="13.5" font-weight="600" fill="#334155">${esc(t)}</text>`);
+  });
+  y += 30 + todos.length * 30 + 34;
+  const H = y + 22;
+  lastCardH = H;
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif">
     <rect width="${W}" height="${H}" rx="28" fill="#ffffff"/>
     <rect width="${W}" height="156" rx="28" fill="#1e1b4b"/>
@@ -19687,42 +19771,62 @@ function buildParentCardSvg() {
     <text x="40" y="62" font-size="24" font-weight="800" fill="#ffffff">📚 StudyOS Progress Report</text>
     <text x="40" y="92" font-size="15" font-weight="700" fill="#a5b4fc">${name}${cls ? ' · ' + cls : ''}${exam ? ' · ' + exam : ''}</text>
     <text x="40" y="118" font-size="12.5" font-weight="600" fill="#818cf8">${esc(localISO())} · studyos-academic.vercel.app</text>
-    <text x="40" y="182" font-size="15" font-weight="800" fill="#1e293b" letter-spacing="1.5">PERFORMANCE</text>
-    ${statTiles}
-    <text x="40" y="330" font-size="15" font-weight="800" fill="#1e293b" letter-spacing="1.5">IMPROVEMENT LINE</text>
-    <g transform="translate(40, 344) scale(1.047)">${progressChartSvg(s.history).replace(/^<svg[^>]*>/, '').replace(/<\/svg>\s*$/, '')}</g>
-    <text x="40" y="${bySubject.length ? 530 : 545}" font-size="15" font-weight="800" fill="#1e293b" letter-spacing="1.5">BY SUBJECT</text>
-    ${bars || '<text x="40" y="570" font-size="13.5" font-weight="600" fill="#94a3b8">No subject data yet.</text>'}
-    ${weakBlock}
-    <text x="40" y="898" font-size="15" font-weight="800" fill="#1e293b" letter-spacing="1.5">TO-DO THIS WEEK</text>
-    ${todoLines}
-    <text x="375" y="${H - 22}" font-size="11.5" font-weight="700" fill="#94a3b8" text-anchor="middle">Made with StudyOS — a little encouragement goes a long way 💛</text>
+    ${parts.join('')}
+    <text x="${W / 2}" y="${H - 22}" font-size="11.5" font-weight="700" fill="#94a3b8" text-anchor="middle">Made with StudyOS — a little encouragement goes a long way 💛</text>
   </svg>`;
 }
-function downloadParentCard() {
+function rasterizeParentCard(cb) {
   try {
     const svg = buildParentCardSvg();
+    const H = lastCardH;
     const url = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
     const img = new Image();
     img.onload = () => {
       const c = document.createElement('canvas');
-      c.width = 750 * 2; c.height = 1080 * 2;
+      c.width = W2X(750); c.height = W2X(H);
+      function W2X(v) { return v * 2; }
       const ctx = c.getContext('2d');
       ctx.scale(2, 2);
-      ctx.drawImage(img, 0, 0, 750, 1080);
-      c.toBlob(b => {
-        if (!b) { toast('Image export failed on this browser'); return; }
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(b);
-        a.download = 'studyos-report-' + localISO() + '.png';
-        document.body.appendChild(a); a.click();
-        setTimeout(() => { try { URL.revokeObjectURL(a.href); a.remove(); } catch (e) { /* noop */ } }, 500);
-        toast('Report image saved — send it to your parent 📸');
-      }, 'image/png');
+      ctx.drawImage(img, 0, 0, 750, H);
+      c.toBlob(b => cb(b), 'image/png');
     };
-    img.onerror = () => toast('Image export failed on this browser');
+    img.onerror = () => cb(null);
     img.src = url;
-  } catch (e) { toast('Image export failed on this browser'); }
+  } catch (e) { cb(null); }
+}
+function downloadParentCard() {
+  rasterizeParentCard(b => {
+    if (!b) { toast('Image export failed on this browser'); return; }
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(b);
+    a.download = 'studyos-report-' + localISO() + '.png';
+    document.body.appendChild(a); a.click();
+    setTimeout(() => { try { URL.revokeObjectURL(a.href); a.remove(); } catch (e) { /* noop */ } }, 500);
+    toast('Report image saved — send it to your parent 📸');
+  });
+}
+function shareParentBundle() {
+  rasterizeParentCard(b => {
+    const text = buildDetailedParentReport();
+    if (b && navigator.share && navigator.canShare) {
+      try {
+        const file = new File([b], 'studyos-report-' + localISO() + '.png', { type: 'image/png' });
+        if (navigator.canShare({ files: [file] })) {
+          navigator.share({ files: [file], text: text, title: 'StudyOS progress report' }).catch(() => { /* user cancelled */ });
+          return;
+        }
+      } catch (e) { /* fall through to fallback */ }
+    }
+    if (b) {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(b);
+      a.download = 'studyos-report-' + localISO() + '.png';
+      document.body.appendChild(a); a.click();
+      setTimeout(() => { try { URL.revokeObjectURL(a.href); a.remove(); } catch (e) { /* noop */ } }, 500);
+    }
+    window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
+    toast('Image saved — attach it in WhatsApp next to the write-up');
+  });
 }
 function copyTextFallback(text, done) {
   try {
@@ -20078,10 +20182,10 @@ function renderParentPage(el) {
       </div>
       <div class="overflow-hidden rounded-2xl border border-slate-100 bg-slate-50 p-2">${buildParentCardSvg()}</div>
       <div class="mt-4 flex flex-wrap gap-2">
+        <button type="button" onclick="shareParentBundle()" class="flex-1 rounded-xl bg-emerald-600 px-4 py-3 text-xs font-black text-white transition hover:bg-emerald-500">📤 Send image + write-up together</button>
         <button type="button" onclick="downloadParentCard()" class="flex-1 rounded-xl bg-indigo-600 px-4 py-3 text-xs font-black text-white transition hover:bg-indigo-700">📥 Download image (PNG)</button>
-        <button type="button" onclick="shareParentReport()" class="flex-1 rounded-xl bg-emerald-600 px-4 py-3 text-xs font-black text-white transition hover:bg-emerald-500">📤 Send text on WhatsApp</button>
       </div>
-      <p class="mt-3 text-center text-[10px] leading-relaxed text-slate-400">Download the image, then attach it in any chat. Nothing is sent automatically — you choose when and to whom.</p>
+      <p class="mt-3 text-center text-[10px] leading-relaxed text-slate-400">On phones that support it, image and write-up fly together in one share; otherwise the image downloads and WhatsApp opens with the write-up ready to send beside it.</p>
       <div class="mt-3 flex flex-wrap gap-2">
         <button type="button" onclick="copyParentReport()" class="flex-1 rounded-xl bg-slate-100 px-4 py-2.5 text-[11px] font-black text-slate-700 transition hover:bg-slate-200">📋 Copy detailed text</button>
         <button type="button" onclick="downloadParentReport()" class="flex-1 rounded-xl bg-slate-100 px-4 py-2.5 text-[11px] font-black text-slate-700 transition hover:bg-slate-200">📥 Download .txt</button>
@@ -20896,6 +21000,14 @@ window.addEventListener('online', () => setText('header-status', 'Online'));
 window.addEventListener('offline', () => setText('header-status', 'Offline'));
 document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeDrawer(); closeSetup(); } });
 
+/* Chart dot tooltips: hover on desktop, tap on mobile */
+document.addEventListener('mouseover', e => { const d = e.target && e.target.closest ? e.target.closest('.chart-dot') : null; if (d) showChartTip(d); });
+document.addEventListener('mouseout', e => { const d = e.target && e.target.closest ? e.target.closest('.chart-dot') : null; if (d) hideChartTip(); });
+document.addEventListener('click', e => {
+  const d = e.target && e.target.closest ? e.target.closest('.chart-dot') : null;
+  if (d) showChartTip(d); else hideChartTip();
+}, true);
+
 /* Expose handlers used by inline onclick attributes */
 Object.assign(window, {
   navigate, changeSubject, openTopic, toggleDrawer, closeDrawer,
@@ -20911,7 +21023,7 @@ Object.assign(window, {
   selectQuizAnswer, submitQuiz, retakeQuiz, examJump, examPrev, examNext, submitExam,
   sendChatMessage, askBuddy, clearChat, setResearch, saveGeminiKey, toggleGeminiPanel,
   openUpgrade, closeUpgrade, upgradeBackdrop, choosePlan, founderUnlock, whatsappUpgrade, savePaystackKey, shareParentReport,
-  dismissFreezeIce, copyParentReport, downloadParentReport, downloadParentCard,
+  dismissFreezeIce, copyParentReport, downloadParentReport, downloadParentCard, shareParentBundle,
   setGeminiModel, testGemini,
 });
 

@@ -1244,6 +1244,15 @@ check('logout hides the app shell', byId('main-app').classList.contains('hidden'
     return /IMPROVEMENT LINE/.test(svg) && /PERFORMANCE/.test(svg) && /TO-DO THIS WEEK/.test(svg) && /<svg/.test(svg) && /StudyOS Progress Report/.test(svg);
   })());
   check('study to-dos always give at least three actionable items', T.computeStudyToDos().length >= 3);
+  check('progress chart exposes hover/tap dots with date, score and subject', (() => {
+    const out = T.progressChartSvg([{ d: '2026-09-10', p: 55, s: 'Physics', m: 'topic', c: 5, t: 10 }, { d: '2026-09-12', p: 75, s: 'Mathematics', m: 'topic', c: 8, t: 10 }]);
+    return /chart-dot/.test(out) && /data-d="2026-09-12"/.test(out) && /data-p="75"/.test(out) && /data-s="Mathematics"/.test(out) && /chart-tip/.test(out);
+  })());
+  check('report card image now carries the write-up (analysis + to-dos)', (() => {
+    const svg = T.buildParentCardSvg();
+    return /ANALYSIS &amp; WEAK AREAS/.test(svg) && /TO-DO THIS WEEK/.test(svg) && /Overall, /.test(svg);
+  })());
+  check('parent page offers image + write-up bundle share', /Send image \+ write-up together/.test(main.innerHTML));
   check('parent page keeps privacy promises', /You are in control/.test(main.innerHTML) && /do not judge/.test(main.innerHTML));
   Object.assign(st, { history: saved.history, bySubject: saved.bySubject, attempts: saved.attempts, correct: saved.correct, total: saved.total, bestPercent: saved.bestPercent, days: saved.days });
   T.getState().page = saved.page;
