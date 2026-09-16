@@ -13,9 +13,9 @@ required. Open it in a browser and it runs.
 
 | | |
 |---|---|
-| Topics with full textbook-length lessons | **120** |
-| Topic-quiz questions (each with an explanation) | **1,322** |
-| Flashcards with long explanatory answers | **1,723** |
+| Topics with full textbook-length lessons | **126** |
+| Topic-quiz questions (each with an explanation) | **1,382** |
+| Flashcards with long explanatory answers | **1,813** |
 | Real WAEC/JAMB-style past questions | **55** |
 | Subjects | **13** |
 | Automated checks across 5 suites | **462** |
@@ -35,7 +35,8 @@ required. Open it in a browser and it runs.
 | Economics | — | ✅ |
 | History | — | ✅ |
 | Literature in English | — | ✅ |
-| Commerce, Financial Accounting | — | SS1 (SS2/SS3 in progress) |
+| Commerce | — | ✅ |
+| Financial Accounting | — | SS1 (SS2/SS3 in progress) |
 
 JSS students only ever see BECE-appropriate content; SS students see JAMB/WAEC/NECO/Post-UTME.
 
@@ -163,7 +164,7 @@ fallback is tested by temporarily blanking a topic quiz at runtime.
 
 The Python scripts in this repo are the one-shot build scripts that generated and patch
 the curriculum data inside `index.html` (`content_*.py`, `deep_*.py`, `lessons*.py`,
-`arts1.py`, `comm1.py`, `topics-gov-*.py`, …). All 120 topics are fully authored; the
+`arts1.py`, `comm1.py`, `topics-gov-*.py`, …). All 126 topics are fully authored; the
 scripts are kept for provenance — each contains safe, assert-guarded splice helpers for
 the curriculum format (exact title matching, 4 options per question, correct-index and
 explanation checks) that can be reused to patch or extend any topic.
