@@ -1176,6 +1176,35 @@ check('logout fires Firebase signOut()', globalThis.__SIGNED_OUT === true);
 await globalThis.__AUTH_CB(null);   // Firebase fires onAuthStateChanged(null) after signOut
 check('logout hides the app shell', byId('main-app').classList.contains('hidden'));
 
+// ---------- probe: new progress & parent pages (executes renderProgressPage / renderParentPage) ----------
+{
+  const main = byId('page-content');
+  const st = T.getState().quizStats;
+  const saved = { history: st.history, bySubject: st.bySubject, attempts: st.attempts, correct: st.correct, total: st.total, bestPercent: st.bestPercent, days: st.days, page: T.getState().page };
+  st.history = [
+    { d: '2026-09-01', p: 40, s: 'Mathematics', m: 'topic', c: 4, t: 10 },
+    { d: '2026-09-03', p: 60, s: 'Mathematics', m: 'topic', c: 6, t: 10 },
+    { d: '2026-09-05', p: 55, s: 'Physics', m: 'topic', c: 11, t: 20 },
+    { d: '2026-09-07', p: 75, s: 'Physics', m: 'cbt', c: 15, t: 20 },
+    { d: '2026-09-09', p: 90, s: 'Chemistry', m: 'topic', c: 9, t: 10 },
+    { d: '2026-09-11', p: 85, s: 'Chemistry', m: 'topic', c: 17, t: 20 },
+  ];
+  st.bySubject = { Mathematics: { correct: 10, total: 20 }, Physics: { correct: 26, total: 40 }, Chemistry: { correct: 26, total: 30 } };
+  st.attempts = 6; st.correct = 62; st.total = 90; st.bestPercent = 90;
+  st.days = { '2026-09-09': 1, '2026-09-11': 1 };
+  globalThis.navigate('progress');
+  check('progress page renders full view (chart, subjects, recent results)', /Improvement line/.test(main.innerHTML) && /Recent results/.test(main.innerHTML) && /Accuracy by subject/.test(main.innerHTML));
+  check('progress page computes an upward trend', /Up \d+ points/.test(main.innerHTML));
+  st.history = [];
+  globalThis.navigate('progress');
+  check('progress page shows empty state with no history', /No data yet/.test(main.innerHTML));
+  globalThis.navigate('parent');
+  check('parent page shows live report preview', /What your parent will receive/.test(main.innerHTML) && /StudyOS weekly report for/.test(main.innerHTML));
+  check('parent page keeps privacy promises', /You are in control/.test(main.innerHTML) && /do not judge/.test(main.innerHTML));
+  Object.assign(st, { history: saved.history, bySubject: saved.bySubject, attempts: saved.attempts, correct: saved.correct, total: saved.total, bestPercent: saved.bestPercent, days: saved.days });
+  T.getState().page = saved.page;
+}
+
 // ---------- report ----------
 const failed = checks.filter(c => !c.ok);
 console.log(`\n${checks.length - failed.length}/${checks.length} checks passed`);

@@ -468,6 +468,12 @@ service cloud.firestore {
         <button type="button" onclick="navigate('assistant')" data-page="assistant"
           class="nav-item flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-xs font-semibold transition-colors hover:bg-slate-800 hover:text-white">
           <span>🤖</span><span>Buddy AI Tutor</span></button>
+        <button type="button" onclick="navigate('progress')" data-page="progress"
+          class="nav-item flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-xs font-semibold transition-colors hover:bg-slate-800 hover:text-white">
+          <span>📈</span><span>Progress</span></button>
+        <button type="button" onclick="navigate('parent')" data-page="parent"
+          class="nav-item flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-xs font-semibold transition-colors hover:bg-slate-800 hover:text-white">
+          <span>👪</span><span>Parent Report</span></button>
         <button type="button" onclick="navigate('badges')" data-page="badges"
           class="nav-item flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-xs font-semibold transition-colors hover:bg-slate-800 hover:text-white">
           <span>🏅</span><span>Badges</span></button>
@@ -18813,6 +18819,7 @@ function renderProfile(el) {
           <p class="mb-3 text-[11px] text-slate-400">Send a parent a plain-English summary of your week — you choose what to share. And when you are ready for the full engine, go Pro.</p>
           <div class="flex flex-wrap items-center gap-2">
             <button type="button" onclick="shareParentReport()" class="rounded-xl bg-emerald-600 px-4 py-2 text-[11px] font-black text-white transition hover:bg-emerald-500">📤 Send parent my report</button>
+            <button type="button" onclick="navigate('parent')" class="rounded-xl bg-slate-100 px-4 py-2 text-[11px] font-black text-slate-700 transition hover:bg-slate-200">👪 Open Parent Report page →</button>
             ${monetizationOn ? (proActive() ? `<span class="rounded-full bg-amber-50 px-3 py-1.5 text-[11px] font-black text-amber-700">⭐ ${state.profile.plan === 'pack' ? 'JAMB Premium Pack active' : 'Pro active'}</span>` : `<button type="button" onclick="openUpgrade('plan')" class="rounded-xl bg-slate-900 px-4 py-2 text-[11px] font-black text-white transition hover:bg-slate-800">⭐ Upgrade to Pro — ₦${PRO_MONTHLY_NGN.toLocaleString()}/mo</button>`) : ''}
           </div>
           ${monetizationOn && !proActive() ? `<p class="mt-2 text-[10px] text-slate-400">Free today: ${Math.max(0, FREE_DAILY_QUIZZES - dailyQuizzesUsed())} quiz${FREE_DAILY_QUIZZES - dailyQuizzesUsed() === 1 ? '' : 'zes'} left · ${Math.max(0, FREE_DAILY_BUDDY - dailyBuddyUsed())} Buddy questions left.</p>` : ''}
@@ -18824,13 +18831,7 @@ function renderProfile(el) {
           ${progressChartSvg(s.history)}
           <h4 class="mb-2 mt-4 text-[11px] font-black uppercase tracking-wide text-slate-400">Activity — last 12 weeks</h4>
           ${activityHeatSvg(s.days)}
-          ${(s.history || []).length ? `
-          <h4 class="mb-2 mt-4 text-[11px] font-black uppercase tracking-wide text-slate-400">Recent results</h4>
-          <div class="space-y-1.5">${(s.history || []).slice(-6).reverse().map(q => `
-            <div class="flex items-center justify-between gap-2 rounded-lg bg-slate-50 px-3 py-1.5 text-[11px] font-semibold text-slate-600">
-              <span class="truncate">${q.d} · ${escapeHtml(q.s)} · ${MODE_LABELS[q.m] || 'Quiz'}</span>
-              <span class="shrink-0 rounded-full px-2 py-0.5 font-black ${q.p >= 70 ? 'bg-emerald-100 text-emerald-700' : q.p >= 40 ? 'bg-amber-100 text-amber-700' : 'bg-rose-100 text-rose-700'}">${q.p}%</span>
-            </div>`).join('')}</div>` : ''}
+          <button type="button" onclick="navigate('progress')" class="mt-4 w-full rounded-xl bg-emerald-600 px-4 py-2.5 text-xs font-bold text-white transition hover:bg-emerald-500">📈 Open my full progress page →</button>
         </section>
 
         <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-card">
@@ -19251,6 +19252,126 @@ function renderBadges(el) {
     </div>`;
 }
 
+function renderProgressPage(el) {
+  const s = state.quizStats;
+  const accuracy = s.total ? Math.round((s.correct / s.total) * 100) : 0;
+  const hist = s.history || [];
+  const last5 = hist.slice(-5);
+  const before5 = hist.slice(-10, -5);
+  const avg = arr => arr.length ? Math.round(arr.reduce((a, q) => a + q.p, 0) / arr.length) : null;
+  const recentAvg = avg(last5);
+  const earlierAvg = avg(before5);
+  const delta = (recentAvg !== null && earlierAvg !== null) ? recentAvg - earlierAvg : null;
+  const deltaText = delta === null ? 'Take more quizzes to unlock your trend.' :
+    delta > 0 ? `📈 Up ${delta} points — you are improving!` :
+    delta < 0 ? `📉 Down ${Math.abs(delta)} points this stretch — a tough run is normal. Revise your weakest topic and bounce back.` :
+    '➡️ Holding steady — push one weak topic to break out.';
+  const bySubject = Object.entries(s.bySubject || {});
+  const empty = !hist.length;
+
+  el.innerHTML = `
+    ${pageHeader('My Progress', 'Your improvement, activity and every recent result — all in one place.')}
+    ${empty ? `
+      <section class="rounded-2xl border-2 border-dashed border-slate-200 bg-white p-8 text-center shadow-card">
+        <div class="text-4xl">📈</div>
+        <h3 class="mt-3 text-base font-bold text-slate-900">No data yet — go take a quiz!</h3>
+        <p class="mx-auto mt-2 max-w-sm text-xs leading-relaxed text-slate-500">Every quiz you finish draws a dot on your improvement line. Take one now and come back here to watch it climb.</p>
+        <button type="button" onclick="navigate('quiz')" class="mt-4 rounded-xl bg-indigo-600 px-5 py-2.5 text-xs font-bold text-white transition hover:bg-indigo-700">📝 Take my first quiz →</button>
+      </section>` : `
+    <div class="grid grid-cols-2 gap-3 md:grid-cols-4">
+      <div class="rounded-2xl border border-slate-200 bg-white p-4 text-center shadow-card">
+        <div class="text-2xl font-black text-indigo-600">${s.attempts || 0}</div>
+        <div class="text-[10px] font-bold text-slate-500">quizzes taken</div>
+      </div>
+      <div class="rounded-2xl border border-slate-200 bg-white p-4 text-center shadow-card">
+        <div class="text-2xl font-black text-emerald-600">${accuracy}%</div>
+        <div class="text-[10px] font-bold text-slate-500">overall accuracy</div>
+      </div>
+      <div class="rounded-2xl border border-slate-200 bg-white p-4 text-center shadow-card">
+        <div class="text-2xl font-black text-amber-600">${s.bestPercent || 0}%</div>
+        <div class="text-[10px] font-bold text-slate-500">best score ever</div>
+      </div>
+      <div class="rounded-2xl border border-slate-200 bg-white p-4 text-center shadow-card">
+        <div class="text-2xl font-black ${delta !== null && delta >= 0 ? 'text-emerald-600' : 'text-rose-500'}">${delta === null ? '—' : (delta > 0 ? '+' + delta : delta)}</div>
+        <div class="text-[10px] font-bold text-slate-500">trend vs last 5</div>
+      </div>
+    </div>
+    <p class="mt-3 rounded-2xl bg-slate-900 px-4 py-3 text-[11px] font-semibold leading-relaxed text-slate-300">${deltaText}</p>
+
+    <section class="mt-5 rounded-2xl border border-slate-200 bg-white p-5 shadow-card">
+      <h3 class="mb-1 text-sm font-bold text-slate-900">📈 Improvement line</h3>
+      <p class="mb-3 text-[11px] text-slate-400">Every quiz draws a dot — the last ${(hist.length > 60 ? 60 : hist.length)} results. Watch the line climb.</p>
+      ${progressChartSvg(s.history)}
+    </section>
+
+    ${bySubject.length ? `
+    <section class="mt-5 rounded-2xl border border-slate-200 bg-white p-5 shadow-card">
+      <h3 class="mb-4 text-sm font-bold text-slate-900">🎯 Accuracy by subject</h3>
+      <div class="space-y-2">
+        ${bySubject.map(([subj, st]) => {
+          const pct = st.total ? Math.round((st.correct / st.total) * 100) : 0;
+          return `<div>
+            <div class="mb-1 flex justify-between text-[11px] font-bold"><span class="text-slate-600">${subj}</span><span class="text-slate-400">${pct}%</span></div>
+            <div class="h-1.5 overflow-hidden rounded-full bg-slate-100"><div class="h-full rounded-full ${subjectColor(subj).solid}" style="width:${pct}%"></div></div>
+          </div>`;
+        }).join('')}
+      </div>
+    </section>` : ''}
+
+    <section class="mt-5 rounded-2xl border border-slate-200 bg-white p-5 shadow-card">
+      <h3 class="mb-3 text-sm font-bold text-slate-900">🔥 Activity — last 12 weeks</h3>
+      ${activityHeatSvg(s.days)}
+    </section>
+
+    <section class="mt-5 rounded-2xl border border-slate-200 bg-white p-5 shadow-card">
+      <h3 class="mb-3 text-sm font-bold text-slate-900">🧾 Recent results</h3>
+      <div class="space-y-1.5">
+        ${hist.slice(-12).reverse().map(q => `
+          <div class="flex items-center justify-between gap-2 rounded-lg bg-slate-50 px-3 py-2 text-[11px] font-semibold text-slate-600">
+            <span class="truncate">${q.d} · ${escapeHtml(q.s)} · ${MODE_LABELS[q.m] || 'Quiz'}</span>
+            <span class="shrink-0 rounded-full px-2 py-0.5 font-black ${q.p >= 70 ? 'bg-emerald-100 text-emerald-700' : q.p >= 40 ? 'bg-amber-100 text-amber-700' : 'bg-rose-100 text-rose-700'}">${q.p}%</span>
+          </div>`).join('')}
+      </div>
+    </section>`}
+  `;
+}
+
+function renderParentPage(el) {
+  const report = buildParentReport();
+  el.innerHTML = `
+    ${pageHeader('Parent Report', 'One tap and your week flies to your parent on WhatsApp — in plain English.')}
+    <div class="grid gap-5 lg:grid-cols-2">
+      <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-card">
+        <h3 class="mb-2 text-sm font-bold text-slate-900">💬 What your parent will receive</h3>
+        <p class="mb-4 text-[11px] leading-relaxed text-slate-500">This is the exact message — a snapshot of your effort, not a verdict on you. Nothing else is shared: no private chats with Buddy, no lesson history, no passwords.</p>
+        <div class="rounded-2xl bg-emerald-50 p-4">
+          <div class="mb-2 flex items-center gap-2">
+            <div class="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-600 text-sm text-white">👪</div>
+            <div><div class="text-[11px] font-black text-emerald-800">StudyOS weekly report</div><div class="text-[10px] text-emerald-600">via WhatsApp</div></div>
+          </div>
+          <pre class="nice-scroll whitespace-pre-wrap rounded-xl bg-white p-3 text-[11px] leading-relaxed text-slate-700">${escapeHtml(report)}</pre>
+        </div>
+        <button type="button" onclick="shareParentReport()" class="mt-4 w-full rounded-xl bg-emerald-600 px-4 py-3 text-xs font-black text-white transition hover:bg-emerald-500">📤 Send this to my parent now</button>
+        <p class="mt-3 text-center text-[10px] text-slate-400">Opens WhatsApp with the message ready — you pick who receives it and press send yourself.</p>
+      </section>
+
+      <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-card">
+        <h3 class="mb-3 text-sm font-bold text-slate-900">🛡️ How this works</h3>
+        <ul class="space-y-2.5 text-[11px] leading-relaxed text-slate-600">
+          <li class="flex gap-2"><span>✅</span><span><b>You are in control.</b> Nothing is sent automatically — the report only leaves when <i>you</i> press send and choose the contact.</span></li>
+          <li class="flex gap-2"><span>✅</span><span><b>Effort, not judgement.</b> The report shows study days, questions answered and streaks. We listen, but we do not judge — and neither should anyone reading it.</span></li>
+          <li class="flex gap-2"><span>✅</span><span><b>Private stays private.</b> Your Buddy chats, wrong answers and browsing inside StudyOS are never included.</span></li>
+          <li class="flex gap-2"><span>✅</span><span><b>Encouragement built in.</b> The message ends with a nudge for your parent to cheer you on — a little encouragement goes a long way.</span></li>
+        </ul>
+        <div class="mt-4 rounded-xl bg-slate-50 p-3 text-[11px] leading-relaxed text-slate-500">
+          💡 <b>Tip:</b> send one after a good week — parents remember the streak photo more than the score.
+        </div>
+        <button type="button" onclick="navigate('progress')" class="mt-4 w-full rounded-xl bg-slate-100 px-4 py-2.5 text-xs font-bold text-slate-700 transition hover:bg-slate-200">📈 See my full progress first →</button>
+      </section>
+    </div>
+  `;
+}
+
 /* ==================================================================
    NAVIGATION & SHELL
    ================================================================== */
@@ -19262,6 +19383,8 @@ const PAGE_TITLES = {
   quiz: ['Practice Exam', 'Timed-style practice with explanations'],
   assistant: ['Buddy AI Tutor', 'Your built-in academic assistant'],
   profile: ['My Profile', 'Your progress and achievements'],
+  progress: ['My Progress', 'Watch your improvement climb'],
+  parent: ['Parent Report', 'Share your week with the people rooting for you'],
   badges: ['Badges', 'Your trophy collection']
 };
 
@@ -19308,6 +19431,8 @@ function renderPage() {
     case 'quiz': renderQuiz(main); if (state.quiz.mode !== 'list' && state.quiz.deadline && !state.quiz.submitted) startQuizTimer(); else stopQuizTimer(); break;
     case 'assistant': renderAssistant(main); break;
     case 'profile': renderProfile(main); break;
+    case 'progress': renderProgressPage(main); break;
+    case 'parent': renderParentPage(main); break;
     case 'badges': renderBadges(main); break;
     default: renderHome(main);
   }
