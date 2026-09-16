@@ -20346,6 +20346,21 @@ window.__researchOn = () => state.settings.research;
 window.__geminiKey = () => state.settings.geminiApiKey;
 
 boot();
+
+/* Demo hook: add ?freeze=1 to the URL to preview the streak-freeze ice animation */
+try {
+  if (new URLSearchParams(location.search).get('freeze') === '1') {
+    const play = () => { state.streak = state.streak > 1 ? state.streak : 7; state.streakFreezes = state.streakFreezes || 2; queueCelebration({ type: 'saved' }); };
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.textContent = '❄️ Replay freeze animation';
+    btn.className = 'fixed bottom-4 right-4 z-[80] rounded-2xl bg-sky-600 px-4 py-3 text-xs font-black text-white shadow-pop';
+    btn.addEventListener('click', play);
+    document.body.appendChild(btn);
+    setTimeout(play, 700);
+  }
+} catch (e) { /* demo hook only */ }
+
 </script>
 </body>
 </html>
