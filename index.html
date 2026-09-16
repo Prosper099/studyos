@@ -18690,8 +18690,12 @@ function setAuthBusy(on, label) {
 async function handleGoogleSignIn() {
   if (signingIn) return;
   if (!isConfigured || !auth) {
-    authNotice('Cloud sync is not connected yet — connect your project, or explore in <b>Demo Mode</b> below.');
-    openSetup();
+    if (!isConfigured) {
+      authNotice('Cloud sync is not connected yet — connect your project, or explore in <b>Demo Mode</b> below.');
+      openSetup();
+    } else {
+      authNotice('Sign-in could not start just now. Please check your connection and try again, or explore in <b>Demo Mode</b> below.');
+    }
     return;
   }
   signingIn = true;
