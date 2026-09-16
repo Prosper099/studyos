@@ -149,5 +149,5 @@
   .card-in { animation: cardIn .38s cubic-bezier(.2, .9, .3, 1); }
   .flash-got { animation: gotSwipe .58s cubic-bezier(.45, .05, .6, .95) forwards; }
   .flash-got .flashcard-face { animation: gotBorder .58s ease; }
-.cpg .cpd,.cpg .cph{opacity:0;transition:opacity .12s ease}
-.cpg:hover .cpd,.cpg:hover .cph,.cpg.cp-on .cpd,.cpg.cp-on .cph{opacity:1}
+.cpg .cph{opacity:0;transition:opacity .12s ease}
+.cpg:hover .cph,.cpg.cp-on .cph{opacity:1}
