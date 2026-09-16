@@ -128,6 +128,34 @@
   /* Streak & badge celebration animations */
   @keyframes celebPop { 0% { transform: scale(.35) rotate(-6deg); opacity: 0; } 60% { transform: scale(1.12) rotate(2deg); } 100% { transform: scale(1) rotate(0deg); opacity: 1; } }
   @keyframes flameWiggle { 0%, 100% { transform: rotate(-5deg) scale(1); } 50% { transform: rotate(5deg) scale(1.1); } }
+  /* Streak-freeze ice animation: ice covers the flame, cracks, shatters, flame flares */
+  .freeze-flame-anim { animation: freezeFlameFlare 3.6s ease-out both; }
+  @keyframes freezeFlameFlare {
+    0%, 58% { transform: scale(.7); opacity: .5; filter: saturate(.5); }
+    72% { transform: scale(1.22); opacity: 1; filter: saturate(1.2); }
+    100% { transform: scale(1); opacity: 1; filter: saturate(1); }
+  }
+  .freeze-ice-anim { animation: freezeIceCycle 3.6s ease-out both; }
+  @keyframes freezeIceCycle {
+    0% { opacity: 0; transform: scale(1.45) translateY(-10px); }
+    16% { opacity: 1; transform: scale(1) translateY(0); }
+    56% { opacity: 1; transform: scale(1) rotate(0deg); }
+    62% { opacity: 1; transform: scale(1.03) rotate(-4deg); }
+    68% { opacity: 1; transform: scale(1.05) rotate(5deg); }
+    74% { opacity: .85; transform: scale(1.08) rotate(-6deg); }
+    82% { opacity: 0; transform: scale(1.3); }
+    100% { opacity: 0; transform: scale(1.3); }
+  }
+  .freeze-crack { position: absolute; inset: 0; opacity: 0; pointer-events: none; }
+  .freeze-crack-anim { animation: freezeCrackShow 3.6s ease-out both; }
+  @keyframes freezeCrackShow { 0%, 60% { opacity: 0; } 68%, 78% { opacity: 1; } 86%, 100% { opacity: 0; } }
+  .freeze-shard { position: absolute; top: 50%; left: 50%; font-size: 22px; opacity: 0; pointer-events: none; }
+  .freeze-shard-anim { animation: freezeShardFly 3.6s ease-out both; }
+  @keyframes freezeShardFly {
+    0%, 74% { opacity: 0; transform: translate(-50%, -50%) scale(.3); }
+    80% { opacity: 1; }
+    100% { opacity: 0; transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(1) rotate(var(--rot)); }
+  }
   @keyframes floatUp { 0% { transform: translateY(14px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
   @keyframes ringPulse { 0% { box-shadow: 0 0 0 0 rgba(249, 115, 22, .45); } 100% { box-shadow: 0 0 0 26px rgba(249, 115, 22, 0); } }
   @keyframes flameRise {
@@ -406,6 +434,29 @@ service cloud.firestore {
     <div id="streak-flame-icon" class="text-[7rem] leading-none">🔥</div>
     <div id="streak-flame-title" class="mt-3 rounded-full bg-slate-900/85 px-4 py-1.5 text-sm font-black text-white shadow-pop">Day 1 streak!</div>
     <div id="streak-flame-sub" class="mt-2 max-w-[17rem] text-center text-[11px] font-semibold text-slate-900/80 drop-shadow-sm">Keep the flame alive!</div>
+  </div>
+</div>
+
+<div id="freeze-overlay" onclick="dismissFreezeIce()" class="fixed inset-0 z-[70] hidden cursor-pointer items-center justify-center bg-slate-900/75 p-4">
+  <div class="celeb-pop relative w-full max-w-xs rounded-3xl bg-white p-6 text-center shadow-pop">
+    <div class="relative mx-auto h-36 w-36">
+      <div id="freeze-flame" class="absolute inset-0 flex items-center justify-center text-[5.5rem] leading-none">🔥</div>
+      <div id="freeze-ice" class="absolute inset-1 flex items-center justify-center rounded-3xl border-4 border-sky-200 bg-sky-100/60 text-6xl backdrop-blur-[2px]">🧊</div>
+      <svg id="freeze-crack" class="freeze-crack" viewBox="0 0 100 100" fill="none" aria-hidden="true">
+        <path d="M50 8 L44 34 L56 44 L46 60 L54 74 L48 94" stroke="#0ea5e9" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M44 34 L26 28 M56 44 L74 40 M46 60 L28 66 M54 74 L72 80" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <span id="freeze-shard-1" class="freeze-shard" style="--tx:-70px; --ty:-60px; --rot:-140deg">❄️</span>
+      <span id="freeze-shard-2" class="freeze-shard" style="--tx:70px; --ty:-55px; --rot:150deg">❄️</span>
+      <span id="freeze-shard-3" class="freeze-shard" style="--tx:-80px; --ty:10px; --rot:-90deg">🧊</span>
+      <span id="freeze-shard-4" class="freeze-shard" style="--tx:80px; --ty:20px; --rot:120deg">🧊</span>
+      <span id="freeze-shard-5" class="freeze-shard" style="--tx:-30px; --ty:75px; --rot:-60deg">❄️</span>
+      <span id="freeze-shard-6" class="freeze-shard" style="--tx:40px; --ty:70px; --rot:80deg">❄️</span>
+    </div>
+    <div class="mt-2 text-[11px] font-black uppercase tracking-widest text-sky-500">Streak saved!</div>
+    <div id="freeze-title" class="mt-1 text-2xl font-black text-slate-900">The freeze took the hit</div>
+    <p id="freeze-sub" class="mt-2 text-xs leading-relaxed text-slate-500">You missed a day, but ice shielded your flame.</p>
+    <p class="mt-4 text-[10px] font-semibold text-slate-400">Tap anywhere to continue</p>
   </div>
 </div>
 
@@ -16204,11 +16255,8 @@ function nextCelebration() {
     showStreakFlame(c.type);
     return;
   } else if (c.type === 'saved') {
-    icon.textContent = '❄️'; icon.className = 'mx-auto mb-3 flex h-24 w-24 items-center justify-center rounded-full bg-sky-50 text-6xl ring-pulse';
-    kick.textContent = 'Streak saved!';
-    kick.className = 'text-[11px] font-black uppercase tracking-widest text-sky-500';
-    title.textContent = `Freeze used — ${state.streak}-day streak lives`;
-    sub.textContent = `You missed a day, but a streak freeze took the hit. ${state.streakFreezes} left in the bank.`;
+    showFreezeIce();
+    return;
   } else if (c.type === 'reset') {
     icon.textContent = '💔'; icon.className = 'mx-auto mb-3 flex h-24 w-24 items-center justify-center rounded-full bg-rose-50 text-6xl';
     kick.textContent = 'Fresh start';
@@ -16264,6 +16312,37 @@ function showStreakFlame(type) {
     celebBusy = false;
     nextCelebration();
   }, 3800);
+}
+
+let freezeTimer = null;
+function showFreezeIce() {
+  const wrap = $('#freeze-overlay');
+  const flame = $('#freeze-flame'), ice = $('#freeze-ice'), crack = $('#freeze-crack');
+  $('#freeze-title').textContent = `Freeze used — ${state.streak}-day streak lives`;
+  $('#freeze-sub').textContent = `You missed a day, but ice shielded your flame. ${state.streakFreezes} freeze${state.streakFreezes === 1 ? '' : 's'} left in the bank.`;
+  if (flame) { flame.classList.remove('freeze-flame-anim'); void flame.offsetWidth; flame.classList.add('freeze-flame-anim'); }
+  if (ice) { ice.classList.remove('freeze-ice-anim'); void ice.offsetWidth; ice.classList.add('freeze-ice-anim'); }
+  if (crack) { crack.classList.remove('freeze-crack-anim'); void crack.offsetWidth; crack.classList.add('freeze-crack-anim'); }
+  for (let i = 1; i <= 6; i++) {
+    const sh = $('#freeze-shard-' + i);
+    if (!sh) continue;
+    sh.classList.remove('freeze-shard-anim'); void sh.offsetWidth; sh.classList.add('freeze-shard-anim');
+  }
+  wrap.classList.remove('hidden'); wrap.classList.add('flex');
+  clearTimeout(freezeTimer);
+  freezeTimer = setTimeout(() => {
+    wrap.classList.add('hidden'); wrap.classList.remove('flex');
+    celebBusy = false;
+    nextCelebration();
+  }, 3800);
+}
+
+function dismissFreezeIce() {
+  clearTimeout(freezeTimer);
+  const wrap = $('#freeze-overlay');
+  wrap.classList.add('hidden'); wrap.classList.remove('flex');
+  celebBusy = false;
+  setTimeout(nextCelebration, 250);
 }
 
 function dismissCelebration() {
@@ -19033,6 +19112,76 @@ function buildParentReport() {
 function shareParentReport() {
   window.open('https://wa.me/?text=' + encodeURIComponent(buildParentReport()), '_blank');
 }
+function buildDetailedParentReport() {
+  const s = state.quizStats || {};
+  const acc = s.total ? Math.round((s.correct / s.total) * 100) : 0;
+  const now = new Date();
+  const daysKey = Object.keys(s.days || {});
+  const activeIn = n => daysKey.filter(d => { const diff = (now - new Date(d + 'T00:00:00')) / 86400000; return diff >= 0 && diff < n; }).length;
+  const weak = weakestTopicInfo();
+  const bySubject = Object.entries(s.bySubject || {});
+  const ranked = bySubject.slice().sort((a, b) => ((b[1].total ? b[1].correct / b[1].total : 0) - (a[1].total ? a[1].correct / a[1].total : 0)));
+  const hist = s.history || [];
+  const avg = arr => arr.length ? Math.round(arr.reduce((a, q) => a + q.p, 0) / arr.length) : null;
+  const a1 = avg(hist.slice(-5)), a0 = avg(hist.slice(-10, -5));
+  const trend = (a1 !== null && a0 !== null)
+    ? (a1 - a0 > 0 ? 'Improving (+' + (a1 - a0) + ' points over the last 5 quizzes)'
+      : a1 - a0 < 0 ? 'A tougher stretch lately (' + (a1 - a0) + ' points) — encouragement welcome'
+      : 'Steady and consistent')
+    : 'Still building history';
+  const lines = [
+    'STUDYOS DETAILED PROGRESS REPORT',
+    'Student: ' + (state.profile.name || 'Student') + ' (' + (state.profile.classLevel || '—') + ')',
+    'Target exam: ' + (state.profile.targetExam || '—'),
+    'Generated: ' + localISO(),
+    '',
+    'ACTIVITY',
+    '- Active study days (last 7 days): ' + activeIn(7),
+    '- Active study days (last 30 days): ' + activeIn(30),
+    '- Current streak: ' + (state.streak || 0) + ' day(s); freezes banked: ' + (state.streakFreezes || 0),
+    '',
+    'PERFORMANCE',
+    '- Quizzes taken: ' + (s.attempts || 0) + ' · best score: ' + (s.bestPercent || 0) + '%',
+    '- Questions answered: ' + (s.total || 0) + ' at ' + acc + '% accuracy',
+    '- Trend: ' + trend
+  ];
+  if (bySubject.length) {
+    lines.push('', 'BY SUBJECT');
+    bySubject.forEach(([subj, st]) => {
+      lines.push('- ' + subj + ': ' + (st.total ? Math.round((st.correct / st.total) * 100) : 0) + '% (' + (st.correct || 0) + '/' + (st.total || 0) + ' questions right)');
+    });
+    if (ranked.length) lines.push('- Strongest subject: ' + ranked[0][0]);
+  }
+  lines.push('- Focus area: ' + (weak.weakSub ? weak.weakSub + (weak.weakTop ? ' — ' + weak.weakTop : '') + ' (' + (weak.topPct || weak.weakPct) + '%)' : 'building across subjects'));
+  lines.push('', 'A little encouragement goes a long way! — StudyOS');
+  return lines.join('\n');
+}
+function copyTextFallback(text, done) {
+  try {
+    const ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+    done();
+  } catch (e) { toast('Copy failed — try the download button'); }
+}
+function copyParentReport() {
+  const text = buildDetailedParentReport();
+  const done = () => toast('Detailed report copied — paste it anywhere');
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(done, () => copyTextFallback(text, done));
+  } else copyTextFallback(text, done);
+}
+function downloadParentReport() {
+  try {
+    const blob = new Blob([buildDetailedParentReport()], { type: 'text/plain' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'studyos-report-' + localISO() + '.txt';
+    document.body.appendChild(a); a.click();
+    setTimeout(() => { try { URL.revokeObjectURL(a.href); a.remove(); } catch (e) { /* noop */ } }, 500);
+    toast('Report downloaded as .txt');
+  } catch (e) { toast('Download failed on this browser — use copy instead'); }
+}
 function lockTeaser(label) {
   return `<div class="rounded-xl border border-dashed border-amber-200 bg-amber-50/60 p-3">
     <div class="text-[11px] font-bold text-amber-700">🔒 ${label} — Pro</div>
@@ -19338,11 +19487,16 @@ function renderProgressPage(el) {
 
 function renderParentPage(el) {
   const report = buildParentReport();
+  const s = state.quizStats || {};
+  const acc = s.total ? Math.round((s.correct / s.total) * 100) : 0;
+  const bySubject = Object.entries(s.bySubject || {});
+  const now = new Date();
+  const activeIn = n => Object.keys(s.days || {}).filter(d => { const diff = (now - new Date(d + 'T00:00:00')) / 86400000; return diff >= 0 && diff < n; }).length;
   el.innerHTML = `
-    ${pageHeader('Parent Report', 'One tap and your week flies to your parent on WhatsApp — in plain English.')}
+    ${pageHeader('Parent Report', 'Share your week with the people rooting for you — summary, deep analysis or file export.')}
     <div class="grid gap-5 lg:grid-cols-2">
       <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-card">
-        <h3 class="mb-2 text-sm font-bold text-slate-900">💬 What your parent will receive</h3>
+        <h3 class="mb-2 text-sm font-bold text-slate-900">💬 Quick WhatsApp summary</h3>
         <p class="mb-4 text-[11px] leading-relaxed text-slate-500">This is the exact message — a snapshot of your effort, not a verdict on you. Nothing else is shared: no private chats with Buddy, no lesson history, no passwords.</p>
         <div class="rounded-2xl bg-emerald-50 p-4">
           <div class="mb-2 flex items-center gap-2">
@@ -19353,21 +19507,51 @@ function renderParentPage(el) {
         </div>
         <button type="button" onclick="shareParentReport()" class="mt-4 w-full rounded-xl bg-emerald-600 px-4 py-3 text-xs font-black text-white transition hover:bg-emerald-500">📤 Send this to my parent now</button>
         <p class="mt-3 text-center text-[10px] text-slate-400">Opens WhatsApp with the message ready — you pick who receives it and press send yourself.</p>
+        <div class="mt-4 border-t border-slate-100 pt-4">
+          <h4 class="mb-1 text-xs font-black text-slate-900">📦 Export the detailed report</h4>
+          <p class="mb-3 text-[11px] leading-relaxed text-slate-500">The detailed report adds per-subject accuracy, 7/30-day activity, trend and focus area — great for printouts or email.</p>
+          <div class="flex flex-wrap gap-2">
+            <button type="button" onclick="copyParentReport()" class="flex-1 rounded-xl bg-slate-900 px-4 py-2.5 text-[11px] font-black text-white transition hover:bg-slate-800">📋 Copy detailed report</button>
+            <button type="button" onclick="downloadParentReport()" class="flex-1 rounded-xl bg-slate-100 px-4 py-2.5 text-[11px] font-black text-slate-700 transition hover:bg-slate-200">📥 Download .txt</button>
+          </div>
+        </div>
       </section>
 
-      <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-card">
-        <h3 class="mb-3 text-sm font-bold text-slate-900">🛡️ How this works</h3>
-        <ul class="space-y-2.5 text-[11px] leading-relaxed text-slate-600">
-          <li class="flex gap-2"><span>✅</span><span><b>You are in control.</b> Nothing is sent automatically — the report only leaves when <i>you</i> press send and choose the contact.</span></li>
-          <li class="flex gap-2"><span>✅</span><span><b>Effort, not judgement.</b> The report shows study days, questions answered and streaks. We listen, but we do not judge — and neither should anyone reading it.</span></li>
-          <li class="flex gap-2"><span>✅</span><span><b>Private stays private.</b> Your Buddy chats, wrong answers and browsing inside StudyOS are never included.</span></li>
-          <li class="flex gap-2"><span>✅</span><span><b>Encouragement built in.</b> The message ends with a nudge for your parent to cheer you on — a little encouragement goes a long way.</span></li>
-        </ul>
-        <div class="mt-4 rounded-xl bg-slate-50 p-3 text-[11px] leading-relaxed text-slate-500">
-          💡 <b>Tip:</b> send one after a good week — parents remember the streak photo more than the score.
-        </div>
-        <button type="button" onclick="navigate('progress')" class="mt-4 w-full rounded-xl bg-slate-100 px-4 py-2.5 text-xs font-bold text-slate-700 transition hover:bg-slate-200">📈 See my full progress first →</button>
-      </section>
+      <div class="space-y-5">
+        <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-card">
+          <h3 class="mb-3 text-sm font-bold text-slate-900">📊 Detailed analysis</h3>
+          <div class="grid grid-cols-2 gap-3">
+            <div class="rounded-xl bg-slate-50 p-3"><div class="text-xl font-bold text-slate-900">${activeIn(7)}/7</div><div class="text-[11px] text-slate-500">active days this week</div></div>
+            <div class="rounded-xl bg-slate-50 p-3"><div class="text-xl font-bold text-slate-900">${activeIn(30)}/30</div><div class="text-[11px] text-slate-500">active days this month</div></div>
+            <div class="rounded-xl bg-slate-50 p-3"><div class="text-xl font-bold text-slate-900">${acc}%</div><div class="text-[11px] text-slate-500">overall accuracy</div></div>
+            <div class="rounded-xl bg-slate-50 p-3"><div class="text-xl font-bold text-slate-900">🔥 ${state.streak || 0}</div><div class="text-[11px] text-slate-500">day streak · ❄️ ${state.streakFreezes || 0} freezes</div></div>
+          </div>
+          <h4 class="mb-1 mt-4 text-[11px] font-black uppercase tracking-wide text-slate-400">Improvement line</h4>
+          ${progressChartSvg(s.history)}
+          ${bySubject.length ? `
+            <h4 class="mb-2 mt-4 text-[11px] font-black uppercase tracking-wide text-slate-400">Accuracy by subject</h4>
+            <div class="space-y-2">
+              ${bySubject.map(([subj, st]) => {
+                const pct = st.total ? Math.round((st.correct / st.total) * 100) : 0;
+                return `<div>
+                  <div class="mb-1 flex justify-between text-[11px] font-bold"><span class="text-slate-600">${subj}</span><span class="text-slate-400">${pct}%</span></div>
+                  <div class="h-1.5 overflow-hidden rounded-full bg-slate-100"><div class="h-full rounded-full ${subjectColor(subj).solid}" style="width:${pct}%"></div></div>
+                </div>`;
+              }).join('')}
+            </div>` : '<p class="mt-4 text-xs text-slate-400">Take a quiz and the analysis fills in here.</p>'}
+          <button type="button" onclick="navigate('progress')" class="mt-4 w-full rounded-xl bg-slate-100 px-4 py-2.5 text-xs font-bold text-slate-700 transition hover:bg-slate-200">📈 See my full progress page →</button>
+        </section>
+
+        <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-card">
+          <h3 class="mb-3 text-sm font-bold text-slate-900">🛡️ How this works</h3>
+          <ul class="space-y-2.5 text-[11px] leading-relaxed text-slate-600">
+            <li class="flex gap-2"><span>✅</span><span><b>You are in control.</b> Nothing is sent automatically — every report leaves only when <i>you</i> press send, copy or download.</span></li>
+            <li class="flex gap-2"><span>✅</span><span><b>Effort, not judgement.</b> Reports show study days, questions answered and streaks. We listen, but we do not judge — and neither should anyone reading it.</span></li>
+            <li class="flex gap-2"><span>✅</span><span><b>Private stays private.</b> Your Buddy chats, wrong answers and browsing inside StudyOS are never included.</span></li>
+            <li class="flex gap-2"><span>✅</span><span><b>Encouragement built in.</b> Every report ends with a nudge for your parent to cheer you on — a little encouragement goes a long way.</span></li>
+          </ul>
+        </section>
+      </div>
     </div>
   `;
 }
@@ -19550,6 +19734,7 @@ async function persistStreak() {
       quizSetup: state.quizSetup, examPrefs: state.examPrefs,
       updatedAt: serverTimestamp()
     });
+    saveLocal(); // keep the local cache in step so stale values can never revive
   } catch (err) {
     warnFirestoreOnce(err);
     saveLocal();
@@ -19967,11 +20152,28 @@ async function copyRules() {
 /* ==================================================================
    ENTER / LEAVE APP
    ================================================================== */
+/* Passive gap check: if the user returns after missing day(s), settle the streak now —
+   a banked freeze shields it (with the ice animation), otherwise it resets. Activity
+   still extends the streak; merely opening the app never does. */
+function checkStreakOnEntry() {
+  const d = todayISO();
+  if (computeStreak(state.lastActiveDate, d) !== 1) return; // only gaps are settled here
+  const rolled = applyStreak(state.streak, state.lastActiveDate, d, state.streakFreezes);
+  if (!rolled.changed) return;
+  state.streak = rolled.streak;
+  state.streakFreezes = rolled.freezes;
+  state.lastActiveDate = d;
+  queueCelebration({ type: rolled.event });
+  updateChrome();
+  persistProgress();
+}
+
 function enterApp() {
   show($('#boot-screen'), false);
   show($('#auth-screen'), false);
   $('#main-app').classList.remove('hidden');
   $('#main-app').classList.add('flex');
+  checkStreakOnEntry();
   updateChrome();
   activeTopic = null;
   renderPage();
@@ -20117,13 +20319,14 @@ Object.assign(window, {
   selectQuizAnswer, submitQuiz, retakeQuiz, examJump, examPrev, examNext, submitExam,
   sendChatMessage, askBuddy, clearChat, setResearch, saveGeminiKey, toggleGeminiPanel,
   openUpgrade, closeUpgrade, upgradeBackdrop, choosePlan, founderUnlock, whatsappUpgrade, savePaystackKey, shareParentReport,
+  dismissFreezeIce, copyParentReport, downloadParentReport,
   setGeminiModel, testGemini,
 });
 
 /* Test hook (used by the automated checks) */
 window.__STUDYOS_TEST__ = {
   computeStreak, applyStreak, BADGES, FREEZE_EVERY_TASKS, MAX_FREEZES,
-  checkBadges, recordTask, persistProgress,
+  checkBadges, recordTask, persistProgress, checkStreakOnEntry, buildDetailedParentReport,
   gradeQuiz, mergeQuizStats, initials, startPastQuiz, examJump, examPrev, examNext, submitExam,
   scoreKb, buddyReply, plainMath, solveQuadratic, solveSimultaneous, extractCoeffs,
   topicsFor, quizFor, pastFor, PASTQ, buildQuiz, shuffled, flashFor, mdToHtml, escapeHtml, fmtQuad,

@@ -229,6 +229,43 @@ check('streak freeze: brand-new user starts at Day 1 without spending a freeze',
   const r = T.applyStreak(0, '', '2026-09-09', 2);
   return r.streak === 1 && r.freezes === 2 && r.event === 'start';
 })());
+check('passive entry roll: missed day consumes a freeze and keeps the streak', (() => {
+  const st = T.getState();
+  const saved = [st.streak, st.lastActiveDate, st.streakFreezes];
+  st.streak = 5; st.streakFreezes = 1;
+  const d = new Date(); d.setDate(d.getDate() - 2);
+  st.lastActiveDate = d.toISOString().slice(0, 10);
+  T.checkStreakOnEntry();
+  const ok = st.streak === 5 && st.streakFreezes === 0;
+  [st.streak, st.lastActiveDate, st.streakFreezes] = saved;
+  return ok;
+})());
+check('passive entry roll: missed day with no freeze resets to Day 1', (() => {
+  const st = T.getState();
+  const saved = [st.streak, st.lastActiveDate, st.streakFreezes];
+  st.streak = 5; st.streakFreezes = 0;
+  const d = new Date(); d.setDate(d.getDate() - 3);
+  st.lastActiveDate = d.toISOString().slice(0, 10);
+  T.checkStreakOnEntry();
+  const ok = st.streak === 1 && st.streakFreezes === 0;
+  [st.streak, st.lastActiveDate, st.streakFreezes] = saved;
+  return ok;
+})());
+check('passive entry roll: same-day entry never touches streak or freezes', (() => {
+  const st = T.getState();
+  const saved = [st.streak, st.lastActiveDate, st.streakFreezes];
+  st.streak = 5; st.streakFreezes = 2;
+  st.lastActiveDate = new Date().toISOString().slice(0, 10);
+  T.checkStreakOnEntry();
+  const ok = st.streak === 5 && st.streakFreezes === 2;
+  [st.streak, st.lastActiveDate, st.streakFreezes] = saved;
+  return ok;
+})());
+check('detailed parent report includes activity, performance, by-subject and trend sections', (() => {
+  const txt = T.buildDetailedParentReport();
+  return /STUDYOS DETAILED PROGRESS REPORT/.test(txt) && /ACTIVITY/.test(txt)
+    && /PERFORMANCE/.test(txt) && /Trend:/.test(txt) && /Focus area:/.test(txt);
+})());
 check('badge catalog: 76 badges (59 secret) incl. streaks, focus family and exam badges', T.BADGES.length === 76
   && T.BADGES.filter(b => b.secret).length === 59
   && ['streak-7', 'streak-30', 'streak-365'].every(id => T.BADGES.some(b => b.id === id)));
@@ -1110,7 +1147,8 @@ await globalThis.__AUTH_CB({ uid: 'test-uid-2', email: 'a@b.c', displayName: 'Am
 await new Promise(r => setImmediate(r));
 T.getState().profile.plan = 'pro'; // second account also runs Pro so the CBT flow stays un-gated
 const doc2 = globalThis.__FS_STORE.get('users/test-uid-2');
-check('login never touches the streak (activity-based)', doc2.streak === 7, 'streak=' + doc2.streak);
+check('login settles a stale streak immediately (passive gap roll, no freeze banked)',
+  T.getState().streak === 1, 'streak=' + T.getState().streak);
 T.recordTask('quiz', { percent: 80 });
 check('stale streak resets on the next study activity (no freeze banked)',
   globalThis.__FS_STORE.get('users/test-uid-2').streak === 1,
@@ -1199,7 +1237,7 @@ check('logout hides the app shell', byId('main-app').classList.contains('hidden'
   globalThis.navigate('progress');
   check('progress page shows empty state with no history', /No data yet/.test(main.innerHTML));
   globalThis.navigate('parent');
-  check('parent page shows live report preview', /What your parent will receive/.test(main.innerHTML) && /StudyOS weekly report for/.test(main.innerHTML));
+  check('parent page shows summary preview and detailed analysis', /Quick WhatsApp summary/.test(main.innerHTML) && /StudyOS weekly report for/.test(main.innerHTML) && /Detailed analysis/.test(main.innerHTML));
   check('parent page keeps privacy promises', /You are in control/.test(main.innerHTML) && /do not judge/.test(main.innerHTML));
   Object.assign(st, { history: saved.history, bySubject: saved.bySubject, attempts: saved.attempts, correct: saved.correct, total: saved.total, bestPercent: saved.bestPercent, days: saved.days });
   T.getState().page = saved.page;

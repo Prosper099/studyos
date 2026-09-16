@@ -125,7 +125,10 @@ const feature = [
   ['streak celebration overlay with confetti/icon/title/sub', /id="celebration"[\s\S]*id="celebration-confetti"[\s\S]*id="celebration-icon"[\s\S]*id="celebration-title"[\s\S]*id="celebration-sub"/],
   ['sidebar streak-freeze counter', /id="freeze-count"/],
   ['badge catalog incl. weekly, monthly and yearly streak badges', /streak-7[\s\S]*streak-30[\s\S]*streak-365/],
-  ['profile badges section', /Badges &amp; streaks|Badges & streaks/]
+  ['profile badges section', /Badges &amp; streaks|Badges & streaks/],
+  ['streak freeze ice-shatter overlay', /id="freeze-overlay"/],
+  ['parent report export buttons', /copyParentReport\(\)[\s\S]*downloadParentReport\(\)/],
+  ['passive streak check on app entry', /checkStreakOnEntry\(\);/]
 ];
 for (const [name, re] of feature) check(name, typeof re === 'boolean' ? re : re.test(html));
 
