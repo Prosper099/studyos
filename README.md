@@ -1,13 +1,13 @@
 # StudyOS 📚
 
-An intelligent, single-file study companion built for Nigerian secondary-school students —
+An intelligent study companion built for Nigerian secondary-school students —
 covering **JAMB UTME, WAEC WASSCE, NECO, Post-UTME** (senior) and **BECE** (junior).
 
 Live: **https://studyos-academic.vercel.app**
 
-Everything — markup, curriculum data, lessons, quizzes, flashcards, the exam engine and the
-AI study buddy — lives in **one file: `index.html`**. No build step, no bundler, no server
-required. Open it in a browser and it runs.
+The source is a modular Vite project (`src/`), and the build ships the whole product as
+**one ready-to-run file: `dist/index.html`** — markup, curriculum, engines, styles, all
+inlined. Download that one file and it runs in any browser, no server required.
 
 ## By the numbers
 
@@ -62,46 +62,39 @@ JSS students only ever see BECE-appropriate content; SS students see JAMB/WAEC/N
 - **Premium engine** — a complete freemium + Paystack checkout system is built in but
   **dormant** (`monetizationOn = false`): everything is unlocked while StudyOS grows.
 
-## Architecture — why one file?
+## Architecture — modular source, single-file build
 
-This is a deliberate choice, not an accident:
+The product strategy is still *one file you can hand to a student*, but the engineering
+is now a proper modular project (migrated 2026-09-16):
 
-- **Zero-friction deployment** — any static host serves it as-is (currently Vercel,
-  redeploying on every push to `main`). No build pipeline to break.
-- **Zero dependencies** — one HTML file, Tailwind via CDN, Firebase via ES module imports.
-  Nothing to `npm install`, nothing to audit.
+```
+index.html                  Vite entry: markup + head (Tailwind CDN, meta/OG)
+vite.config.mjs             single-file build, unminified (harness-readable)
+src/
+├── main.mjs                app shell: auth, onboarding, engines, CBT, buddy,
+│                           streaks, premium (dormant), __STUDYOS_TEST__ seams
+├── styles.css              all custom CSS (keyframes, flashcard flip, drawer…)
+├── data/
+│   ├── curriculum.mjs      assembles the 13 subjects
+│   ├── curriculum-*.mjs    one module per subject: levels → topics
+│   │                       { title, tags, summary, content, cards[], quiz[] }
+│   └── pastq.mjs           real past questions (5 senior subjects)
+└── modules/
+    ├── charts.mjs          score-trend SVG + hover tooltips + activity heatmap
+    └── utils.mjs           escapeHtml, localISO
+```
+
+Why the build still outputs ONE file:
+
 - **Portability** — a student on a shared computer can run the whole app from a single
-  downloaded file.
+  downloaded `dist/index.html`.
+- **Zero-friction deployment** — Vercel runs `npm run build` on every push to `main` and
+  serves `dist/`; any static host works the same way.
+- **Readable output** — the bundle is deliberately unminified so the verification
+  harnesses can read the shipped code, not a copy of it.
 
-The file is organised with banner-comment sections so you can jump straight to what you
-need (search for `====`):
-
-```
-index.html
-├── <head>                 Tailwind CDN, fonts, meta/OG tags
-├── BOOT / LOADING SPLASH
-├── AUTH SCREEN            Google Sign-In, Demo Mode banner
-├── SETUP MODAL            Firebase connect guide (fork users only — see below)
-├── ONBOARDING MODAL       name → class → department → target exam
-├── UPGRADE / PRO SHEET    premium UI (dormant behind monetizationOn)
-├── STREAK / BADGE OVERLAY
-├── MAIN APP SHELL         sidebar, dashboard, topics, lesson reader,
-│                          quizzes, flashcards, CBT, buddy, profile,
-│                          exam command centre
-└── <script type="module">
-    ├── firebaseConfig     public web config (see Firebase section)
-    ├── CURRICULUM         13 subjects → levels → topics
-    │                      { title, tags, summary, content, cards[], quiz[] }
-    ├── PASTQ              real past questions (5 senior subjects)
-    ├── state + storage    localStorage + Firestore sync, Demo Mode fallback
-    ├── engines            streaks, quizzes, CBT, buddy, analytics,
-    │                      exam prediction, premium/paystack (dormant)
-    └── __STUDYOS_TEST__   test seams used by the verify suites
-```
-
-If this ever grows past the point where a single file is comfortable, the section banners
-map cleanly onto a `src/` split (`data/`, `services/`, `components/`, `styles/`) — but
-until then the single file *is* the product strategy.
+Firebase stays a browser ES-module import from `gstatic.com` (externalised by the
+bundler), so the built file keeps zero npm runtime dependencies.
 
 ## The Firebase setup panel (fork users only)
 
@@ -112,13 +105,15 @@ still contains placeholder values — on the live site (real config) it can neve
 ## Running it
 
 ```bash
-# Option 1: just open the file
-open index.html            # macOS
-xdg-open index.html        # Linux
+npm install
+npm run build              # → dist/index.html (the single-file product)
+open dist/index.html       # runs as-is in any browser
 
-# Option 2: serve it locally
-node serve.mjs             # → http://localhost:8080
+npm run dev                # Vite dev server with hot reload
 ```
+
+`serve.mjs` still serves the repo root if you need a quick static server for
+`preview.html` (the shareable /check page).
 
 ## Firebase
 
@@ -128,7 +123,7 @@ protected by Firestore security rules (signed-in users may only read/write their
 `users/{uid}` document).
 
 To point the app at your own project, replace the seven values in the `firebaseConfig`
-object near the top of the module script, enable **Google** as a sign-in provider in
+object near the top of `src/main.mjs`, enable **Google** as a sign-in provider in
 Firebase Authentication, and apply rules equivalent to:
 
 ```
@@ -149,11 +144,13 @@ Without valid config the app still runs in Demo Mode with a banner.
 Five automated suites verify the build (Node 18+, no dependencies):
 
 ```bash
-node verify-static.mjs                  # markup/handler integrity        (76 checks)
-node verify.mjs                         # runtime harness, placeholder config (134)
-STUDYOS_REAL_CONFIG=1 node verify.mjs   # runtime harness, real config   (208)
-node verify-degraded.mjs                # offline / no-Firestore behaviour (11)
-node preview-smoke.mjs                  # deployment smoke test          (33)
+npm run build                                    # suites verify the BUILT single file
+node scripts/make-fixtures.mjs                   # dist → .verify fixtures
+STUDYOS_HTML=$PWD/dist/index.html node verify-static.mjs   # markup/handler integrity
+node verify.mjs                                  # runtime harness, placeholder config
+STUDYOS_REAL_CONFIG=1 node verify.mjs            # runtime harness, real config
+node verify-degraded.mjs                         # offline / no-Firestore behaviour
+node preview-smoke.mjs                           # deployment smoke test (/check page)
 ```
 
 The suites include full curriculum contracts: every topic must carry a quiz with valid
@@ -162,12 +159,13 @@ fallback is tested by temporarily blanking a topic quiz at runtime.
 
 ## Content tooling
 
-The Python scripts in this repo are the one-shot build scripts that generated and patch
-the curriculum data inside `index.html` (`content_*.py`, `deep_*.py`, `lessons*.py`,
-`arts1.py`, `comm1.py`, `topics-gov-*.py`, …). All 132 topics are fully authored; the
-scripts are kept for provenance — each contains safe, assert-guarded splice helpers for
-the curriculum format (exact title matching, 4 options per question, correct-index and
-explanation checks) that can be reused to patch or extend any topic.
+The Python scripts in this repo are the one-shot generators that authored the curriculum
+(`content_*.py`, `deep_*.py`, `lessons*.py`, `arts1.py`, `comm1.py`, `topics-*.py`, …).
+All 132 topics are fully authored and now live in `src/data/curriculum-*.mjs`; new or
+revised topics should be edited there directly (same shape: `{ title, tags, summary,
+content, cards[], quiz[] }` — 4 options per question, correct index, explanation on every
+quiz item). The scripts are kept for provenance and for their assert-guarded format
+helpers.
 
 ## Deploying
 
@@ -175,7 +173,7 @@ Push to `main` and Vercel redeploys automatically. Any static host works — Git
 Netlify, or Firebase Hosting:
 
 ```bash
-firebase init hosting    # public dir: the folder containing index.html
+firebase init hosting    # public dir: dist (after npm run build)
 firebase deploy
 ```
 

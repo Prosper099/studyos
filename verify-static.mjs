@@ -77,7 +77,7 @@ const feature = [
   ['GoogleAuthProvider with account chooser', /new GoogleAuthProvider\(\)[\s\S]*setCustomParameters/],
   ['redirect fallback when pop-ups are blocked', /signInWithRedirect\(auth,\s*googleProvider\(\)\)/],
   ['no email/password auth remains', !/signInWithEmailAndPassword|createUserWithEmailAndPassword|switchAuthTab/.test(html)],
-  ['Firestore users/{uid} document', /doc\(db, 'users'/],
+  ['Firestore users/{uid} document', /doc\(db, [\"']users[\"']/],
   ['setDoc merge + updateDoc writes', /setDoc\([\s\S]*?\{ merge: true \}/],
   ['onSnapshot live sync', /onSnapshot\(/],
   ['serverTimestamp()', /serverTimestamp\(\)/],
@@ -89,33 +89,33 @@ const feature = [
   ['live research toggle in the chat UI', /setResearch\(/],
   ['sources are cited with links', /sourcesHtml\(/],
   ['lesson pages offer live research', /Research live/],
-  ['onboarding step 1 classes SS1-JSS3', /'SS1', 'SS2', 'SS3', 'JSS1', 'JSS2', 'JSS3'/],
-  ['onboarding step 2 senior list (JAMB, WAEC, NECO, Post-UTME, General)', /SS: \[[\s\S]*JAMB UTME[\s\S]*WAEC WASSCE[\s\S]*NECO[\s\S]*Post-UTME[\s\S]*'General'/],
-  ['junior exam list is General + BECE', /JSS: \[[\s\S]*'General'[\s\S]*'BECE'/],
-  ['examsForLevel splits junior and senior', /function examsForLevel\(classLevel\) \{[\s\S]*startsWith\('JSS'\)/],
-  ['onboarding step 2 renders level-aware exams', /examsForLevel\(o\.classLevel\)\.map\(e =>/],
-  ['changing class clears an exam that no longer fits', /if \(!examsForLevel\(o\.classLevel\)\.some\(e => e\.id === o\.targetExam\)\) o\.targetExam = '';/],
-  ['hydrateFromDoc clears an exam invalid for the level', /!examsForLevel\(state\.profile\.classLevel\)\.some\(e => e\.id === state\.profile\.targetExam\)/],
-  ['onboarding step 3 lists all seven subjects', /'Mathematics', 'English Language', 'Basic Science', 'Basic Technology',[\s\S]*'Physics', 'Chemistry', 'Biology'/],
-  ['level catalogue maps JSS to junior subjects', /JSS1: \['Mathematics', 'English Language', 'Basic Science', 'Basic Technology'\]/],
-  ['level catalogue maps SS to senior subjects', /SS1:\s+\['Mathematics', 'English Language', 'Physics', 'Chemistry', 'Biology', 'Government', 'Literature in English', 'History', 'Economics', 'Commerce', 'Financial Accounting'\]/],
+  ['onboarding step 1 classes SS1-JSS3', /[\"']SS1[\"'],\s*[\"']SS2[\"'],\s*[\"']SS3[\"'],\s*[\"']JSS1[\"'],\s*[\"']JSS2[\"'],\s*[\"']JSS3[\"']/],
+  ['onboarding step 2 senior list (JAMB, WAEC, NECO, Post-UTME, General)', /SS: \[[\s\S]*JAMB UTME[\s\S]*WAEC WASSCE[\s\S]*NECO[\s\S]*Post-UTME[\s\S]*[\"']General[\"']/],
+  ['junior exam list is General + BECE', /JSS: \[[\s\S]*[\"']General[\"'][\s\S]*[\"']BECE[\"']/],
+  ['examsForLevel splits junior and senior', /function examsForLevel\(classLevel\) \{[\s\S]*startsWith\([\"']JSS[\"']\)/],
+  ['onboarding step 2 renders level-aware exams', /examsForLevel\(o\.classLevel\)\.map\(\(?e\)? =>/],
+  ['changing class clears an exam that no longer fits', /if \(!examsForLevel\(o\.classLevel\)\.some\(\(?e\)? => e\.id === o\.targetExam\)\) o\.targetExam = [\"']{2};/],
+  ['hydrateFromDoc clears an exam invalid for the level', /!examsForLevel\(state\.profile\.classLevel\)\.some\(\(?e\)? => e\.id === state\.profile\.targetExam\)/],
+  ['onboarding step 3 lists all seven subjects', /[\"']Mathematics[\"'],\s*[\"']English Language[\"'],\s*[\"']Basic Science[\"'],\s*[\"']Basic Technology[\"'],[\s\S]*[\"']Physics[\"'],\s*[\"']Chemistry[\"'],\s*[\"']Biology[\"']/],
+  ['level catalogue maps JSS to junior subjects', /JSS1: \[\s*[\"']Mathematics[\"'],\s*[\"']English Language[\"'],\s*[\"']Basic Science[\"'],\s*[\"']Basic Technology[\"']\s*\]/],
+  ['level catalogue maps SS to senior subjects', /SS1:\s*\[\s*[\"']Mathematics[\"'],\s*[\"']English Language[\"'],\s*[\"']Physics[\"'],\s*[\"']Chemistry[\"'],\s*[\"']Biology[\"'],\s*[\"']Government[\"'],\s*[\"']Literature in English[\"'],\s*[\"']History[\"'],\s*[\"']Economics[\"'],\s*[\"']Commerce[\"'],\s*[\"']Financial Accounting[\"']\s*\]/],
   ['subjectsForLevel falls back to every subject', /function subjectsForLevel\(classLevel\) \{[\s\S]*Object\.keys\(CURRICULUM\)/],
-  ['onboarding uses selectableSubjects()', /selectableSubjects\(\)\.map\(s =>/],
-  ['onboarding drops subjects unavailable at the level', /o\.subjects\.filter\(x => subjectsForLevel\(o\.classLevel\)\.includes\(x\)\)/],
+  ['onboarding uses selectableSubjects()', /selectableSubjects\(\)\.map\(\(?s\)? =>/],
+  ['onboarding drops subjects unavailable at the level', /o\.subjects\.filter\(\(?x\)? => subjectsForLevel\(o\.classLevel\)\.includes\(x\)\)/],
   ['subject chips filtered by class level', /const available = subjectsForLevel\(state\.profile\.classLevel\)/],
-  ['hydrateFromDoc strips unavailable subjects', /state\.profile\.subjects\.filter\(x => avail\.includes\(x\)\)/],
-  ['subject icons include Basic Science and Technology', /'Basic Science': '🔬', 'Basic Technology': '🛠️'/],
-  ['SUBJECT_COLORS covers all seven subjects', /'Basic Science': \{ bg: 'bg-teal-50'[\s\S]*'Basic Technology': \{ bg: 'bg-amber-50'/],
+  ['hydrateFromDoc strips unavailable subjects', /state\.profile\.subjects\.filter\(\(?x\)? => avail\.includes\(x\)\)/],
+  ['subject icons include Basic Science and Technology', /[\"']Basic Science[\"']: [\"']🔬[\"'],\s*[\"']Basic Technology[\"']: [\"']🛠️[\"']/],
+  ['SUBJECT_COLORS covers all seven subjects', /[\"']Basic Science[\"']: \{\s*bg: [\"']bg-teal-50[\"'][\s\S]*[\"']Basic Technology[\"']: \{\s*bg: [\"']bg-amber-50[\"']/],
   ['lessons contain inline SVG diagrams', /class="diagram"/],
   ['diagram CSS defined', /\.prose-lesson \.diagram svg \{ width:100%/],
   ['diagrams have accessible labels', /role="img" aria-label=/],
   ['mobile drawer sidebar', /id="sidebar"[\s\S]*drawer[\s\S]*md:translate|id="sidebar"/],
   ['3D flip flashcard CSS', /\.flashcard\.flipped \.flashcard-inner \{ transform: rotateY\(180deg\); \}/],
   ['flashcard next/prev controls', /nextFlashcard\(\)[\s\S]*prevFlashcard\(\)|prevFlashcard\(\)[\s\S]*nextFlashcard\(\)/],
-  ['quiz explanations rendered (with past-paper attribution badge)', /tracking-wide[^"]*">Explanation\$\{q\.src/],
+  ['quiz explanations rendered (with past-paper attribution badge)', /tracking-wide[\s\S]{0,120}>Explanation\$\{q\.src/],
   ['retake quiz option', /Retake Quiz|Retake \$\{subject\} Quiz|Retake/],
   ['Buddy chat interface', /id="chat-box"[\s\S]*id="chat-input"/],
-  ['Buddy knowledge base entries', /const BUDDY_KB = \[/],
+  ['Buddy knowledge base entries', /(?:const|var|let) BUDDY_KB = \[/],
   ['Buddy quadratic solver', /function solveQuadratic\(/],
   ['Buddy simultaneous solver', /function solveSimultaneous\(/],
   ['profile log out button', /onclick="handleLogout\(\)"/],
@@ -136,7 +136,7 @@ for (const [name, re] of feature) check(name, typeof re === 'boolean' ? re : re.
 
 // ---------- 4b. real past-question bank + content attribution ----------
 check('real past-question bank embedded with exam-body + year attribution',
-  /const PASTQ = \{/.test(html) && /src"?: "(WAEC|NECO|JAMB) (19|20)\d\d"/.test(html)
+  /(?:const|var|let) PASTQ = \{/.test(html) && /src"?: "(WAEC|NECO|JAMB) (19|20)\d\d"/.test(html)
   && /Open past question drill/.test(html) && /startPastQuiz\(\)/.test(html));
 check('open-licence attribution footer present (OpenStax CC BY 4.0 + question banks)',
   /Content credits/.test(html) && /OpenStax/.test(html) && /CC BY 4\.0/.test(html)
@@ -163,8 +163,8 @@ check('secret badges are hidden until earned, with a curiosity teaser',
 check('past questions run in a JAMB-style exam interface',
   /function examJump/.test(html) && /function submitExam/.test(html)
   && /Question palette/.test(html) && /Real exam simulation/.test(html)
-  && /examIdx: 0/.test(html)
-  && /examJump, examPrev, examNext, submitExam/.test(html));
+  && /["']?examIdx["']?: 0/.test(html)
+  && /examJump,[\s\S]{0,200}examPrev,[\s\S]{0,200}examNext,[\s\S]{0,200}submitExam/.test(html));
 check('Internet Archive is on the resources shelf (EduPodia removed)',
   /archive\.org/.test(html) && !/edupodia/i.test(html));
 check('LaTeX sanitizer + prompt guard fix broken AI math text',

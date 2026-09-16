@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 
 const root = '/home/user';
 const html = fs.readFileSync(process.env.STUDYOS_HTML || path.join(root, '.verify/real/index.html'), 'utf8');
-const code0 = html.match(/<script type="module">([\s\S]*?)<\/script>/)[1];
+const code0 = html.match(/<script type="module"[^>]*>([\s\S]*?)<\/script>/)[1];
 
 const results = [];
 const check = (name, cond, detail = '') => {
@@ -43,9 +43,9 @@ const fsStub = write('fs.mjs', `
 `);
 
 const code = code0
-  .replace(/from 'https:\/\/www\.gstatic\.com\/firebasejs\/[\d.]+\/firebase-app\.js'/, `from '${appStub}'`)
-  .replace(/from 'https:\/\/www\.gstatic\.com\/firebasejs\/[\d.]+\/firebase-auth\.js'/, `from '${authStub}'`)
-  .replace(/from 'https:\/\/www\.gstatic\.com\/firebasejs\/[\d.]+\/firebase-firestore\.js'/, `from '${fsStub}'`);
+  .replace(/from ['"]https:\/\/www\.gstatic\.com\/firebasejs\/[\d.]+\/firebase-app\.js['"]/, `from '${appStub}'`)
+  .replace(/from ['"]https:\/\/www\.gstatic\.com\/firebasejs\/[\d.]+\/firebase-auth\.js['"]/, `from '${authStub}'`)
+  .replace(/from ['"]https:\/\/www\.gstatic\.com\/firebasejs\/[\d.]+\/firebase-firestore\.js['"]/, `from '${fsStub}'`);
 assert.ok(!/gstatic\.com\/firebasejs/.test(code));
 const modPath = path.join(dir, 'app-under-test.mjs');
 fs.writeFileSync(modPath, code);
