@@ -1141,51 +1141,69 @@ const CURRICULUM = {
           tags: ['Quadratic formula', 'Discriminant', 'Completing the square'],
           summary: 'The quadratic formula, the discriminant, and the sum/product of roots.',
           content: `
-            <h3>Three ways to solve ax^2 + bx + c = 0</h3>
-            <ol><li>Factorisation (fastest when the roots are neat integers).</li>
-            <li>Completing the square.</li>
-            <li>The quadratic formula — always works.</li></ol>
-            <div class="formula">x = ( -b ± √(b^2 - 4ac) ) / 2a</div>
-            <h3>The discriminant Δ = b^2 - 4ac</h3>
-            <table><tr><th>Δ</th><th>Nature of roots</th></tr>
-            <tr><td>Δ &gt; 0</td><td>Two distinct real roots</td></tr>
-            <tr><td>Δ = 0</td><td>Two equal (repeated) real roots</td></tr>
-            <tr><td>Δ &lt; 0</td><td>No real roots (complex conjugates)</td></tr></table>
-            <h3>Sum &amp; product of roots</h3>
-            <div class="formula">α + β = -b/a    αβ = c/a</div>
-            <div class="worked"><b>Worked example:</b> 2x^2 - 5x - 3 = 0 → a=2, b=-5, c=-3.<br>
-            Δ = 25 + 24 = 49, √Δ = 7 → x = (5 ± 7)/4 → <b>x = 3 or x = -1/2</b>.<br>
-            Check: α + β = 3 - 0.5 = 2.5 = 5/2 ✓</div>
-            <div class="tip"><b>Exam tip:</b> "Find the values of k for which the roots are real and distinct" always means: set b^2 - 4ac &gt; 0 and solve the inequality for k.</div>
-            <h3>Worked practice</h3>
-            <div class="worked"><b>Q1.</b> Find the values of k for which x^2 + kx + 9 = 0 has equal roots.<br>
-            Equal roots means b^2 - 4ac = 0, so k^2 - 36 = 0 and k = <b>±6</b>.</div>
-            <div class="worked"><b>Q2.</b> The sum of the roots of 3x^2 - 7x + 2 = 0 is α + β and the product is αβ. Find 1/α + 1/β.<br>
-            α + β = 7/3 and αβ = 2/3, so 1/α + 1/β = (α + β)/αβ = (7/3) ÷ (2/3) = <b>7/2</b>.</div>
-            <div class="worked"><b>Q3.</b> Solve by completing the square: x^2 + 6x - 4 = 0.<br>
-            (x + 3)^2 - 9 - 4 = 0 → (x + 3)^2 = 13 → x = -3 ± √13 ~= <b>0.606 or -6.606</b>.</div>
-            <h3>Common mistakes</h3>
-            <ul>
-              <li>Losing the sign of b. In 2x^2 - 5x - 3, b is <b>-5</b>, not 5.</li>
-              <li>Dividing only part of the expression by 2a in the formula.</li>
-              <li>Confusing the condition for <b>real</b> roots (Δ >= 0) with <b>distinct real</b> roots (Δ &gt; 0).</li>
-              <li>Forgetting that a quadratic can have <b>no</b> real solution — state this rather than forcing an answer.</li>
-            </ul>
-            <h3>Deep dive: three solution methods, one discriminant</h3>
-            <p><b>1. Factorisation</b> — fastest when the roots are tidy: x^2 - 5x + 6 = 0 → (x - 2)(x - 3) = 0 → x = 2 or 3. <b>2. Completing the square</b> — x^2 + 6x + 5 = (x + 3)^2 - 4, so (x + 3)^2 = 4 → x = -1 or -5; this form also hands you the <b>vertex</b> of the parabola. <b>3. The formula</b> — works always:</p>
-            <div class="formula">x = (-b ± √(b^2 - 4ac)) ÷ 2a &nbsp;&nbsp; for ax^2 + bx + c = 0</div>
-            <h3>Worked example, step by step</h3>
-            <p><b>Solve 2x^2 + 3x - 5 = 0.</b> a = 2, b = 3, c = -5. Discriminant: b^2 - 4ac = 9 + 40 = 49 (a perfect square — it would have factorised as (2x + 5)(x - 1)). x = (-3 ± 7)/4 → x = <b>1</b> or x = <b>-5/2</b>.</p>
-            <p><b>Nature of roots from the discriminant:</b> b^2 - 4ac &gt; 0 → two distinct real roots; = 0 → one repeated root (the graph kisses the x-axis); &lt; 0 → no real roots (the parabola floats above or below the axis).</p>
-            <p><b>Forming an equation from roots</b> α and β: x^2 - (α + β)x + αβ = 0. Roots 3 and -4 → x^2 - (-1)x + (-12) = x^2 + x - 12 = 0.</p>
-            <h3>Examiner's traps</h3>
-            <ul>
-              <li>Sign errors with negative b or c inside the formula — write a, b, c down explicitly first.</li>
-              <li>Forgetting the ± : √ gives two roots, one on each side of the axis of symmetry.</li>
-              <li>x^2 = 9 has roots +3 <b>and</b> -3; answering only 3 loses half the marks.</li>
-            </ul>
 
-          `,
+            <h3>1. What a quadratic is</h3>
+            <p>A quadratic equation has the form <b>ax^2 + bx + c = 0</b> with a ≠ 0 — the highest power of x is 2, so there are (at most) <b>two roots</b>. Four solution methods: factorisation, completing the square, the formula, and graphs. Exams also test the <b>sum/product of roots</b> and the <b>discriminant</b>.</p>
+
+            <h3>2. Factorisation</h3>
+            <p>Find two numbers that <b>multiply to ac and add to b</b>, split the middle term, then factor by grouping; set each bracket to zero.</p>
+            <div class="worked"><b>Worked example:</b> x^2 − 5x + 6 = 0. Numbers: −2 and −3 (multiply to 6, add to −5). (x − 2)(x − 3) = 0 → x = 2 or x = <b>3</b>.</div>
+            <div class="worked"><b>Worked example:</b> 2x^2 + 5x − 3 = 0. ac = −6; numbers 6 and −1. 2x^2 + 6x − x − 3 = 2x(x + 3) − 1(x + 3) = (2x − 1)(x + 3) = 0 → x = 1/2 or x = <b>−3</b>.</div>
+
+            <h3>3. Completing the square</h3>
+            <p>Rewrite as (x + b/2a)^2 minus a constant, then take square roots.</p>
+            <div class="worked"><b>Worked example:</b> x^2 + 6x − 7 = 0 → (x + 3)^2 − 9 − 7 = 0 → (x + 3)^2 = 16 → x + 3 = ±4 → x = 1 or x = <b>−7</b>.</div>
+
+            <h3>4. The formula — the universal hammer</h3>
+            <div class="formula">x = (−b ± √(b^2 − 4ac)) ÷ 2a</div>
+            <div class="worked"><b>Worked example:</b> 3x^2 − 4x − 2 = 0 → x = (4 ± √(16 + 24))/6 = (4 ± √40)/6 ≈ (4 ± 6.32)/6 → x ≈ <b>1.72 or −0.39</b> (2 d.p.).</div>
+
+            <h3>5. Sum and product of roots</h3>
+            <div class="formula">α + β = −b/a • αβ = c/a</div>
+            <ul>
+              <li><b>Form an equation from roots:</b> x^2 − (sum)x + (product) = 0.</li>
+              <li><b>Evaluate expressions</b> like 1/α + 1/β = (α + β)/(αβ) without solving.</li>
+            </ul>
+            <div class="worked"><b>Worked example:</b> Roots 2 and −5: sum −3, product −10 → equation x^2 + 3x − 10 = 0.</div>
+            <div class="worked"><b>Worked example:</b> For 2x^2 − 7x + 3 = 0, find 1/α + 1/β. Sum = 7/2, product = 3/2 → (7/2)/(3/2) = <b>7/3</b>.</div>
+
+            <h3>6. The discriminant — nature of roots</h3>
+            <div class="formula">D = b^2 − 4ac • D &gt; 0: two distinct real roots • D = 0: equal roots • D &lt; 0: no real roots</div>
+            <div class="worked"><b>Worked example:</b> Find k so that x^2 + kx + 9 = 0 has equal roots. D = k^2 − 36 = 0 → k = <b>±6</b>.</div>
+
+            <h3>7. Word problems that hide quadratics</h3>
+            <div class="worked"><b>Worked example:</b> A number exceeds its square root's square by… (too tame) — try this: "The product of two consecutive positive integers is 56." n(n + 1) = 56 → n^2 + n − 56 = 0 → (n + 8)(n − 7) = 0 → n = 7 (reject −8). The numbers: <b>7 and 8</b>. Always reject roots the story forbids.</div>
+
+            <h3>8. Common mistakes that cost marks</h3>
+            <ul>
+              <li>Dropping the ± when taking square roots — losing one root costs half the marks.</li>
+              <li>Sign slips in −b and in the sum/product formulas.</li>
+              <li>Using D &gt; 0 for "equal roots" — equal means D = 0.</li>
+              <li>Accepting negative or fractional answers that the word problem forbids.</li>
+              <li>Dividing by x to "simplify" x^2 = 3x — you kill the root x = 0. Factor instead.</li>
+            </ul>
+            <div class="tip"><b>Speed trick:</b> try factorisation for 60 seconds; if the numbers do not jump out, switch to the formula without guilt. Marks care about answers, not methods.</div>
+          
+            <h3>Deep dive: graphical solution</h3>
+            <p>Plot y = ax^2 + bx + c with a small table of values; the <b>roots are where the curve crosses y = 0</b> (the x-axis). A curve that touches once has equal roots; one that never touches has no real roots — the picture of the discriminant.</p>
+            <div class="worked"><b>Worked example:</b> Solve x^2 − 4x − 5 = 0 graphically. Table: x = −2..6 gives y = 7, 0, −5, −8, −9, −8, −5, 0, 7. The curve crosses at x = −1 and x = 5 → roots <b>−1 and 5</b>.</div>
+            <p>Graphs also solve <b>mixed equations</b>: to solve x^2 = 2x + 3, draw y = x^2 and y = 2x + 3 and read the intersections.</p>
+
+            <h3>Deep dive: identities built from sum and product</h3>
+            <ul>
+              <li>α^2 + β^2 = (α + β)^2 − 2αβ.</li>
+              <li>(α − β)^2 = (α + β)^2 − 4αβ.</li>
+              <li>1/α + 1/β = (α + β)/(αβ) and α/β + β/α = ((α + β)^2 − 2αβ)/(αβ).</li>
+            </ul>
+            <div class="worked"><b>Worked example:</b> If α, β are roots of x^2 − 5x + 4 = 0, find α^2 + β^2. Sum = 5, product = 4 → 25 − 8 = <b>17</b> — without solving the equation at all.</div>
+
+            <h3>Deep dive: one linear + one quadratic (substitution)</h3>
+            <div class="worked"><b>Worked example:</b> y = x + 1 and x^2 + y^2 = 13. Substitute: x^2 + (x+1)^2 = 13 → 2x^2 + 2x − 12 = 0 → x^2 + x − 6 = 0 → (x + 3)(x − 2) = 0 → x = 2, y = 3 or x = −3, y = −2. Points: <b>(2, 3) and (−3, −2)</b>.</div>
+
+            <h3>Deep dive: word problems that bite</h3>
+            <div class="worked"><b>Worked example (ages):</b> In 3 years, Kofi's age squared will equal 9 times his age then. Let age then be x: x^2 = 9x → x(x − 9) = 0 → x = 9 (not 0) → now he is <b>6</b>.</div>
+            <div class="tip"><b>Exam tip:</b> after solving any word quadratic, run the "story check": does the root make sense (positive, whole, in range)? Writing one line of check rescues silly-mark losses.</div>
+`,
           cards: [
             { q: 'Write the general form of a quadratic equation.', a: 'ax^2 + bx + c = 0 with a not equal to zero — its graph is a parabola and it has at most two roots.' },
             { q: 'Solve x^2 + 5x + 6 = 0 by factorisation.', a: '(x + 2)(x + 3) = 0, so x = -2 or x = -3 — each bracket is set to zero.' },
@@ -1484,7 +1502,22 @@ const CURRICULUM = {
               <li>Forgetting a horizontal line has gradient 0 and a vertical line has <b>no</b> gradient.</li>
             </ul>
             <div class="tip"><b>Speed trick:</b> rewrite every given line into y = mx + c on the first line of your answer. Half of coordinate errors die right there.</div>
-          `,
+          
+            <h3>Deep dive: area of a triangle from coordinates</h3>
+            <div class="formula">Area = (1/2) | x1(y2 − y3) + x2(y3 − y1) + x3(y1 − y2) |  (take the absolute value)</div>
+            <div class="worked"><b>Worked example:</b> A(1, 1), B(4, 1), C(1, 5): Area = (1/2)|1(1−5) + 4(5−1) + 1(1−1)| = (1/2)|−4 + 16 + 0| = <b>6 square units</b>. (Check: right triangle, legs 3 and 4 → (1/2)(3)(4) = 6 ✓.)</div>
+            <p>If the area comes out <b>zero</b>, the three points are <b>collinear</b> — that is the examiner's favourite disguise of a collinearity question.</p>
+
+            <h3>Deep dive: dividing a segment in a ratio</h3>
+            <p>A point P dividing AB in the ratio m : n (from A) has coordinates ((n·x1 + m·x2)/(m + n), (n·y1 + m·y2)/(m + n)). The midpoint is just m : n = 1 : 1.</p>
+            <div class="worked"><b>Worked example:</b> P divides A(2, 3) and B(8, 9) in ratio 2 : 1. P = ((1×2 + 2×8)/3, (1×3 + 2×9)/3) = (18/3, 21/3) = <b>(6, 7)</b>.</div>
+
+            <h3>Deep dive: combining the tools (exam medley)</h3>
+            <div class="worked"><b>Q1.</b> Line L1: 3y = 6x − 9 and L2 through (0, 2) perpendicular to L1. m1 = 2 → m2 = −1/2 → L2: <b>y = −x/2 + 2</b>.</div>
+            <div class="worked"><b>Q2.</b> Show (0, 0), (4, 0), (0, 3) form a right triangle: gradients of the two legs are 0 (horizontal) and undefined (vertical) → perpendicular; or use area formula → 6 = (1/2)(4)(3) ✓.</div>
+            <div class="worked"><b>Q3.</b> Find the point on the x-axis equidistant from (2, 3) and (5, 1): let P(k, 0); (k−2)^2 + 9 = (k−5)^2 + 1 → −4k + 13 = −10k + 26 → 6k = 13 → k = <b>13/6</b>.</div>
+            <div class="tip"><b>Exam tip:</b> "equidistant" always means set the two distance-squares equal and let the squares cancel into a linear equation — never take square roots.</div>
+`,
           cards: [
             { q: 'How are coordinates written, and what is the origin?', a: 'As an ordered pair (x, y) — x across, y up — measured from the origin (0, 0) where the axes cross; the four quadrants are numbered anticlockwise from top-right.' },
             { q: 'Find the midpoint of (2, 3) and (8, 7).', a: 'Midpoint = ((x1 + x2)/2, (y1 + y2)/2) = (5, 5) — the average of each coordinate.' },
@@ -1750,51 +1783,71 @@ const CURRICULUM = {
           tags: ['Mutually exclusive', 'Independent events', 'Mean & SD'],
           summary: 'Addition and multiplication rules, plus mean, median and standard deviation.',
           content: `
-            <h3>Probability rules</h3>
-            <div class="formula">P(A or B) = P(A) + P(B) - P(A and B)   (mutually exclusive → just add)<br>
-            P(A and B) = P(A) × P(B)   (independent events)<br>
-            0 <= P(A) <= 1,  P(not A) = 1 - P(A)</div>
-            <div class="worked"><b>Worked example:</b> A fair die is thrown. P(even or prime) = P({2,4,6}) + P({2,3,5}) - P({2}) = 3/6 + 3/6 - 1/6 = <b>5/6</b>.</div>
-            <h3>Statistics</h3>
-            <ul><li><b>Mean</b> x̄ = Σfx / Σf</li>
-            <li><b>Median</b> — the middle value when arranged in order.</li>
-            <li><b>Mode</b> — the most frequent value.</li>
-            <li><b>Variance</b> = Σf(x - x̄)^2/Σf, and <b>SD</b> = √variance.</li></ul>
-            <div class="tip"><b>Exam tip:</b> For grouped data in WAEC theory, always show the frequency table with fx and fx^2 columns — method marks are awarded for the table even if the arithmetic slips.</div>
-            <h3>Worked practice</h3>
-            <div class="worked"><b>Q1.</b> Two dice are thrown. Find P(total = 9).<br>
-            The favourable outcomes are (3,6), (4,5), (5,4), (6,3) — four of 36, so P = <b>1/9</b>.</div>
-            <div class="worked"><b>Q2.</b> A bag holds 4 red and 6 blue balls. Two are drawn without replacement. Find P(both red).<br>
-            (4/10) × (3/9) = 12/90 = <b>2/15</b>. Note the second denominator is 9 — the bag has one fewer ball.</div>
-            <div class="worked"><b>Q3.</b> The marks of 5 students are 12, 15, 18, 20 and 25. Find the mean, median and standard deviation.<br>
-            Mean = 90/5 = 18. Median = 18.<br>
-            Deviations: -6, -3, 0, 2, 7 → squares 36, 9, 0, 4, 49 → variance = 98/5 = 19.6 → SD ~= <b>4.43</b>.</div>
-            <h3>Common mistakes</h3>
+
+            <h3>1. Summarising data: mean, median, mode</h3>
             <ul>
-              <li>Using the multiplication rule for events that are not independent.</li>
-              <li>Forgetting to reduce the total after drawing <b>without replacement</b>.</li>
-              <li>Reading the median without putting the data in order first.</li>
-              <li>Reporting the variance when the question asks for the <b>standard deviation</b> — take the square root.</li>
+              <li><b>Mean:</b> total ÷ number of values.</li>
+              <li><b>Median:</b> the middle value when sorted (average of the two middles if even count).</li>
+              <li><b>Mode:</b> the most frequent value.</li>
+              <li><b>Range:</b> largest − smallest.</li>
             </ul>
-            <h3>Deep dive: counting the chances</h3>
-            <div class="formula">P(event) = favourable outcomes ÷ total outcomes &nbsp;·&nbsp; P(not A) = 1 - P(A)</div>
-            <p><b>Mutually exclusive</b> events (cannot both happen) add: P(A or B) = P(A) + P(B). <b>Independent</b> events (one doesn't affect the other) multiply: P(A and B) = P(A) × P(B). <b>Without replacement</b> changes the denominator after each pick — tree diagrams keep this honest.</p>
-            <h3>Worked examples</h3>
-            <ol>
-              <li><b>Fair die: P(even)</b> = 3/6 = <b>1/2</b>; <b>P(greater than 4)</b> = 2/6 = 1/3; both cannot overlap? 5 is odd, so P(even or &gt;4) = 1/2 + 1/3 = 5/6.</li>
-              <li><b>Two dice, sum of 7:</b> outcomes (1,6)(2,5)(3,4)(4,3)(5,2)(6,1) → 6/36 = <b>1/6</b>.</li>
-              <li><b>Bag: 3 red, 2 blue. Two drawn without replacement, P(both red)</b> = 3/5 × 2/4 = 6/20 = <b>3/10</b>.</li>
-              <li><b>Data 2, 3, 3, 5, 7:</b> mean = 20/5 = <b>4</b>; median (middle when ordered) = <b>3</b>; mode (most frequent) = <b>3</b>; range = 7 - 2 = 5.</li>
-            </ol>
-            <p>For grouped/frequency data: mean = Σfx ÷ Σf — multiply each value by its frequency first.</p>
-            <h3>Examiner's traps</h3>
+            <div class="worked"><b>Worked example:</b> Data: 3, 7, 7, 9, 4. Sorted: 3, 4, 7, 7, 9. Mean = 30/5 = 6; median = 7; mode = 7; range = 6.</div>
+            <div class="worked"><b>Worked example (frequency table):</b> Scores 1, 2, 3 with frequencies 2, 5, 3. Mean = (1×2 + 2×5 + 3×3)/(2+5+3) = (2 + 10 + 9)/10 = <b>2.1</b>. Median = average of 5th and 6th values = (2+3)/2 = 2.5.</div>
+
+            <h3>2. Pie charts — the angle arithmetic</h3>
+            <div class="formula">Sector angle = (frequency ÷ total) × 360</div>
+            <div class="worked"><b>Worked example:</b> A family spends ₦12,000 of a ₦48,000 budget on food. Food angle = 12,000/48,000 × 360 = <b>90 degrees</b>.</div>
+
+            <h3>3. Probability basics</h3>
+            <p>Probability measures how likely an event is, on a scale from <b>0 (impossible) to 1 (certain)</b>. For equally likely outcomes:</p>
+            <div class="formula">P(event) = number of favourable outcomes ÷ total outcomes</div>
+            <div class="worked"><b>Worked example:</b> A fair die: P(even) = 3/6 = <b>1/2</b>; P(greater than 4) = 2/6 = 1/3.</div>
+            <div class="worked"><b>Worked example:</b> A bag has 3 red and 5 blue balls. P(red) = <b>3/8</b>.</div>
+
+            <h3>4. The three rules that carry every exam</h3>
             <ul>
-              <li><b>With</b> vs <b>without</b> replacement: the second fraction changes only in the second case.</li>
-              <li>Median requires the data <b>sorted first</b>; with an even count it is the average of the two middle values.</li>
-              <li>Probabilities never exceed 1 or fall below 0 — an answer like 7/5 means the counting went wrong.</li>
+              <li><b>Complement:</b> P(not A) = 1 − P(A). "At least one" questions love this.</li>
+              <li><b>Addition (mutually exclusive):</b> P(A or B) = P(A) + P(B) when both cannot happen together.</li>
+              <li><b>Multiplication (independent):</b> P(A and B) = P(A) × P(B) when one result does not affect the other.</li>
+            </ul>
+            <div class="worked"><b>Worked example (complement):</b> P(rain) = 0.35 → P(no rain) = <b>0.65</b>.</div>
+            <div class="worked"><b>Worked example (addition):</b> Die: P(2 or 5) = 1/6 + 1/6 = <b>1/3</b>.</div>
+            <div class="worked"><b>Worked example (multiplication):</b> Two fair coins: P(two heads) = 1/2 × 1/2 = <b>1/4</b>. Sample space {HH, HT, TH, TT} confirms it.</div>
+            <div class="worked"><b>Worked example (without replacement — dependent!):</b> From 3 red + 5 blue, two reds in a row without replacement: 3/8 × 2/7 = <b>6/56 = 3/28</b>. The second draw's odds change — multiplication still works, but with updated numbers.</div>
+
+            <h3>5. Examiner's favourites</h3>
+            <ul>
+              <li>"Probability that the sum of two dice is 7" — list the 6 favourable pairs out of 36 → 1/6.</li>
+              <li>"At least one head in two throws" — 1 − P(no heads) = 1 − 1/4 = 3/4.</li>
+              <li>Pie-chart angles both ways (angle → frequency and frequency → angle).</li>
             </ul>
 
-          `,
+            <h3>6. Common mistakes that cost marks</h3>
+            <ul>
+              <li>Writing a probability above 1 or below 0 — instant mark loss.</li>
+              <li>Adding probabilities of events that can happen together (double counting).</li>
+              <li>Using 1/2 × 1/2 for draws <b>without replacement</b> — the second fraction must shrink.</li>
+              <li>Forgetting to sort data before finding the median.</li>
+              <li>Using the wrong total in a frequency table (sum of frequencies, not of values).</li>
+            </ul>
+            <div class="tip"><b>Speed trick:</b> see "at least" → complement. See "or" between exclusive events → add. See "and/together/successive independent" → multiply. Three keywords, three rules.</div>
+          
+            <h3>Deep dive: grouped data and cumulative frequency</h3>
+            <ul>
+              <li><b>Mean of grouped data:</b> use class <b>midpoints</b> x: mean = Σ(f·x)/Σf.</li>
+              <li><b>Cumulative frequency:</b> running totals; the median is the value at the (n/2)th position, read from the table or the ogive (cumulative frequency curve).</li>
+            </ul>
+            <div class="worked"><b>Worked example:</b> Marks 10, 20, 30 with frequencies 2, 3, 5. Midpoints are the marks themselves: mean = (20 + 60 + 150)/10 = <b>23</b>. Cumulative: 2, 5, 10; n/2 = 5 → the 5th value lies in the 20 class → median = <b>20</b>.</div>
+
+            <h3>Deep dive: two dice — the 36-cell grid</h3>
+            <p>Half of all probability questions are two dice in costume. Memorise the grid facts: 36 equally likely outcomes; sum 7 appears <b>6</b> ways (1/6); sum 6 and 8 appear 5 ways each; doubles appear 6 ways (1/6).</p>
+            <div class="worked"><b>Worked example:</b> P(sum ≥ 10) = (3 + 2 + 1)/36 = 6/36 = <b>1/6</b> (sums 10, 11, 12 give 3, 2, 1 ways).</div>
+            <div class="worked"><b>Worked example (tree thinking):</b> A box has 2 red, 3 blue. Draw one, replace it, draw again. P(same colour) = P(RR) + P(BB) = (2/5)(2/5) + (3/5)(3/5) = 4/25 + 9/25 = <b>13/25</b>. With replacement = independent; add the mutually exclusive "same" paths.</div>
+
+            <h3>Deep dive: reading charts back to numbers</h3>
+            <div class="worked"><b>Worked example:</b> A pie chart of 90 students shows Mathematics at 120 degrees. How many chose Maths? 120/360 × 90 = <b>30</b>. The reverse direction is tested just as often as the forward one.</div>
+            <div class="tip"><b>Exam tip:</b> when a question says "two are chosen", immediately write whether it is <b>with</b> or <b>without replacement</b> — that single word decides the second fraction.</div>
+`,
           cards: [
             { q: 'Define probability and state its range.', a: 'P(event) = number of favourable outcomes / total number of equally likely outcomes; it always lies between 0 (impossible) and 1 (certain).' },
             { q: 'State the complement rule.', a: 'P(not A) = 1 - P(A) — e.g. if P(rain) = 0.35, then P(no rain) = 0.65.' },
@@ -1840,50 +1893,70 @@ const CURRICULUM = {
           tags: ['Cone', 'Cylinder', 'Frustum', 'Sphere'],
           summary: 'Volumes and surface areas of the standard solids plus the frustum shortcut.',
           content: `
-            <div class="formula">Cylinder: V = πr^2h,  CSA = 2πrh<br>
-            Cone: V = 1/3πr^2h,  CSA = πrl (l = slant height)<br>
-            Sphere: V = 4/3 πr^3,  SA = 4πr^2<br>
-            Frustum: V = 1/3πh(R^2 + Rr + r^2)</div>
-            <div class="worked"><b>Worked example:</b> A cone of radius 7 cm and height 24 cm: slant l = √(7^2 + 24^2) = 25 cm.<br>
-            V = 1/3 × 22/7 × 49 × 24 = <b>1232 cm^3</b>; CSA = 22/7 × 7 × 25 = 550 cm^2.</div>
-            <div class="tip"><b>Exam tip:</b> Unless the question says "use π = 3.142", leave your answer in terms of π — it is shorter and cannot lose accuracy marks.</div>
-            <h3>Worked practice</h3>
-            <div class="worked"><b>Q1.</b> A cylindrical tank has radius 1.4 m and height 3 m. Find its capacity in litres (π = 22/7).<br>
-            V = πr^2h = 22/7 × 1.96 × 3 = 18.48 m^3 = <b>18,480 litres</b>.</div>
-            <div class="worked"><b>Q2.</b> A cone and a cylinder have the same radius and height. Compare their volumes.<br>
-            Cone = 1/3πr^2h and cylinder = πr^2h, so the cone holds exactly <b>one third</b> as much.</div>
-            <div class="worked"><b>Q3.</b> A frustum has radii 7 cm and 3 cm and height 6 cm. Find its volume.<br>
-            V = 1/3πh(R^2 + Rr + r^2) = 1/3 × 22/7 × 6 × (49 + 21 + 9) = 22/7 × 2 × 79 ~= <b>496.6 cm^3</b>.</div>
-            <div class="worked"><b>Q4.</b> A hemisphere has radius 10 cm. Find its total surface area.<br>
-            Curved surface = 2πr^2 = 200π; base = πr^2 = 100π. Total = 300π ~= <b>942.9 cm^2</b>.</div>
-            <h3>Common mistakes</h3>
-            <ul>
-              <li>Using the vertical height where the <b>slant height</b> is needed for a cone's curved surface.</li>
-              <li>Confusing radius with diameter — halve the diameter before squaring.</li>
-              <li>Forgetting the base of a hemisphere or the two circular faces of a cylinder in a total surface area.</li>
-              <li>Mixing units: convert cm to m <b>before</b> cubing, not after.</li>
-            </ul>
-            <h3>Deep dive: the formulas that must be automatic</h3>
-            <div class="formula">Circle: C = 2πr, A = πr^2 &nbsp;·&nbsp; Sector (angle θ): arc = θ/360 × 2πr, area = θ/360 × πr^2<br/>Cylinder: V = πr^2h, total surface = 2πr(r + h) &nbsp;·&nbsp; Cone: V = 1/3πr^2h, curved surface = πrl<br/>Sphere: V = 4/3 πr^3, A = 4πr^2</div>
-            <p>The cone's 1/3 and its <b>slant height l = √(r^2 + h^2)</b> are where marks are won and lost. A frustum (a cone with its tip cut off, like a bucket or a funnel) = big cone minus small cone.</p>
-            <h3>Worked examples</h3>
-            <ol>
-              <li><b>Cylinder r = 7 cm, h = 10 cm (π = 22/7):</b> V = (22/7) × 49 × 10 = <b>1540 cm^3</b>.</li>
-              <li><b>Sector of a circle, r = 7 cm, θ = 60°:</b> area = 60/360 × (22/7) × 49 = (1/6)(154) = <b>25.67 cm^2</b>.</li>
-              <li><b>Cone r = 3, h = 4:</b> l = √(9+16) = 5; curved surface = π × 3 × 5 = <b>15π</b>; V = 1/3 π × 9 × 4 = <b>12π</b>.</li>
-            </ol>
-            <h3>Similar solids</h3>
-            <p>If the linear scale factor is k, then <b>areas scale by k^2</b> and <b>volumes by k^3</b>: a model car at 1/10 scale has 1/100 of the paint area and 1/1000 of the metal volume.</p>
-            <h3>Examiner's traps</h3>
-            <ul>
-              <li>Using height h where slant height l belongs in the cone's curved surface.</li>
-              <li>Forgetting the 1/3 in cone and pyramid volumes — a cone is exactly one-third of its cylinder.</li>
-              <li>"Total surface area" includes <b>every</b> face — the closed tin, not the open bucket, unless the question says so.</li>
-            </ul>
-            <h3>See it around you</h3>
-            <p>A 1000-litre poly tank is a cylinder (V = πr^2h tells you its height), a funnel is a cone, paint estimates for a room are total surface area minus doors and windows.</p>
 
-          `,
+            <h3>1. Plane figures — the core areas</h3>
+            <ul>
+              <li><b>Rectangle:</b> A = l × b; perimeter = 2(l + b).</li>
+              <li><b>Triangle:</b> A = (1/2) × base × height.</li>
+              <li><b>Parallelogram:</b> A = base × perpendicular height (not the slant side!).</li>
+              <li><b>Trapezium:</b> A = (1/2)(a + b)h, a and b the parallel sides.</li>
+              <li><b>Circle:</b> A = πr^2; circumference = 2πr = πd.</li>
+            </ul>
+            <div class="worked"><b>Worked example:</b> Trapezium with parallel sides 8 cm and 12 cm, height 5 cm: A = (1/2)(20)(5) = <b>50 cm^2</b>.</div>
+
+            <h3>2. Circle sectors and arcs</h3>
+            <div class="formula">Arc length = (θ/360) × 2πr • Sector area = (θ/360) × πr^2</div>
+            <div class="worked"><b>Worked example:</b> A sector of 90 degrees in a circle of radius 7 cm (π = 22/7): arc = (90/360) × 2 × 22/7 × 7 = <b>11 cm</b>; area = (90/360) × 22/7 × 49 = <b>38.5 cm^2</b>.</div>
+
+            <h3>3. Solids: volumes first</h3>
+            <ul>
+              <li><b>Cube (edge e):</b> V = e^3; surface = 6e^2.</li>
+              <li><b>Cuboid:</b> V = l × b × h; surface = 2(lb + bh + lh).</li>
+              <li><b>Cylinder (radius r, height h):</b> V = πr^2h; curved surface = 2πrh; total = 2πrh + 2πr^2.</li>
+              <li><b>Cone (radius r, height h, slant l):</b> V = (1/3)πr^2h; curved surface = πrl.</li>
+              <li><b>Sphere:</b> V = (4/3)πr^3; surface = 4πr^2.</li>
+              <li><b>Prism:</b> V = cross-section area × length.</li>
+            </ul>
+            <div class="worked"><b>Worked example:</b> Cylinder r = 7 cm, h = 10 cm (π = 22/7): V = 22/7 × 49 × 10 = <b>1540 cm^3</b>.</div>
+            <div class="worked"><b>Worked example:</b> Cone r = 3 cm, h = 4 cm: slant l = √(9 + 16) = 5 cm; V = (1/3) × π × 9 × 4 = 12π ≈ <b>37.7 cm^3</b>; curved surface = π × 3 × 5 = 15π ≈ 47.1 cm^2.</div>
+
+            <h3>4. Examiner's favourites</h3>
+            <ul>
+              <li><b>Melting/recasting:</b> volume is conserved — melt a sphere into a cylinder: set volumes equal, solve for the unknown height.</li>
+              <li><b>Water in a tank:</b> rise in level = volume added ÷ base area.</li>
+              <li><b>Shaded regions:</b> subtract the smaller area from the bigger (circle inside a square, sector minus triangle).</li>
+              <li><b>Cone from a sector:</b> a sector of radius l rolled into a cone has slant l and base radius r where arc length = 2πr.</li>
+            </ul>
+            <div class="worked"><b>Worked example (recast):</b> A sphere of radius 3 cm is melted into a cylinder of radius 3 cm. Height? (4/3)π(27) = π(9)h → 36 = 9h → h = <b>4 cm</b>.</div>
+
+            <h3>5. Common mistakes that cost marks</h3>
+            <ul>
+              <li>Using diameter where the formula wants radius (or vice versa).</li>
+              <li>Using slant height for a cone's <b>volume</b> — volume needs the perpendicular height; curved surface needs the slant.</li>
+              <li>Parallelogram area with the slant side instead of the perpendicular height.</li>
+              <li>Forgetting the (1/3) in cone and pyramid volumes.</li>
+              <li>Ignoring the stated value of π (22/7 vs 3.14) and losing the "exact" mark.</li>
+              <li>Mixing units — cm with m — before multiplying.</li>
+            </ul>
+            <div class="tip"><b>Speed trick:</b> before computing, write r = … and h = … on the answer line. Most mensuration marks die in the first ten seconds of misread data, not in the arithmetic.</div>
+          
+            <h3>Deep dive: pyramids and the (1/3) family</h3>
+            <p>Every "pointy" solid carries the one-third: cone = (1/3)πr^2h and pyramid = (1/3) × base area × height — each exactly one third of the prism or cylinder that encloses it.</p>
+            <div class="worked"><b>Worked example:</b> Square-based pyramid, base 6 cm, height 10 cm: V = (1/3)(36)(10) = <b>120 cm^3</b>.</div>
+
+            <h3>Deep dive: the three classic scenarios, fully worked</h3>
+            <div class="worked"><b>Water rise:</b> A tank 20 cm by 15 cm holds water; a stone raises the level by 4 cm. Stone volume = 20 × 15 × 4 = <b>1200 cm^3</b> — displaced water equals the object.</div>
+            <div class="worked"><b>Shaded region:</b> A circle of radius 7 cm inside a square of side 14 cm. Shaded = 196 − (22/7 × 49) = 196 − 154 = <b>42 cm^2</b>.</div>
+            <div class="worked"><b>Sector becomes cone:</b> A 180-degree sector of radius 10 cm is rolled into a cone. Arc = (180/360)(2π × 10) = 10π = base circumference = 2πr → r = 5 cm. Slant = 10 → height = √(100 − 25) = √75 ≈ 8.66 cm. Volume = (1/3)π(25)(8.66) ≈ <b>226.7 cm^3</b>.</div>
+
+            <h3>Deep dive: unit discipline</h3>
+            <ul>
+              <li>1 m^3 = 1,000,000 cm^3; 1 litre = 1000 cm^3 — tank capacity questions live here.</li>
+              <li>Convert <b>before</b> multiplying, never after.</li>
+            </ul>
+            <div class="worked"><b>Worked example:</b> A tank 2 m by 1 m by 0.5 m holds 2 × 1 × 0.5 = 1 m^3 = <b>1000 litres</b>.</div>
+            <div class="tip"><b>Exam tip:</b> if the answer line feels wrong (a cup holding 4000 litres), your units slipped — the smell test catches it before the examiner does.</div>
+`,
           cards: [
             { q: 'Give the area formulas for a rectangle, triangle, trapezium and circle.', a: 'Rectangle lw; triangle (1/2)bh; trapezium (1/2)(a + b)h; circle πr^2 (circumference 2πr).' },
             { q: 'Find the area and perimeter of a sector of radius 7 cm, angle 90 deg (π = 22/7).', a: 'Area = 90/360 x (22/7) x 49 = 38.5 cm2; arc = 90/360 x 2 x (22/7) x 7 = 11 cm, so perimeter = 11 + 7 + 7 = 25 cm.' },
@@ -1969,7 +2042,24 @@ const CURRICULUM = {
               <li>Multiplying M⁻^1K in the wrong order (it must be M⁻^1 × K, not K × M⁻^1).</li>
             </ul>
             <div class="tip"><b>Speed trick:</b> for any inverse, do it in one chant: "swap the diagonal, negate the off-diagonal, divide by det." Say it every time; the inverse is free marks.</div>
-          `,
+          
+            <h3>Deep dive: Cramer's rule — determinants doing the solving</h3>
+            <p>For ax + by = e and cx + dy = f: x = det[e b; f d] ÷ det M and y = det[a e; c f] ÷ det M — replace the column you are solving for with the answers column.</p>
+            <div class="worked"><b>Worked example:</b> 3x + y = 7; 2x + 4y = 18. det M = 10. x = det[7 1; 18 4]/10 = (28 − 18)/10 = <b>1</b>; y = det[3 7; 2 18]/10 = (54 − 14)/10 = <b>4</b> — matching the inverse method.</div>
+
+            <h3>Deep dive: determinant and matrix facts that score</h3>
+            <ul>
+              <li>det(AB) = det A × det B.</li>
+              <li>det(kM) for 2 × 2 = k^2 det M (the scalar hits both rows).</li>
+              <li>M × M⁻^1 = M⁻^1 × M = I, and (M⁻^1)⁻^1 = M.</li>
+              <li>A singular matrix (det = 0) has <b>no inverse</b> — say so and stop, that is the answer.</li>
+            </ul>
+            <div class="worked"><b>Worked example:</b> det A = 3, det B = 5 → det(AB) = <b>15</b>; det(2A) = 4 × 3 = <b>12</b>.</div>
+
+            <h3>Deep dive: word problems as matrix equations</h3>
+            <div class="worked"><b>Worked example:</b> Two books and one pen cost ₦2,500; one book and three pens cost ₦3,000. 2b + p = 2500; b + 3p = 3000. M = [2 1; 1 3], det = 5. b = det[2500 1; 3000 3]/5 = (7500 − 3000)/5 = <b>900</b>; p = det[2 2500; 1 3000]/5 = (6000 − 2500)/5 = <b>700</b>. Book ₦900, pen ₦700.</div>
+            <div class="tip"><b>Exam tip:</b> translate the story straight into the two equations, then choose Cramer or inverse — both are two minutes; the marks are in the setup.</div>
+`,
           cards: [
             { q: 'What is the order of a matrix, and what is the order of a 2 x 3 matrix?', a: 'Order = rows x columns; a 2 x 3 matrix has 2 rows and 3 columns (6 elements).' },
             { q: 'When can two matrices be added, and how?', a: 'Only when they have the same order — add corresponding elements.' },
@@ -12926,41 +13016,61 @@ Ada eventually saved enough to buy her mother a gift and returned home proud." (
           tags: ['Trade', 'Aids to trade', 'Production types', 'Chain of distribution'],
           summary: 'What commerce covers, how it links producer to consumer, and the production it serves.',
           content: `
-            <h3>1. What commerce is</h3>
-            <p><b>Commerce</b> is the branch of business activity concerned with the <b>exchange of goods and services</b> and with removing the hindrances that exchange faces — from producer to final consumer.</p>
-            <ul>
-              <li><b>Trade:</b> buying and selling — home (internal) and foreign (import/export/entrepot).</li>
-              <li><b>Aids to trade (auxiliaries):</b> transport (place hindrance), warehousing (time hindrance), banking &amp; finance (capital hindrance), insurance (risk hindrance), advertising (information hindrance), communication (contact hindrance).</li>
-            </ul>
-            <div class="diagram"><svg viewBox="0 0 460 150" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Commerce structure: trade at the centre with aids to trade surrounding it">
-              <rect x="8" y="8" width="444" height="134" rx="10" fill="#eff6ff" stroke="#1e40af" stroke-width="2"/>
-              <rect x="180" y="52" width="100" height="46" rx="10" fill="#2563eb"/><text x="230" y="80" text-anchor="middle" font-size="14" font-weight="800" fill="#fff">TRADE</text>
-              <g font-size="9.5" font-weight="700" fill="#1e3a8a">
-                <rect x="24" y="20" width="86" height="26" rx="8" fill="#dbeafe"/><text x="67" y="37" text-anchor="middle">Transport</text>
-                <rect x="120" y="20" width="86" height="26" rx="8" fill="#dbeafe"/><text x="163" y="37" text-anchor="middle">Warehousing</text>
-                <rect x="216" y="20" width="86" height="26" rx="8" fill="#dbeafe"/><text x="259" y="37" text-anchor="middle">Banking</text>
-                <rect x="312" y="20" width="86" height="26" rx="8" fill="#dbeafe"/><text x="355" y="37" text-anchor="middle">Insurance</text>
-                <rect x="70" y="106" width="96" height="26" rx="8" fill="#dbeafe"/><text x="118" y="123" text-anchor="middle">Advertising</text>
-                <rect x="288" y="106" width="96" height="26" rx="8" fill="#dbeafe"/><text x="336" y="123" text-anchor="middle">Communication</text>
-              </g>
-            </svg></div>
 
-            <h3>2. Production and its types</h3>
-            <ul>
-              <li><b>Production:</b> creation of goods and services (utility). Extractive (mining, fishing), manufacturing (processing), constructive (building), tertiary/services (teaching, banking).</li>
-              <li><b>Chain of distribution:</b> producer → wholesaler → retailer → consumer.</li>
-            </ul>
-            <div class="worked"><b>Worked example:</b> Match aid to hindrance: transport removes PLACE (goods must move); warehousing removes TIME (goods wait for demand); insurance removes RISK (fire, theft); banking removes CAPITAL (money to trade); advertising removes INFORMATION (nobody knows the product).</div>
-            <div class="formula">Watch out — TRAP: commerce ≠ trade. Trade is ONE branch; commerce = trade + aids to trade.</div>
+            <h3>1. Where commerce sits in the economy</h3>
+            <p><b>Production</b> creates goods and services; <b>consumption</b> uses them; <b>commerce</b> is the bridge — the part of production concerned with the <b>exchange and distribution</b> of goods from producer to consumer. Without commerce, yam harvests rot in the village while cities go hungry.</p>
+            <div class="formula">Business studies = Industry (production) + Commerce (trade + aids to trade)</div>
 
-            <h3>3. Try these (with answers)</h3>
+            <h3>2. The two wings of commerce</h3>
             <ul>
-              <li><b>Q1.</b> Buying and selling across borders is? <i>Ans: foreign trade.</i></li>
-              <li><b>Q2.</b> Which aid removes risk? <i>Ans: insurance.</i></li>
-              <li><b>Q3.</b> Producer → ? → retailer → consumer. <i>Ans: wholesaler.</i></li>
+              <li><b>Trade:</b> buying and selling. <b>Home trade</b> (wholesale and retail within the country) and <b>foreign trade</b> (imports, exports, and <b>entrepôt</b> — re-export, buying from one country to sell to another without home use).</li>
+              <li><b>Aids to trade (auxiliaries):</b> the services that let trade happen smoothly.</li>
             </ul>
-            <div class="formula">SUMMARY: commerce is exchange plus the removal of exchange&apos;s hindrances: trade (home and foreign) sits at the centre, ringed by aids to trade — transport, warehousing, banking, insurance, advertising and communication — each killing one hindrance of place, time, capital, risk or information; it serves production (extractive, manufacturing, constructive, services) and moves goods down the chain producer–wholesaler–retailer–consumer.</div>
-`,
+            <ul>
+              <li><b>Transport:</b> moves goods across space — creates <b>place utility</b>.</li>
+              <li><b>Warehousing:</b> stores goods across time — creates <b>time utility</b>, steadies prices.</li>
+              <li><b>Banking:</b> holds money, lends capital, enables payments.</li>
+              <li><b>Insurance:</b> spreads risk (fire, theft, damage) so traders can sleep.</li>
+              <li><b>Advertising:</b> informs and persuades buyers; builds brands.</li>
+              <li><b>Communication:</b> orders, enquiries and market news travel fast.</li>
+            </ul>
+            <div class="worked"><b>Worked example:</b> Which auxiliary removes each obstacle? Distance → transport; time → warehousing; risk → insurance; capital → banking; ignorance of the product → advertising.</div>
+
+            <h3>3. Wholesale and retail — the chain</h3>
+            <ul>
+              <li><b>Wholesaler:</b> buys in bulk from producers, breaks bulk, finances retailers (by giving credit), warehouses and bears risk.</li>
+              <li><b>Retailer:</b> sells in small quantities to the final consumer, offers choice and convenience, feeds consumer tastes back up the chain.</li>
+              <li><b>Chain stores/supermarkets & e-commerce</b> shorten or re-route the chain — but someone still performs every auxiliary function.</li>
+            </ul>
+
+            <h3>4. Production: meaning and types</h3>
+            <p><b>Production</b> is the creation of <b>utility</b> (satisfaction) — it is not finished until the good reaches the consumer, which is why commerce counts as production. Three types:</p>
+            <ul>
+              <li><b>Primary (extractive):</b> taking from nature — farming, fishing, mining, quarrying, forestry. Nigeria: crude oil, tin, cocoa.</li>
+              <li><b>Secondary (manufacturing & construction):</b> turning raw materials into finished or semi-finished goods — flour milling, textiles, cement, building.</li>
+              <li><b>Tertiary (services):</b> the intangible — teaching, banking, transport, medicine, trade itself.</li>
+            </ul>
+            <div class="worked"><b>Worked example (classification):</b> A fisherman (primary) sells to a cannery (secondary) whose tins ride a truck (tertiary) to a wholesaler (commerce) to a retailer (commerce). Point at each stage's type.</div>
+
+            <h3>5. Specialisation and interdependence</h3>
+            <p>No one produces everything; we specialise (by person, firm and region) and exchange the surplus — that exchange is commerce's reason for existing. Specialisation gains skill, speed and scale, but makes everyone <b>interdependent</b>, so commerce's job (moving goods reliably) becomes the economy's lifeline.</p>
+
+            <h3>6. Examiner's favourites</h3>
+            <ul>
+              <li>"Commerce is production." Discuss — argue that production is incomplete until goods reach the consumer; commerce adds time and place utility.</li>
+              <li>Match each auxiliary to the obstacle it removes (the worked table above).</li>
+              <li>Classify industries as primary/secondary/tertiary — mixed examples (a bakery with its own delivery van) test judgement.</li>
+            </ul>
+
+            <h3>7. Common mistakes that cost marks</h3>
+            <ul>
+              <li>Calling commerce the same as trade — trade is one wing; auxiliaries are the other.</li>
+              <li>Classifying banking as secondary — services are tertiary.</li>
+              <li>Saying entrepôt trade means importing for home use — it is re-export.</li>
+              <li>Thinking production ends at the factory gate.</li>
+            </ul>
+            <div class="tip"><b>Speed trick:</b> draw the chain producer → wholesaler → retailer → consumer once, hang an auxiliary under each arrow, and every commerce question becomes "which box is this?"</div>
+          `,
           quiz: [
             { q: 'Commerce is concerned with', options: ['production only', 'exchange of goods and services and removing its hindrances', 'farming only', 'taxation'], correct: 1, exp: 'Exchange plus hindrance removal.' },
             { q: 'Buying and selling within the country is', options: ['foreign trade', 'home trade', 'entrepot', 'barter'], correct: 1, exp: 'Trade within one country is home or internal trade.' },
