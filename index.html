@@ -16089,38 +16089,62 @@ function pushHistory(result, subject, mode) {
   const keys = Object.keys(qs.days);
   if (keys.length > 200) { keys.sort(); for (const k of keys.slice(0, keys.length - 200)) delete qs.days[k]; }
 }
+let chartIdSeq = 0;
+function chartSmoothPath(points) {
+  if (points.length < 3) return 'M' + points.map(p => p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' L ');
+  let d = 'M' + points[0][0].toFixed(1) + ' ' + points[0][1].toFixed(1);
+  const t = 0.18;
+  for (let i = 0; i < points.length - 1; i++) {
+    const p0 = points[i - 1] || points[i], p1 = points[i], p2 = points[i + 1], p3 = points[i + 2] || p2;
+    const c1x = p1[0] + (p2[0] - p0[0]) * t, c1y = p1[1] + (p2[1] - p0[1]) * t;
+    const c2x = p2[0] - (p3[0] - p1[0]) * t, c2y = p2[1] - (p3[1] - p1[1]) * t;
+    d += ' C' + c1x.toFixed(1) + ' ' + c1y.toFixed(1) + ',' + c2x.toFixed(1) + ' ' + c2y.toFixed(1) + ',' + p2[0].toFixed(1) + ' ' + p2[1].toFixed(1);
+  }
+  return d;
+}
 function progressChartSvg(h) {
   const pts = (h || []).slice(-20);
   if (pts.length === 0) return '<p class="rounded-xl bg-slate-50 px-3 py-4 text-center text-xs font-semibold text-slate-400">Take a couple of quizzes and your score graph starts growing here. 📈</p>';
-  if (pts.length === 1) {
-    const q0 = pts[0], y0 = (154 - (q0.p / 100) * 128).toFixed(1);
-    return `<svg viewBox="0 0 560 180" class="w-full" role="img" aria-label="Quiz score trend">
-      <line x1="26" y1="154" x2="534" y2="154" stroke="#cbd5e1" stroke-width="1.4"/>
-      <line x1="26" y1="${y0}" x2="534" y2="${y0}" stroke="#e2e8f0" stroke-dasharray="4 4"/>
-      <circle cx="280" cy="${y0}" r="5.5" fill="${q0.p >= 70 ? '#059669' : q0.p >= 40 ? '#d97706' : '#e11d48'}"/>
-      <text x="280" y="22" font-size="11" fill="#64748b" font-weight="800" text-anchor="middle">${q0.p}% on ${escapeHtml(q0.s)} — first data point recorded. One more quiz draws your trend line.</text>
-    </svg>`;
-  }
-  const W2 = 560, H2 = 180, pad = 26;
-  const xs = i => pad + i * (W2 - 2 * pad) / (pts.length - 1);
-  const ys = p => H2 - pad - (p / 100) * (H2 - 2 * pad);
-  const line = pts.map((q, i) => xs(i).toFixed(1) + ',' + ys(q.p).toFixed(1)).join(' ');
-  const area = pad.toFixed(1) + ',' + (H2 - pad) + ' ' + line + ' ' + (W2 - pad).toFixed(1) + ',' + (H2 - pad);
-  const dots = pts.map((q, i) => '<circle cx="' + xs(i).toFixed(1) + '" cy="' + ys(q.p).toFixed(1) + '" r="3.4" fill="' + (q.p >= 70 ? '#059669' : q.p >= 40 ? '#d97706' : '#e11d48') + '"/>').join('');
+  chartIdSeq = (chartIdSeq + 1) % 100000;
+  const g = 'pc' + chartIdSeq;
+  const W2 = 640, H2 = 230, padL = 40, padR = 22, padT = 40, padB = 34;
+  const plotW = W2 - padL - padR, plotH = H2 - padT - padB;
+  const xs = i => pts.length === 1 ? padL + plotW / 2 : padL + i * plotW / (pts.length - 1);
+  const ys = p => padT + (1 - Math.max(0, Math.min(100, p)) / 100) * plotH;
+  const P = pts.map((q, i) => [xs(i), ys(q.p)]);
+  const grid = [100, 75, 50, 25, 0].map(v => `<line x1="${padL}" y1="${ys(v).toFixed(1)}" x2="${W2 - padR}" y2="${ys(v).toFixed(1)}" stroke="${v === 0 ? '#dbe3ec' : '#eef2f7'}" stroke-width="${v === 0 ? 1.4 : 1}"${v === 100 || v === 0 ? '' : ' stroke-dasharray="3 5"'}/><text x="${padL - 8}" y="${(ys(v) + 3.5).toFixed(1)}" font-size="9.5" font-weight="700" fill="#a3b0c2" text-anchor="end">${v}</text>`).join('');
+  const line = chartSmoothPath(P);
+  const area = line + ' L ' + P[P.length - 1][0].toFixed(1) + ' ' + ys(0).toFixed(1) + ' L ' + P[0][0].toFixed(1) + ' ' + ys(0).toFixed(1) + ' Z';
   const last = pts[pts.length - 1], first = pts[0];
   const trend = last.p - first.p;
+  const up = trend >= 0;
+  const lx = P[P.length - 1][0], ly = P[P.length - 1][1];
+  const labelY = ly < padT + 18 ? ly + 24 : ly - 14;
+  const single = pts.length === 1;
+  const dots = single ? '' : P.slice(0, -1).map((p, i) => `<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="3.2" fill="#ffffff" stroke="#8b5cf6" stroke-width="2"/>`).join('');
+  const lastDot = `<circle cx="${lx.toFixed(1)}" cy="${ly.toFixed(1)}" r="9.5" fill="#8b5cf6" opacity="0.16"/><circle cx="${lx.toFixed(1)}" cy="${ly.toFixed(1)}" r="5" fill="#7c3aed" stroke="#ffffff" stroke-width="2.4"/>` +
+    `<g><rect x="${(lx - 22).toFixed(1)}" y="${(labelY - 13).toFixed(1)}" width="44" height="19" rx="9.5" fill="#1e1b4b"/><text x="${lx.toFixed(1)}" y="${(labelY + 0.5).toFixed(1)}" font-size="10.5" font-weight="800" fill="#ffffff" text-anchor="middle">${last.p}%</text></g>`;
+  const pillW = 148, pillX = W2 - padR - pillW;
+  const trendPill = `<rect x="${pillX}" y="9" width="${pillW}" height="21" rx="10.5" fill="${up ? '#ecfdf5' : '#fff1f2'}"/><text x="${pillX + pillW / 2}" y="23.5" font-size="10.5" font-weight="800" fill="${up ? '#059669' : '#e11d48'}" text-anchor="middle">${up ? '▲' : '▼'} ${Math.abs(trend)} pts · ${pts.length} quiz${pts.length === 1 ? '' : 'zes'}</text>`;
+  const dates = single ? `<text x="${(W2 / 2).toFixed(1)}" y="${H2 - 10}" font-size="10" font-weight="700" fill="#a3b0c2" text-anchor="middle">${escapeHtml(first.d.slice(5))} · ${escapeHtml(first.s)} — first data point. One more quiz draws your trend line.</text>`
+    : `<text x="${padL}" y="${H2 - 10}" font-size="10" font-weight="700" fill="#a3b0c2">${escapeHtml(first.d.slice(5))}</text><text x="${W2 - padR}" y="${H2 - 10}" font-size="10" font-weight="700" fill="#a3b0c2" text-anchor="end">${escapeHtml(last.d.slice(5))}</text>`;
   return `<svg viewBox="0 0 ${W2} ${H2}" class="w-full" role="img" aria-label="Quiz score trend">
-    <line x1="${pad}" y1="${ys(100)}" x2="${W2 - pad}" y2="${ys(100)}" stroke="#e2e8f0" stroke-width="1"/>
-    <line x1="${pad}" y1="${ys(50)}" x2="${W2 - pad}" y2="${ys(50)}" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="4 4"/>
-    <line x1="${pad}" y1="${ys(0)}" x2="${W2 - pad}" y2="${ys(0)}" stroke="#cbd5e1" stroke-width="1.4"/>
-    <text x="4" y="${ys(100) + 4}" font-size="10" fill="#94a3b8" font-weight="700">100</text>
-    <text x="8" y="${ys(50) + 4}" font-size="10" fill="#94a3b8" font-weight="700">50</text>
-    <polygon points="${area}" fill="#6366f1" opacity="0.08"/>
-    <polyline points="${line}" fill="none" stroke="#6366f1" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+    <defs>
+      <linearGradient id="${g}-stroke" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#6366f1"/><stop offset="0.55" stop-color="#8b5cf6"/><stop offset="1" stop-color="#d946ef"/>
+      </linearGradient>
+      <linearGradient id="${g}-area" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#8b5cf6" stop-opacity="0.20"/><stop offset="1" stop-color="#8b5cf6" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    ${grid}
+    <path d="${area}" fill="url(#${g}-area)"/>
+    <path d="${line}" fill="none" stroke="url(#${g}-stroke)" stroke-width="8" stroke-linecap="round" opacity="0.10"/>
+    <path d="${line}" fill="none" stroke="url(#${g}-stroke)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
     ${dots}
-    <text x="${pad}" y="${H2 - 6}" font-size="10" fill="#94a3b8" font-weight="700">${first.d.slice(5)}</text>
-    <text x="${W2 - pad}" y="${H2 - 6}" font-size="10" fill="#94a3b8" font-weight="700" text-anchor="end">${last.d.slice(5)}</text>
-    <text x="${W2 - pad}" y="14" font-size="11" fill="${trend >= 0 ? '#059669' : '#e11d48'}" font-weight="800" text-anchor="end">${trend >= 0 ? '▲' : '▼'} ${Math.abs(trend)} pts over ${pts.length} quizzes</text>
+    ${lastDot}
+    ${trendPill}
+    ${dates}
   </svg>`;
 }
 function activityHeatSvg(days) {
@@ -19156,6 +19180,92 @@ function buildDetailedParentReport() {
   lines.push('', 'A little encouragement goes a long way! — StudyOS');
   return lines.join('\n');
 }
+function computeStudyToDos() {
+  const s = state.quizStats || {};
+  const weak = weakestTopicInfo();
+  const todos = [];
+  if (weak.weakSub) todos.push(`Do 2 fresh quizzes in ${weak.weakSub} — your lowest-scoring subject (${weak.weakPct}%)`);
+  if (weak.weakTop) todos.push(`Re-read the lesson: ${weak.weakTop} (${weak.topPct}% last time)`);
+  todos.push('One 15-minute flashcard session on your weakest subject');
+  todos.push(state.streak > 0 ? `Protect your ${state.streak}-day streak — study something today` : 'Start a new streak — one quiz today sets Day 1');
+  return todos.slice(0, 4);
+}
+function buildParentCardSvg() {
+  const s = state.quizStats || {};
+  const acc = s.total ? Math.round((s.correct / s.total) * 100) : 0;
+  const weak = weakestTopicInfo();
+  const todos = computeStudyToDos();
+  const bySubject = Object.entries(s.bySubject || {}).slice(0, 5);
+  const W = 750, H = 1080;
+  const name = escapeHtml(state.profile.name || 'Student');
+  const cls = escapeHtml(state.profile.classLevel || '');
+  const exam = escapeHtml(state.profile.targetExam || '');
+  const esc = t => escapeHtml(String(t));
+  const statTiles = [
+    [acc + '%', 'accuracy', '#eef2ff', '#4338ca'],
+    [(s.attempts || 0) + '', 'quizzes', '#ecfdf5', '#047857'],
+    [(s.bestPercent || 0) + '%', 'best', '#fffbeb', '#b45309'],
+    ['🔥 ' + (state.streak || 0), 'streak', '#fff1f2', '#be123c']
+  ].map((t, i) => {
+    const x = 40 + i * 172;
+    return `<rect x="${x}" y="196" width="152" height="86" rx="18" fill="${t[2]}"/><text x="${x + 76}" y="240" font-size="27" font-weight="800" fill="${t[3]}" text-anchor="middle">${esc(t[0])}</text><text x="${x + 76}" y="262" font-size="12.5" font-weight="700" fill="#64748b" text-anchor="middle">${esc(t[1])}</text>`;
+  }).join('');
+  const bars = bySubject.map(([subj, st], i) => {
+    const p = st.total ? Math.round((st.correct / st.total) * 100) : 0;
+    const y = 560 + i * 44;
+    return `<text x="40" y="${y + 4}" font-size="13.5" font-weight="700" fill="#334155">${esc(subj)}</text><text x="710" y="${y + 4}" font-size="13.5" font-weight="800" fill="#64748b" text-anchor="end">${p}%</text><rect x="40" y="${y + 12}" width="670" height="10" rx="5" fill="#eef2f7"/><rect x="40" y="${y + 12}" width="${(670 * p / 100).toFixed(0)}" height="10" rx="5" fill="${p >= 70 ? '#10b981' : p >= 40 ? '#f59e0b' : '#f43f5e'}"/>`;
+  }).join('');
+  const weakBlock = weak.weakSub
+    ? `<rect x="40" y="800" width="670" height="72" rx="18" fill="#fff7ed" stroke="#fed7aa" stroke-width="1.5"/><text x="64" y="830" font-size="14" font-weight="800" fill="#c2410c">⚠️ Weak area: ${esc(weak.weakSub)}${weak.weakTop ? ' — ' + esc(weak.weakTop) : ''}</text><text x="64" y="854" font-size="13" font-weight="600" fill="#9a3412">Scoring ${weak.topPct || weak.weakPct}% here — the biggest single opportunity for score growth.</text>`
+    : `<rect x="40" y="800" width="670" height="72" rx="18" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1.5"/><text x="64" y="842" font-size="14" font-weight="800" fill="#15803d">✅ No weak areas flagged yet — keep building across subjects.</text>`;
+  const todoLines = todos.map((t, i) => {
+    const y = 916 + i * 30;
+    return `<rect x="40" y="${y - 12}" width="18" height="18" rx="6" fill="#eef2ff" stroke="#c7d2fe" stroke-width="1.5"/><text x="70" y="${y + 2}" font-size="13.5" font-weight="600" fill="#334155">${esc(t)}</text>`;
+  }).join('');
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif">
+    <rect width="${W}" height="${H}" rx="28" fill="#ffffff"/>
+    <rect width="${W}" height="156" rx="28" fill="#1e1b4b"/>
+    <rect y="128" width="${W}" height="28" fill="#1e1b4b"/>
+    <text x="40" y="62" font-size="24" font-weight="800" fill="#ffffff">📚 StudyOS Progress Report</text>
+    <text x="40" y="92" font-size="15" font-weight="700" fill="#a5b4fc">${name}${cls ? ' · ' + cls : ''}${exam ? ' · ' + exam : ''}</text>
+    <text x="40" y="118" font-size="12.5" font-weight="600" fill="#818cf8">${esc(localISO())} · studyos-academic.vercel.app</text>
+    <text x="40" y="182" font-size="15" font-weight="800" fill="#1e293b" letter-spacing="1.5">PERFORMANCE</text>
+    ${statTiles}
+    <text x="40" y="330" font-size="15" font-weight="800" fill="#1e293b" letter-spacing="1.5">IMPROVEMENT LINE</text>
+    <g transform="translate(40, 344) scale(1.047)">${progressChartSvg(s.history).replace(/^<svg[^>]*>/, '').replace(/<\/svg>\s*$/, '')}</g>
+    <text x="40" y="${bySubject.length ? 530 : 545}" font-size="15" font-weight="800" fill="#1e293b" letter-spacing="1.5">BY SUBJECT</text>
+    ${bars || '<text x="40" y="570" font-size="13.5" font-weight="600" fill="#94a3b8">No subject data yet.</text>'}
+    ${weakBlock}
+    <text x="40" y="898" font-size="15" font-weight="800" fill="#1e293b" letter-spacing="1.5">TO-DO THIS WEEK</text>
+    ${todoLines}
+    <text x="375" y="${H - 22}" font-size="11.5" font-weight="700" fill="#94a3b8" text-anchor="middle">Made with StudyOS — a little encouragement goes a long way 💛</text>
+  </svg>`;
+}
+function downloadParentCard() {
+  try {
+    const svg = buildParentCardSvg();
+    const url = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+    const img = new Image();
+    img.onload = () => {
+      const c = document.createElement('canvas');
+      c.width = 750 * 2; c.height = 1080 * 2;
+      const ctx = c.getContext('2d');
+      ctx.scale(2, 2);
+      ctx.drawImage(img, 0, 0, 750, 1080);
+      c.toBlob(b => {
+        if (!b) { toast('Image export failed on this browser'); return; }
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(b);
+        a.download = 'studyos-report-' + localISO() + '.png';
+        document.body.appendChild(a); a.click();
+        setTimeout(() => { try { URL.revokeObjectURL(a.href); a.remove(); } catch (e) { /* noop */ } }, 500);
+        toast('Report image saved — send it to your parent 📸');
+      }, 'image/png');
+    };
+    img.onerror = () => toast('Image export failed on this browser');
+    img.src = url;
+  } catch (e) { toast('Image export failed on this browser'); }
+}
 function copyTextFallback(text, done) {
   try {
     const ta = document.createElement('textarea');
@@ -19486,70 +19596,94 @@ function renderProgressPage(el) {
 }
 
 function renderParentPage(el) {
-  const report = buildParentReport();
   const s = state.quizStats || {};
   const acc = s.total ? Math.round((s.correct / s.total) * 100) : 0;
   const bySubject = Object.entries(s.bySubject || {});
+  const weak = weakestTopicInfo();
+  const todos = computeStudyToDos();
   const now = new Date();
   const activeIn = n => Object.keys(s.days || {}).filter(d => { const diff = (now - new Date(d + 'T00:00:00')) / 86400000; return diff >= 0 && diff < n; }).length;
+  const hist = s.history || [];
+  const avg = arr => arr.length ? Math.round(arr.reduce((a, q) => a + q.p, 0) / arr.length) : null;
+  const a1 = avg(hist.slice(-5)), a0 = avg(hist.slice(-10, -5));
+  const trendLine = (a1 !== null && a0 !== null)
+    ? (a1 - a0 > 0 ? `Scores are climbing — up ${a1 - a0} points across the last five quizzes. Whatever they are doing, it is working.`
+      : a1 - a0 < 0 ? `The last five quizzes dipped ${Math.abs(a1 - a0)} points — a normal part of tackling harder topics. Encouragement now matters more than ever.`
+      : 'Scores are holding steady and consistent — reliability is a real strength.')
+    : 'Not enough quiz history yet to compute a trend — the line will appear after a few more quizzes.';
   el.innerHTML = `
-    ${pageHeader('Parent Report', 'Share your week with the people rooting for you — summary, deep analysis or file export.')}
-    <div class="grid gap-5 lg:grid-cols-2">
+    ${pageHeader('Parent Report', 'The full picture as a shareable image: the graph, the analysis, weak areas and what to do next.')}
+    <section class="rounded-2xl border border-slate-200 bg-white p-4 shadow-card sm:p-5">
+      <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
+        <h3 class="text-sm font-bold text-slate-900">🖼️ Report card image</h3>
+        <span class="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-black text-slate-500">updated live</span>
+      </div>
+      <div class="overflow-hidden rounded-2xl border border-slate-100 bg-slate-50 p-2">${buildParentCardSvg()}</div>
+      <div class="mt-4 flex flex-wrap gap-2">
+        <button type="button" onclick="downloadParentCard()" class="flex-1 rounded-xl bg-indigo-600 px-4 py-3 text-xs font-black text-white transition hover:bg-indigo-700">📥 Download image (PNG)</button>
+        <button type="button" onclick="shareParentReport()" class="flex-1 rounded-xl bg-emerald-600 px-4 py-3 text-xs font-black text-white transition hover:bg-emerald-500">📤 Send text on WhatsApp</button>
+      </div>
+      <p class="mt-3 text-center text-[10px] leading-relaxed text-slate-400">Download the image, then attach it in any chat. Nothing is sent automatically — you choose when and to whom.</p>
+      <div class="mt-3 flex flex-wrap gap-2">
+        <button type="button" onclick="copyParentReport()" class="flex-1 rounded-xl bg-slate-100 px-4 py-2.5 text-[11px] font-black text-slate-700 transition hover:bg-slate-200">📋 Copy detailed text</button>
+        <button type="button" onclick="downloadParentReport()" class="flex-1 rounded-xl bg-slate-100 px-4 py-2.5 text-[11px] font-black text-slate-700 transition hover:bg-slate-200">📥 Download .txt</button>
+      </div>
+    </section>
+
+    <div class="mt-5 grid gap-5 lg:grid-cols-2">
       <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-card">
-        <h3 class="mb-2 text-sm font-bold text-slate-900">💬 Quick WhatsApp summary</h3>
-        <p class="mb-4 text-[11px] leading-relaxed text-slate-500">This is the exact message — a snapshot of your effort, not a verdict on you. Nothing else is shared: no private chats with Buddy, no lesson history, no passwords.</p>
-        <div class="rounded-2xl bg-emerald-50 p-4">
-          <div class="mb-2 flex items-center gap-2">
-            <div class="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-600 text-sm text-white">👪</div>
-            <div><div class="text-[11px] font-black text-emerald-800">StudyOS weekly report</div><div class="text-[10px] text-emerald-600">via WhatsApp</div></div>
-          </div>
-          <pre class="nice-scroll whitespace-pre-wrap rounded-xl bg-white p-3 text-[11px] leading-relaxed text-slate-700">${escapeHtml(report)}</pre>
+        <h3 class="mb-3 text-sm font-bold text-slate-900">📊 Performance analysis</h3>
+        <div class="grid grid-cols-2 gap-3">
+          <div class="rounded-xl bg-slate-50 p-3"><div class="text-xl font-bold text-slate-900">${activeIn(7)}/7</div><div class="text-[11px] text-slate-500">active days this week</div></div>
+          <div class="rounded-xl bg-slate-50 p-3"><div class="text-xl font-bold text-slate-900">${activeIn(30)}/30</div><div class="text-[11px] text-slate-500">active days this month</div></div>
+          <div class="rounded-xl bg-slate-50 p-3"><div class="text-xl font-bold text-slate-900">${acc}%</div><div class="text-[11px] text-slate-500">overall accuracy</div></div>
+          <div class="rounded-xl bg-slate-50 p-3"><div class="text-xl font-bold text-slate-900">🔥 ${state.streak || 0}</div><div class="text-[11px] text-slate-500">day streak · ❄️ ${state.streakFreezes || 0} freezes</div></div>
         </div>
-        <button type="button" onclick="shareParentReport()" class="mt-4 w-full rounded-xl bg-emerald-600 px-4 py-3 text-xs font-black text-white transition hover:bg-emerald-500">📤 Send this to my parent now</button>
-        <p class="mt-3 text-center text-[10px] text-slate-400">Opens WhatsApp with the message ready — you pick who receives it and press send yourself.</p>
-        <div class="mt-4 border-t border-slate-100 pt-4">
-          <h4 class="mb-1 text-xs font-black text-slate-900">📦 Export the detailed report</h4>
-          <p class="mb-3 text-[11px] leading-relaxed text-slate-500">The detailed report adds per-subject accuracy, 7/30-day activity, trend and focus area — great for printouts or email.</p>
-          <div class="flex flex-wrap gap-2">
-            <button type="button" onclick="copyParentReport()" class="flex-1 rounded-xl bg-slate-900 px-4 py-2.5 text-[11px] font-black text-white transition hover:bg-slate-800">📋 Copy detailed report</button>
-            <button type="button" onclick="downloadParentReport()" class="flex-1 rounded-xl bg-slate-100 px-4 py-2.5 text-[11px] font-black text-slate-700 transition hover:bg-slate-200">📥 Download .txt</button>
-          </div>
-        </div>
+        <p class="mt-4 rounded-xl bg-indigo-50/70 px-3 py-2.5 text-[11px] leading-relaxed text-indigo-900">📈 <b>Trend:</b> ${trendLine}</p>
+        ${bySubject.length ? `
+          <h4 class="mb-2 mt-4 text-[11px] font-black uppercase tracking-wide text-slate-400">Accuracy by subject</h4>
+          <div class="space-y-2">
+            ${bySubject.map(([subj, st]) => {
+              const pct = st.total ? Math.round((st.correct / st.total) * 100) : 0;
+              return `<div>
+                <div class="mb-1 flex justify-between text-[11px] font-bold"><span class="text-slate-600">${subj}</span><span class="text-slate-400">${pct}%</span></div>
+                <div class="h-1.5 overflow-hidden rounded-full bg-slate-100"><div class="h-full rounded-full ${subjectColor(subj).solid}" style="width:${pct}%"></div></div>
+              </div>`;
+            }).join('')}
+          </div>` : '<p class="mt-4 text-xs text-slate-400">Take a quiz and the analysis fills in here.</p>'}
       </section>
 
       <div class="space-y-5">
         <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-card">
-          <h3 class="mb-3 text-sm font-bold text-slate-900">📊 Detailed analysis</h3>
-          <div class="grid grid-cols-2 gap-3">
-            <div class="rounded-xl bg-slate-50 p-3"><div class="text-xl font-bold text-slate-900">${activeIn(7)}/7</div><div class="text-[11px] text-slate-500">active days this week</div></div>
-            <div class="rounded-xl bg-slate-50 p-3"><div class="text-xl font-bold text-slate-900">${activeIn(30)}/30</div><div class="text-[11px] text-slate-500">active days this month</div></div>
-            <div class="rounded-xl bg-slate-50 p-3"><div class="text-xl font-bold text-slate-900">${acc}%</div><div class="text-[11px] text-slate-500">overall accuracy</div></div>
-            <div class="rounded-xl bg-slate-50 p-3"><div class="text-xl font-bold text-slate-900">🔥 ${state.streak || 0}</div><div class="text-[11px] text-slate-500">day streak · ❄️ ${state.streakFreezes || 0} freezes</div></div>
-          </div>
-          <h4 class="mb-1 mt-4 text-[11px] font-black uppercase tracking-wide text-slate-400">Improvement line</h4>
-          ${progressChartSvg(s.history)}
-          ${bySubject.length ? `
-            <h4 class="mb-2 mt-4 text-[11px] font-black uppercase tracking-wide text-slate-400">Accuracy by subject</h4>
-            <div class="space-y-2">
-              ${bySubject.map(([subj, st]) => {
-                const pct = st.total ? Math.round((st.correct / st.total) * 100) : 0;
-                return `<div>
-                  <div class="mb-1 flex justify-between text-[11px] font-bold"><span class="text-slate-600">${subj}</span><span class="text-slate-400">${pct}%</span></div>
-                  <div class="h-1.5 overflow-hidden rounded-full bg-slate-100"><div class="h-full rounded-full ${subjectColor(subj).solid}" style="width:${pct}%"></div></div>
-                </div>`;
-              }).join('')}
-            </div>` : '<p class="mt-4 text-xs text-slate-400">Take a quiz and the analysis fills in here.</p>'}
-          <button type="button" onclick="navigate('progress')" class="mt-4 w-full rounded-xl bg-slate-100 px-4 py-2.5 text-xs font-bold text-slate-700 transition hover:bg-slate-200">📈 See my full progress page →</button>
+          <h3 class="mb-3 text-sm font-bold text-slate-900">⚠️ Weak areas</h3>
+          ${weak.weakSub ? `
+            <div class="rounded-xl border border-orange-100 bg-orange-50 p-3.5">
+              <div class="text-xs font-black text-orange-700">${weak.weakSub}${weak.weakTop ? ' — ' + escapeHtml(weak.weakTop) : ''}</div>
+              <div class="mt-1 text-[11px] leading-relaxed text-orange-600">Scoring ${weak.topPct || weak.weakPct}% here — the single biggest opportunity for score growth right now.</div>
+            </div>
+            ${weak.strongSub ? `<p class="mt-3 text-[11px] leading-relaxed text-slate-500">💪 <b>Strongest:</b> ${weak.strongSub} at ${weak.strongPct}% — worth maintaining with one review quiz a week.</p>` : ''}
+          ` : `<p class="rounded-xl bg-emerald-50 px-3 py-3 text-[11px] font-semibold leading-relaxed text-emerald-700">✅ No weak areas flagged yet — keep building across subjects and the analysis sharpens.</p>`}
         </section>
 
         <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-card">
-          <h3 class="mb-3 text-sm font-bold text-slate-900">🛡️ How this works</h3>
-          <ul class="space-y-2.5 text-[11px] leading-relaxed text-slate-600">
-            <li class="flex gap-2"><span>✅</span><span><b>You are in control.</b> Nothing is sent automatically — every report leaves only when <i>you</i> press send, copy or download.</span></li>
-            <li class="flex gap-2"><span>✅</span><span><b>Effort, not judgement.</b> Reports show study days, questions answered and streaks. We listen, but we do not judge — and neither should anyone reading it.</span></li>
-            <li class="flex gap-2"><span>✅</span><span><b>Private stays private.</b> Your Buddy chats, wrong answers and browsing inside StudyOS are never included.</span></li>
-            <li class="flex gap-2"><span>✅</span><span><b>Encouragement built in.</b> Every report ends with a nudge for your parent to cheer you on — a little encouragement goes a long way.</span></li>
+          <h3 class="mb-3 text-sm font-bold text-slate-900">✅ To-dos this week</h3>
+          <ul class="space-y-2.5">
+            ${todos.map(t => `<li class="flex items-start gap-2.5 text-[11px] leading-relaxed text-slate-600">
+              <span class="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-md border-2 border-indigo-200 bg-indigo-50 text-[9px] font-black text-indigo-500">✓</span>
+              <span>${escapeHtml(t)}</span>
+            </li>`).join('')}
           </ul>
+          <p class="mt-3 text-[10px] leading-relaxed text-slate-400">These to-dos are also written into the report card image and the detailed text — a parent can read them and cheer accordingly.</p>
+        </section>
+
+        <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-card">
+          <h3 class="mb-3 text-sm font-bold text-slate-900">🛡️ Privacy, always</h3>
+          <ul class="space-y-2 text-[11px] leading-relaxed text-slate-600">
+            <li class="flex gap-2"><span>✅</span><span><b>You are in control.</b> Nothing leaves the app until <i>you</i> download, copy or send it.</span></li>
+            <li class="flex gap-2"><span>✅</span><span><b>Effort, not judgement.</b> Reports show study days, questions answered and streaks. We listen, but we do not judge.</span></li>
+            <li class="flex gap-2"><span>✅</span><span><b>Private stays private.</b> Buddy chats, wrong answers and browsing are never included.</span></li>
+          </ul>
+          <button type="button" onclick="navigate('progress')" class="mt-4 w-full rounded-xl bg-slate-100 px-4 py-2.5 text-xs font-bold text-slate-700 transition hover:bg-slate-200">📈 My full progress page →</button>
         </section>
       </div>
     </div>
@@ -20319,14 +20453,14 @@ Object.assign(window, {
   selectQuizAnswer, submitQuiz, retakeQuiz, examJump, examPrev, examNext, submitExam,
   sendChatMessage, askBuddy, clearChat, setResearch, saveGeminiKey, toggleGeminiPanel,
   openUpgrade, closeUpgrade, upgradeBackdrop, choosePlan, founderUnlock, whatsappUpgrade, savePaystackKey, shareParentReport,
-  dismissFreezeIce, copyParentReport, downloadParentReport,
+  dismissFreezeIce, copyParentReport, downloadParentReport, downloadParentCard,
   setGeminiModel, testGemini,
 });
 
 /* Test hook (used by the automated checks) */
 window.__STUDYOS_TEST__ = {
   computeStreak, applyStreak, BADGES, FREEZE_EVERY_TASKS, MAX_FREEZES,
-  checkBadges, recordTask, persistProgress, checkStreakOnEntry, buildDetailedParentReport,
+  checkBadges, recordTask, persistProgress, checkStreakOnEntry, buildDetailedParentReport, computeStudyToDos, buildParentCardSvg,
   gradeQuiz, mergeQuizStats, initials, startPastQuiz, examJump, examPrev, examNext, submitExam,
   scoreKb, buddyReply, plainMath, solveQuadratic, solveSimultaneous, extractCoeffs,
   topicsFor, quizFor, pastFor, PASTQ, buildQuiz, shuffled, flashFor, mdToHtml, escapeHtml, fmtQuad,
@@ -20346,20 +20480,6 @@ window.__researchOn = () => state.settings.research;
 window.__geminiKey = () => state.settings.geminiApiKey;
 
 boot();
-
-/* Demo hook: add ?freeze=1 to the URL to preview the streak-freeze ice animation */
-try {
-  if (new URLSearchParams(location.search).get('freeze') === '1') {
-    const play = () => { state.streak = state.streak > 1 ? state.streak : 7; state.streakFreezes = state.streakFreezes || 2; queueCelebration({ type: 'saved' }); };
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.textContent = '❄️ Replay freeze animation';
-    btn.className = 'fixed bottom-4 right-4 z-[80] rounded-2xl bg-sky-600 px-4 py-3 text-xs font-black text-white shadow-pop';
-    btn.addEventListener('click', play);
-    document.body.appendChild(btn);
-    setTimeout(play, 700);
-  }
-} catch (e) { /* demo hook only */ }
 
 </script>
 </body>

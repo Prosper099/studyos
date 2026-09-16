@@ -174,7 +174,7 @@ check('rare glyphs purged from content (no vulgar fractions, sub/superscript dig
   !/[⅓⅔⅕⅖⅗⅚¼½¾⅛⁄₀₁₂₃₄₅₆₇₈₉⁰¹²³⁴⁵⁶⁷⁸⁹ₙ]/.test(html));
 
 // ---------- 5. no leftover build artifacts ----------
-check('no leftover template placeholders', !/\{\{|\}\}|TODO|FIXME|lorem ipsum/i.test(html));
+check('no leftover template placeholders', !/\{\{|\}\}|\bTODO\b|\bFIXME\b|lorem ipsum/i.test(html));
 check('single self-contained file (no local src/href)',
   !/(?:src|href)="(?!https?:|#|data:)[^"]+"/.test(html.replace(/<script[\s\S]*?<\/script>/g, '')),
   (html.match(/(?:src|href)="(?!https?:|#|data:)[^"]+"/g) || []).join(', '));

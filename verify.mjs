@@ -1237,7 +1237,13 @@ check('logout hides the app shell', byId('main-app').classList.contains('hidden'
   globalThis.navigate('progress');
   check('progress page shows empty state with no history', /No data yet/.test(main.innerHTML));
   globalThis.navigate('parent');
-  check('parent page shows summary preview and detailed analysis', /Quick WhatsApp summary/.test(main.innerHTML) && /StudyOS weekly report for/.test(main.innerHTML) && /Detailed analysis/.test(main.innerHTML));
+  check('parent page leads with the report card image', /Report card image/.test(main.innerHTML) && /StudyOS Progress Report/.test(main.innerHTML));
+  check('parent page shows analysis, weak areas and to-dos', /Performance analysis/.test(main.innerHTML) && /Weak areas/.test(main.innerHTML) && /To-dos this week/.test(main.innerHTML));
+  check('report card svg contains graph, stats, weak area and to-do sections', (() => {
+    const svg = T.buildParentCardSvg();
+    return /IMPROVEMENT LINE/.test(svg) && /PERFORMANCE/.test(svg) && /TO-DO THIS WEEK/.test(svg) && /<svg/.test(svg) && /StudyOS Progress Report/.test(svg);
+  })());
+  check('study to-dos always give at least three actionable items', T.computeStudyToDos().length >= 3);
   check('parent page keeps privacy promises', /You are in control/.test(main.innerHTML) && /do not judge/.test(main.innerHTML));
   Object.assign(st, { history: saved.history, bySubject: saved.bySubject, attempts: saved.attempts, correct: saved.correct, total: saved.total, bestPercent: saved.bestPercent, days: saved.days });
   T.getState().page = saved.page;
