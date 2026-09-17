@@ -4084,65 +4084,86 @@ function simPresetsForLevel() {
   return EXAM_PRESETS.filter(p => p.levels.some(l => lvl.startsWith(l)));
 }
 
-/** The pre-exam interface at the top of the Practice Exam page:
- *  pick the exam, pick the mode (study / mock / practice), then sit it. */
+/** The pre-exam interface at the top of the Practice Exam page.
+ *  First you see the exams for your class; opening one reveals its
+ *  modes, questions-per-subject and exam time — then you sit it. */
 function examSimSetupPanel() {
   const avail = simPresetsForLevel();
   if (!state.simSetup || !avail.some(p => p.key === state.simSetup.preset)) {
-    state.simSetup = { preset: avail.length ? avail[0].key : '', mode: (state.simSetup && SIM_MODES[state.simSetup.mode]) ? state.simSetup.mode : 'practice' };
+    state.simSetup = { open: '', preset: avail.length ? avail[0].key : '', mode: (state.simSetup && SIM_MODES[state.simSetup.mode]) ? state.simSetup.mode : 'practice' };
   }
   state.simSetup.customQ = state.simSetup.customQ || 0;
   state.simSetup.customMin = state.simSetup.customMin || 0;
   const sel = state.simSetup;
-  const preset = avail.find(p => p.key === sel.preset) || avail[0];
-  return `
+  const open = avail.find(p => p.key === sel.open);
+  const cd = examCountdown();
+  if (!open) {
+    return `
     <section class="mb-4 rounded-2xl border-2 border-indigo-200 bg-gradient-to-br from-indigo-50 to-violet-50 p-5 shadow-card animate-fadeUp">
       <div class="flex flex-wrap items-center justify-between gap-2">
         <h3 class="text-sm font-bold text-indigo-900">🧪 Full exam simulations</h3>
-        <div class="flex flex-wrap items-center gap-2">
-          ${(() => { const cd = examCountdown(); return cd ? `<span class="rounded-full bg-indigo-100 px-3 py-1 text-[10px] font-black text-indigo-700">⏳ ${cd.days} day${cd.days === 1 ? '' : 's'} to ${escapeHtml(state.profile.targetExam || 'your exam')}</span>` : ''; })()}
-          <span class="rounded-full bg-white/70 px-2.5 py-1 text-[10px] font-black text-indigo-700">subject tabs · master clock · scorecard</span>
-        </div>
+        ${cd ? `<span class="rounded-full bg-indigo-100 px-3 py-1 text-[10px] font-black text-indigo-700">⏳ ${cd.days} day${cd.days === 1 ? '' : 's'} to ${escapeHtml(state.profile.targetExam || 'your exam')}</span>` : ''}
       </div>
-      <p class="mt-1 text-[11px] leading-relaxed text-indigo-700">Sit a full paper across all your subjects before the real thing — switch subjects mid-exam exactly like the exam hall. Real WAEC/NECO/JAMB past questions are mixed into every paper.</p>
-      <h4 class="mt-3 text-[11px] font-black uppercase tracking-wide text-indigo-700">1 · Pick your exam</h4>
-      <div class="mt-1.5 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+      <p class="mt-1 text-[11px] leading-relaxed text-indigo-700">Open an exam to set it up your way — pick a mode, then sit a full paper across your subjects with subject tabs and one master clock, exactly like the exam hall.</p>
+      <div class="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
         ${avail.map(p => `
-        <button type="button" onclick="setSimPreset('${p.key}')" class="rounded-xl border p-3 text-left transition ${sel.preset === p.key ? 'border-indigo-500 bg-white shadow-md ring-2 ring-indigo-200' : 'border-indigo-200 bg-white/60 hover:border-indigo-300'}">
-          <span class="block text-xs font-black text-slate-900">${sel.preset === p.key ? '✅ ' : ''}${p.name}</span>
+        <button type="button" onclick="openExamSetup('${p.key}')" class="group rounded-xl border border-indigo-200 bg-white/70 p-3 text-left transition hover:border-indigo-400 hover:shadow-md">
+          <span class="block text-xs font-black text-slate-900 group-hover:text-indigo-700">${p.name} <span class="float-right text-indigo-400">→</span></span>
           <span class="mt-0.5 block text-[10px] leading-snug text-slate-500">${p.label}</span>
         </button>`).join('')}
       </div>
-      <h4 class="mt-3 text-[11px] font-black uppercase tracking-wide text-indigo-700">2 · Pick how you want to sit it</h4>
+      <p class="mt-2 text-[10px] font-semibold text-slate-400">${String(state.profile.classLevel || '').startsWith('JSS') ? 'Exams shown follow your class (Junior Secondary). Senior exams like JAMB and WAEC appear automatically when you move up to SS1.' : 'Your saved subjects become the sitting papers — edit them any time in your profile.'}</p>
+    </section>`;
+  }
+  const chosenCount = Math.min(open.maxSubjects, (state.profile.subjects && state.profile.subjects.length ? state.profile.subjects : Object.keys(CURRICULUM)).length);
+  const realMin = open.mins || chosenCount * (open.minsPerSubject || 60);
+  return `
+    <section class="mb-4 rounded-2xl border-2 border-indigo-300 bg-white p-5 shadow-card animate-fadeUp">
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="closeExamSetup()" class="rounded-lg bg-slate-100 px-2.5 py-1.5 text-[10px] font-black text-slate-600 transition hover:bg-slate-200">← All exams</button>
+          <h3 class="text-sm font-black text-indigo-900">${open.name}</h3>
+        </div>
+        ${cd ? `<span class="rounded-full bg-indigo-50 px-3 py-1 text-[10px] font-black text-indigo-700">⏳ ${cd.days} days to go</span>` : ''}
+      </div>
+      <p class="mt-2 rounded-xl bg-indigo-50 px-3 py-2 text-[11px] font-semibold text-indigo-700">Real ${open.exam}: ${open.label}. Real WAEC/NECO/JAMB past questions are mixed into every paper.</p>
+      <h4 class="mt-4 text-[11px] font-black uppercase tracking-wide text-indigo-700">How do you want to sit it?</h4>
       <div class="mt-1.5 grid gap-2 sm:grid-cols-3">
         ${Object.entries(SIM_MODES).map(([k, m]) => `
-        <button type="button" onclick="setSimMode('${k}')" class="rounded-xl border p-3 text-left transition ${sel.mode === k ? 'border-indigo-500 bg-white shadow-md ring-2 ring-indigo-200' : 'border-indigo-200 bg-white/60 hover:border-indigo-300'}">
+        <button type="button" onclick="setSimMode('${k}')" class="rounded-xl border p-3 text-left transition ${sel.mode === k ? 'border-indigo-500 bg-indigo-50 ring-2 ring-indigo-200' : 'border-slate-200 bg-white hover:border-indigo-300'}">
           <span class="block text-xs font-black text-slate-900">${m.icon} ${m.name}${sel.mode === k ? ' ✅' : ''}</span>
           <span class="mt-0.5 block text-[10px] leading-snug text-slate-500">${m.blurb}</span>
         </button>`).join('')}
       </div>
-      <h4 class="mt-4 text-[11px] font-black uppercase tracking-wide text-indigo-700">3 · Tune it your way (optional)</h4>
-      <div class="mt-1.5 flex flex-wrap items-start gap-x-8 gap-y-3">
+      <div class="mt-4 flex flex-wrap items-start gap-x-8 gap-y-3">
         <div>
-          <span class="block text-[10px] font-black uppercase tracking-wide text-slate-400">Questions per paper</span>
+          <span class="block text-[10px] font-black uppercase tracking-wide text-slate-400">Questions per subject</span>
           <div class="mt-1 flex flex-wrap gap-1.5">
-            ${[10, 20, 30, 40, 50].map(n => `<button type="button" onclick="setSimQuestions(${n})" class="rounded-full px-3 py-1.5 text-[11px] font-bold transition ${sel.customQ === n ? 'bg-indigo-600 text-white' : 'bg-white text-slate-600 ring-1 ring-inset ring-slate-200 hover:bg-slate-50'}">${n}</button>`).join('')}
-            <button type="button" onclick="setSimQuestions(0)" class="rounded-full px-3 py-1.5 text-[11px] font-bold transition ${sel.customQ === 0 ? 'bg-indigo-600 text-white' : 'bg-white text-slate-600 ring-1 ring-inset ring-slate-200 hover:bg-slate-50'}">Exam shape</button>
+            ${[10, 20, 30, 40, 50].map(n => `<button type="button" onclick="setSimQuestions(${n})" class="rounded-full px-3 py-1.5 text-[11px] font-bold transition ${sel.customQ === n ? 'bg-indigo-600 text-white' : 'bg-slate-50 text-slate-600 ring-1 ring-inset ring-slate-200 hover:bg-slate-100'}">${n}</button>`).join('')}
+            <button type="button" onclick="setSimQuestions(0)" class="rounded-full px-3 py-1.5 text-[11px] font-bold transition ${sel.customQ === 0 ? 'bg-indigo-600 text-white' : 'bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-200 hover:bg-emerald-100'}">Real exam</button>
           </div>
         </div>
         <div>
-          <span class="block text-[10px] font-black uppercase tracking-wide text-slate-400">Total time</span>
+          <span class="block text-[10px] font-black uppercase tracking-wide text-slate-400">Time for the whole exam</span>
           <div class="mt-1 flex flex-wrap gap-1.5">
-            ${[20, 30, 45, 60, 90, 120].map(n => `<button type="button" onclick="setSimMinutes(${n})" class="rounded-full px-3 py-1.5 text-[11px] font-bold transition ${sel.customMin === n ? 'bg-indigo-600 text-white' : 'bg-white text-slate-600 ring-1 ring-inset ring-slate-200 hover:bg-slate-50'}">${n} min</button>`).join('')}
-            <button type="button" onclick="setSimMinutes(0)" class="rounded-full px-3 py-1.5 text-[11px] font-bold transition ${sel.customMin === 0 ? 'bg-indigo-600 text-white' : 'bg-white text-slate-600 ring-1 ring-inset ring-slate-200 hover:bg-slate-50'}">Exam shape</button>
+            ${[20, 30, 45, 60, 90, 120].map(n => `<button type="button" onclick="setSimMinutes(${n})" class="rounded-full px-3 py-1.5 text-[11px] font-bold transition ${sel.customMin === n ? 'bg-indigo-600 text-white' : 'bg-slate-50 text-slate-600 ring-1 ring-inset ring-slate-200 hover:bg-slate-100'}">${n} min</button>`).join('')}
+            <button type="button" onclick="setSimMinutes(0)" class="rounded-full px-3 py-1.5 text-[11px] font-bold transition ${sel.customMin === 0 ? 'bg-indigo-600 text-white' : 'bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-200 hover:bg-emerald-100'}">Real exam (${realMin >= 60 ? Math.floor(realMin / 60) + 'h' + (realMin % 60 ? ' ' + realMin % 60 + 'm' : '') : realMin + ' min'})</button>
           </div>
         </div>
       </div>
-      <button type="button" onclick="startExamSimFromPanel()" class="mt-4 w-full rounded-xl bg-indigo-600 px-6 py-3 text-xs font-black text-white transition hover:bg-indigo-500 sm:w-auto">🚀 Start ${preset ? preset.name : 'sitting'} · ${SIM_MODES[sel.mode].name}${sel.customQ ? ' · ' + sel.customQ + ' Q/paper' : ''}${sel.customMin ? ' · ' + sel.customMin + ' min' : ''}</button>
-      <p class="mt-2 text-[10px] font-semibold text-slate-400">${String(state.profile.classLevel || '').startsWith('JSS') ? 'Exams shown follow your class (Junior Secondary). Senior exams like JAMB and WAEC appear automatically when you move up to SS1.' : 'Your saved subjects become the sitting papers — edit them any time in your profile.'}</p>
+      <button type="button" onclick="startExamSimFromPanel()" class="mt-5 w-full rounded-xl bg-indigo-600 px-6 py-3 text-xs font-black text-white transition hover:bg-indigo-500 sm:w-auto">🚀 Start ${open.name} · ${SIM_MODES[sel.mode].name}${sel.customQ ? ' · ' + sel.customQ + ' questions per subject' : ''}${sel.customMin ? ' · ' + sel.customMin + ' min' : ''}</button>
+      <p class="mt-2 text-[10px] font-semibold text-slate-400">${String(state.profile.classLevel || '').startsWith('JSS') ? 'Only questions from your class level go into this paper — nothing senior, ever.' : 'Papers are built from your saved subjects plus real past questions.'}</p>
     </section>`;
 }
 
+function openExamSetup(key) {
+  state.simSetup = { ...(state.simSetup || {}), open: key, preset: key };
+  renderPage();
+}
+function closeExamSetup() {
+  state.simSetup = { ...(state.simSetup || {}), open: '' };
+  renderPage();
+}
 function setSimPreset(key) {
   state.simSetup = { ...(state.simSetup || {}), preset: key };
   renderPage();
@@ -5385,7 +5406,7 @@ Object.assign(window, {
   markGot, markLater, setFlashFilter, restartFlash, dismissCelebration,
   startTopicQuiz, startMockQuiz, startPastQuiz, backToQuizList, openTopicCards,
   startExamSim, simSelect, simSubject, simJump, simPrev, simNext, submitExamSim, confirmSubmitExamSim, exitExamSim,
-  setSimPreset, setSimMode, setSimQuestions, setSimMinutes, startExamSimFromPanel, EXAM_PRESETS, SIM_MODES,
+  setSimPreset, setSimMode, setSimQuestions, setSimMinutes, startExamSimFromPanel, openExamSetup, closeExamSetup, EXAM_PRESETS, SIM_MODES,
   setQuizCount, setQuizTimer, openFocusModal, closeFocusModal, focusModalBackdrop, startFocus, stopFocus, updateFocusPill, setExamDate,
   selectQuizAnswer, submitQuiz, retakeQuiz, examJump, examPrev, examNext, submitExam,
   sendChatMessage, askBuddy, clearChat, setResearch, saveGeminiKey, toggleGeminiPanel,
