@@ -938,6 +938,19 @@ check('dashboard no longer hosts the simulation lab or drills', (() => {
   const h = byId('page-content').innerHTML;
   return !h.includes('startExamSim(') && !h.includes('drillPast(') && !h.includes('drillMock(');
 })());
+check('exam interface lets the student tune questions per paper and total time', (() => {
+  w.navigate('quiz'); w.backToQuizList();
+  const h = byId('page-content').innerHTML;
+  if (!h.includes('setSimQuestions(') || !h.includes('setSimMinutes(') || !h.includes('Questions per paper')) return false;
+  w.setSimQuestions(10); w.setSimMinutes(20);
+  w.setSimPreset('jamb'); w.setSimMode('practice');
+  w.startExamSimFromPanel();
+  const sim = T.getState().examSim;
+  const ok = !!sim && sim.sections.every(x => x.questions.length <= 10) && sim.totalMin === 20;
+  w.exitExamSim();
+  w.setSimQuestions(0); w.setSimMinutes(0);
+  return ok;
+})());
 check('exam presets follow the class level (SS sees JAMB etc, JSS sees BECE only)', (() => {
   const st = T.getState();
   const savedLvl = st.profile.classLevel;
@@ -1013,10 +1026,9 @@ w.navigate('home');
 check('dashboard renders greeting, streak and quick-nav cards',
   /Good (morning|afternoon|evening), Joseph/.test(page()) && /day streak/.test(page())
   && page().includes("navigate('study')") && page().includes("navigate('assistant')"), page().slice(0, 120));
-check('exam command centre shows countdown, session and projection', (() => {
+check('dashboard keeps daily tools but no longer duplicates progress analytics', (() => {
   const h = page();
-  return h.includes('Your road to JAMB UTME') && h.includes('days to go') && h.includes('Projection')
-    && h.includes('Subject readiness') && h.includes('session');
+  return !h.includes('Your road to') && !h.includes('Subject readiness') && h.includes('mission');
 })());
 check('exam countdown is a sensible SS3 estimate and honours a set date', (() => {
   const st = T.getState();
@@ -1047,7 +1059,7 @@ check('JAMB projection models the full 180-question UTME across four papers (mea
 
 // ---------- freemium: free caps, upgrade sheet, Pro unlock ----------
 T.setMonetization(true); // paid plans are hidden during the growth phase — switch on to test them
-check('free plan locks Pro parts of the command centre, Pro shows them', (() => {
+check('road-to card stays off the dashboard for both plans; exam interface carries the countdown', (() => {
   const st = T.getState();
   const savedPlan = st.profile.plan;
   st.profile.plan = 'free';
@@ -1056,8 +1068,11 @@ check('free plan locks Pro parts of the command centre, Pro shows them', (() => 
   st.profile.plan = savedPlan;
   w.navigate('home');
   const proHtml = page();
-  return freeHtml.includes('Go Pro') && freeHtml.includes('🔒')
-    && proHtml.includes('days to go') && !proHtml.includes('🔒');
+  w.navigate('quiz'); w.backToQuizList();
+  const quizHtml = page();
+  w.navigate('home');
+  return !freeHtml.includes('Your road to') && !proHtml.includes('Your road to')
+    && quizHtml.includes('days to');
 })());
 check('free plan caps quizzes at the daily limit and opens the upgrade sheet', (() => {
   const st = T.getState();
@@ -1103,7 +1118,7 @@ check('growth phase: monetization hidden — full engine unlocked for free users
   w.navigate('profile');
   const prof = page();
   w.navigate('home');
-  return !h.includes('🔒') && !h.includes('Go Pro') && h.includes('days to go') && !prof.includes('Upgrade to Pro');
+  return !h.includes('🔒') && !h.includes('Go Pro') && h.includes('mission') && !prof.includes('Upgrade to Pro');
 })());
 w.navigate('study');
 check('study page lists the subject selector and grouped topic cards',

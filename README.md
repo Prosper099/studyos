@@ -42,7 +42,7 @@ JSS students only ever see BECE-appropriate content; SS students see JAMB/WAEC/N
 
 ## Features
 
-- **Exam simulations on the Practice Exam page** — class-aware full sittings (JSS → BECE; SS → JAMB UTME, WAEC, NECO, NABTEB) with subject tabs for mid-exam paper switching, a master clock, per-subject scorecards and a projected JAMB score. Three modes: Study (no timer, instant explanations), Mock (timed, exam conditions, no reveals) and Practice (timed + full answer review after submitting).
+- **Exam simulations on the Practice Exam page** — class-aware full sittings (JSS → BECE; SS → JAMB UTME, WAEC, NECO, NABTEB) with subject tabs for mid-exam paper switching, a master clock, per-subject scorecards and a projected JAMB score. Three modes: Study (no timer, instant explanations), Mock (timed, exam conditions, no reveals) and Practice (timed + full answer review after submitting). Questions per paper and total time are tunable on top of each exam's official shape.
 - **Full lessons per topic** — long-form explanations, worked examples, common-mistake
   warnings, and inline SVG diagrams.
 - **Per-topic quizzes** — every topic ships its own quiz drawn strictly from its lesson,
