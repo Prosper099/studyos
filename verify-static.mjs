@@ -148,9 +148,9 @@ check('open-licence attribution footer present (OpenStax CC BY 4.0 + question ba
   && /smartest\.ng/.test(html) && /exambuddy\.com\.ng/.test(html));
 
 // ---------- 4c. CBT personalisation: setup chips, timer, focus mode ----------
-check('quiz list has question-count and timer setup chips',
-  /setQuizCount\(\$\{num\}\)/.test(html) && /setQuizCount\(0\)/.test(html)
-  && /setQuizTimer\(\$\{min\}\)/.test(html) && /setQuizTimer\(0\)/.test(html) && /No timer/.test(html));
+check('quiz list has question-count and timer dropdowns',
+  /setQuizCount\(/.test(html) && /setQuizTimer\(/.test(html) && /No timer/.test(html)
+  && /Questions per subject/.test(html) && /setSimQuestions\(/.test(html) && /setSimMinutes\(/.test(html));
 check('quiz header renders the countdown chip when a timer is set',
   /id="quiz-timer"/.test(html) && /fmtCountdown/.test(html));
 check('focus mode: header button, pill and modal present',
