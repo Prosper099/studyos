@@ -132,6 +132,7 @@ w.pickOnboardOption('targetScore', 'Mostly A1-B3');
 await w.onboardNext();
 w.pickOnboardOption('studyPref', 'balanced');
 await w.onboardNext();
+w.setGuardianPhone('2348031234567');
 await w.onboardNext();
 check('onboarding completes without a Firestore connection', byId('onboarding-modal').classList.contains('hidden'));
 const saved = JSON.parse(store.get('studyos.demo.v1') || '{}');
