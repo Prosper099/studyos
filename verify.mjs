@@ -1199,14 +1199,13 @@ check('mission shows a live progress counter', /\d\/3 done/.test(page()) || page
   const st = T.getState();
   const saved = { email: st.profile.email, plan: st.profile.plan, until: st.profile.planUntil };
   st.profile.email = 'tester@studyos.app';
-  const code = T.activationKeyFor('tester@studyos.app', 'pro', T.monthBucket(0));
-  check('activation key is 8 characters starting with S (pro) or P (pack)', /^[SP][A-Z2-9]{7}$/.test(code), code);
-  check('pack keys carry the P prefix', T.activationKeyFor('tester@studyos.app', 'pack', T.monthBucket(0))[0] === 'P');
+  const code = T.activationKeyFor('tester@studyos.app', 'pack', T.monthBucket(0));
+  check('every generated key is an 8-character Bundle key starting with P', /^P[A-Z2-9]{7}$/.test(code), code);
   T.redeemActivationKey(code.toLowerCase());
-  check('redeeming your own key activates Pro for 30 days',
-    st.profile.plan === 'pro' && st.profile.planUntil > Date.now() + 29 * 86400000);
+  check('redeeming your own key unlocks the Bundle permanently',
+    st.profile.plan === 'pack' && st.profile.planUntil > Date.now() + 3600 * 86400000);
   st.profile.plan = 'free'; st.profile.planUntil = 0;
-  T.redeemActivationKey(T.activationKeyFor('someone-else@studyos.app', 'pro', T.monthBucket(0)));
+  T.redeemActivationKey(T.activationKeyFor('someone-else@studyos.app', 'pack', T.monthBucket(0)));
   check('a key generated for another email does not unlock this student', st.profile.plan === 'free');
   check('while everything is free, no page shows the account, the key box or Activate buttons', (() => {
     T.setMonetization(false);
@@ -1223,7 +1222,7 @@ check('mission shows a live progress counter', /\d\/3 done/.test(page()) || page
   st.profile.planUntil = Date.now() + 10 * 86400000;
   check('a Pro still inside its 30 days keeps the gates open', T.proActive() === true);
   T.setMonetization(false);
-  T.activateViaBuddy('pro');
+  T.activateViaBuddy();
   const last = st.chat[st.chat.length - 1];
   check('Activate sends the student to Buddy with the account, the paid-ping and the key button',
     st.page === 'assistant' && last && last.html.includes(T.OPAY_ACCOUNT)

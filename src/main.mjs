@@ -3401,13 +3401,9 @@ function renderAssistant(el) {
                 class="flex-1 rounded-lg border border-slate-200 px-2.5 py-1.5 text-[11px] outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100" />
               <button type="button" onclick="savePaystackKey(document.getElementById('paystack-key').value)" class="rounded-lg bg-slate-900 px-3 py-1.5 text-[11px] font-bold text-white transition hover:bg-slate-700">Save</button>
             </div>
-            <label class="mt-3 block text-[11px] font-bold text-slate-700">Owner only: activation key generator (student pays to the OPay account, then you send this)</label>
+            <label class="mt-3 block text-[11px] font-bold text-slate-700">Owner only: Bundle key generator (student pays ₦${PRO_PACK_NGN.toLocaleString()} to the OPay account, then you send this)</label>
             <div class="mt-1 flex flex-wrap gap-2">
               <input type="email" id="keygen-email" placeholder="student's email" class="flex-1 rounded-lg border border-slate-200 px-2.5 py-1.5 text-[11px] outline-none focus:border-emerald-400" />
-              <select id="keygen-plan" class="rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-[11px] font-semibold text-slate-700">
-                <option value="pro">Pro · 30 days</option>
-                <option value="pack">JAMB Pack · 180 days</option>
-              </select>
               <button type="button" onclick="makeActivationKey()" class="rounded-lg bg-emerald-600 px-3 py-1.5 text-[11px] font-bold text-white transition hover:bg-emerald-500">Generate key</button>
             </div>
             <div id="keygen-out" class="mt-1"></div>
@@ -3658,7 +3654,7 @@ function renderProfile(el) {
           <h3 class="mb-1 text-sm font-bold text-slate-900">👨‍👩‍ Family &amp; plan</h3>
           <p class="mb-3 text-[11px] text-slate-400">When you are ready for the full engine, go Pro.</p>
           <div class="flex flex-wrap items-center gap-2">
-            ${monetizationOn ? (proActive() ? `<span class="rounded-full bg-amber-50 px-3 py-1.5 text-[11px] font-black text-amber-700">⭐ ${state.profile.plan === 'pack' ? 'JAMB Premium Pack active' : 'Pro active'}</span>` : `<button type="button" onclick="openUpgrade('plan')" class="rounded-xl bg-slate-900 px-4 py-2 text-[11px] font-black text-white transition hover:bg-slate-800">⭐ Activate Pro — ₦${PRO_MONTHLY_NGN.toLocaleString()}/mo</button>`) : ''}
+            ${monetizationOn ? (proActive() ? `<span class="rounded-full bg-amber-50 px-3 py-1.5 text-[11px] font-black text-amber-700">⭐ Bundle active — yours forever</span>` : `<button type="button" onclick="openUpgrade('plan')" class="rounded-xl bg-slate-900 px-4 py-2 text-[11px] font-black text-white transition hover:bg-slate-800">⭐ Get the StudyOS Bundle — ₦${PRO_PACK_NGN.toLocaleString()} once</button>`) : ''}
           </div>
           ${monetizationOn && !proActive() ? `<p class="mt-2 text-[10px] text-slate-400">Free today: ${Math.max(0, FREE_DAILY_QUIZZES - dailyQuizzesUsed())} quiz${FREE_DAILY_QUIZZES - dailyQuizzesUsed() === 1 ? '' : 'zes'} left · ${Math.max(0, FREE_DAILY_BUDDY - dailyBuddyUsed())} Buddy questions left.</p>` : ''}
         </section>
@@ -3803,27 +3799,24 @@ function redeemActivationKey(raw) {
   if (!ok) { toast('This key is not for this account or it has expired — ping Prosper on WhatsApp.'); return; }
   activatePlan(plan, 'key:' + code);
 }
-function activateViaBuddy(plan) {
-  const want = plan === 'pack' ? 'pack' : 'pro';
+function activateViaBuddy() {
   closeUpgrade();
   if (state.page !== 'assistant') navigate('assistant');
-  const amt = want === 'pack' ? PRO_PACK_NGN : PRO_MONTHLY_NGN;
-  const what = want === 'pack' ? 'the JAMB Premium Pack (covers you till your UTME ends)' : 'StudyOS Pro (30 days)';
+  const amt = PRO_PACK_NGN;
+  const what = 'the full StudyOS Bundle — one payment, yours forever';
   pushChat('buddy', `<p>Let's get you activated! 🚀</p>
     <p class="mt-2"><b>1.</b> Transfer <b>₦${amt.toLocaleString()}</b> to this OPay account:</p>
     <p class="mt-1 inline-block rounded-xl bg-amber-50 px-3 py-2 text-sm font-black text-amber-800">${OPAY_ACCOUNT} — ${OPAY_NAME}</p>
     <p class="mt-2"><b>2.</b> Tap <b>I have paid</b> — it pings Prosper on WhatsApp with your email so he can confirm the payment.</p>
     <p class="mt-1"><b>3.</b> He replies with your <b>activation key</b>. Come back here, tap <b>Enter key</b>, paste it — and ${what} is yours! ⭐</p>
     <div class="mt-3 flex flex-wrap gap-2">
-      <button type="button" onclick="pingFounderPaid('${want}')" class="rounded-xl bg-emerald-600 px-4 py-2 text-[11px] font-black text-white transition hover:bg-emerald-500">💸 I have paid — ping Prosper</button>
+      <button type="button" onclick="pingFounderPaid()" class="rounded-xl bg-emerald-600 px-4 py-2 text-[11px] font-black text-white transition hover:bg-emerald-500">💸 I have paid — ping Prosper</button>
       <button type="button" onclick="openKeyEntry()" class="rounded-xl bg-indigo-600 px-4 py-2 text-[11px] font-black text-white transition hover:bg-indigo-500">🔑 Enter key</button>
       <button type="button" onclick="copyOpayAccount()" class="rounded-xl bg-slate-100 px-4 py-2 text-[11px] font-black text-slate-600 transition hover:bg-slate-200">📋 Copy account</button>
     </div>`, []);
 }
-function pingFounderPaid(plan) {
-  const amt = plan === 'pack' ? PRO_PACK_NGN : PRO_MONTHLY_NGN;
-  const what = plan === 'pack' ? 'JAMB Pack' : 'Pro (30 days)';
-  const text = `Hi Prosper! I paid N${amt} to the OPay account for StudyOS ${what}. My email: ${state.profile.email || 'not set'}. Please send my activation key. 🙏`;
+function pingFounderPaid() {
+  const text = `Hi Prosper! I paid N${PRO_PACK_NGN} to the OPay account for the StudyOS Bundle (one-time). My email: ${state.profile.email || 'not set'}. Please send my activation key. 🙏`;
   window.open('https://wa.me/' + FOUNDER_WA + '?text=' + encodeURIComponent(text), '_blank');
 }
 function copyOpayAccount() {
@@ -3839,14 +3832,13 @@ function closeKeyEntry() { const m = document.getElementById('key-modal'); if (m
 function keyBackdrop(event) { if (event && event.target === event.currentTarget) closeKeyEntry(); }
 function makeActivationKey() {
   const email = ((document.getElementById('keygen-email') || {}).value || '').trim();
-  const plan = ((document.getElementById('keygen-plan') || {}).value) || 'pro';
   if (!email) { toast('Type the student email first.'); return; }
-  const code = activationKeyFor(email, plan, monthBucket(0));
+  const code = activationKeyFor(email, 'pack', monthBucket(0));
   const out = document.getElementById('keygen-out');
-  if (out) out.innerHTML = `<div class="mt-1 flex flex-wrap items-center gap-2"><span class="rounded-lg bg-emerald-50 px-2 py-1 font-mono text-xs font-black tracking-widest text-emerald-700">${code}</span><button type="button" onclick="sendKeyOnWhatsApp('${email.replace(/'/g, '')}', '${code}')" class="rounded-lg bg-emerald-600 px-2.5 py-1.5 text-[10px] font-bold text-white transition hover:bg-emerald-500">Send on WhatsApp</button></div><p class="mt-1 text-[10px] text-slate-400">The key works while it is still ${monthBucket(0)} (or ${monthBucket(-1)} as grace). Pro runs 30 days from the moment they redeem; the Pack runs 180 days.</p>`;
+  if (out) out.innerHTML = `<div class="mt-1 flex flex-wrap items-center gap-2"><span class="rounded-lg bg-emerald-50 px-2 py-1 font-mono text-xs font-black tracking-widest text-emerald-700">${code}</span><button type="button" onclick="sendKeyOnWhatsApp('${email.replace(/'/g, '')}', '${code}')" class="rounded-lg bg-emerald-600 px-2.5 py-1.5 text-[10px] font-bold text-white transition hover:bg-emerald-500">Send on WhatsApp</button></div><p class="mt-1 text-[10px] text-slate-400">The key works while it is still ${monthBucket(0)} (or ${monthBucket(-1)} as grace). One redemption unlocks the Bundle permanently.</p>`;
 }
 function sendKeyOnWhatsApp(email, code) {
-  const text = `Hi! Your StudyOS activation key is ${code}. Open StudyOS, tap Activate → Enter key, and paste it. Enjoy ${String(code)[0] === 'P' ? 'the JAMB Pack' : 'Pro'}! 🎉`;
+  const text = `Hi! Your StudyOS activation key is ${code}. Open StudyOS, tap Activate → Enter key, and paste it. The full Bundle is yours forever! 🎉`;
   window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
 }
 function proActive() { return !monetizationOn || ((state.profile.plan === 'pro' || state.profile.plan === 'pack') && (!state.profile.planUntil || state.profile.planUntil > Date.now())); }
@@ -3903,7 +3895,7 @@ function activatePlan(plan, ref) {
   state.profile.plan = plan;
   state.profile.planRef = ref || '';
   state.profile.planSince = localISO();
-  const days = ref === 'founder' ? 3650 : (plan === 'pack' ? 180 : 30);
+  const days = ref === 'founder' ? 3650 : (plan === 'pack' ? 3650 : 30);
   state.profile.planUntil = Date.now() + days * 86400000;
   saveProfile({});
   closeUpgrade();
@@ -3937,7 +3929,7 @@ function computeStudyToDos() {
 function lockTeaser(label) {
   return `<div class="rounded-xl border border-dashed border-amber-200 bg-amber-50/60 p-3">
     <div class="text-[11px] font-bold text-amber-700">🔒 ${label} — Pro</div>
-    <button type="button" onclick="openUpgrade('plan')" class="mt-2 rounded-lg bg-amber-500 px-3 py-1.5 text-[11px] font-black text-white transition hover:bg-amber-600">Unlock · ₦${PRO_MONTHLY_NGN.toLocaleString()}/mo</button>
+    <button type="button" onclick="openUpgrade('plan')" class="mt-2 rounded-lg bg-amber-500 px-3 py-1.5 text-[11px] font-black text-white transition hover:bg-amber-600">Unlock · ₦${PRO_PACK_NGN.toLocaleString()} once</button>
   </div>`;
 }
 /* ---------------- Exam command centre (dashboard) ---------------- */
