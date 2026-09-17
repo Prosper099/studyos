@@ -145,10 +145,11 @@ check('open-licence attribution footer present (OpenStax CC BY 4.0 + question ba
 // ---------- 4c. CBT personalisation: setup chips, timer, focus mode ----------
 check('activation popup ships closed and monetization ships off',
   /id="key-modal"[^>]*\bhidden\b/.test(html) && /monetizationOn = false/.test(html));
-check('Buddy: no web scraping, but the Gemini tutor is wired',
+check('Buddy is 100% built-in: no web scraping, no AI services',
   !html.includes('researchOnline') && !html.includes('Live internet research') && !html.includes('Search the web')
   && !html.includes('en.wikipedia.org/w/api.php') && !html.includes('api.duckduckgo.com')
-  && /generativelanguage\.googleapis\.com/.test(html) && html.includes('You are Buddy, a brilliant'));
+  && !html.includes('generativelanguage') && !html.includes('Gemini')
+  && html.includes('Study Skills') && html.includes('How to Memorise Formulas'));
 check('quiz list has question-count and timer dropdowns',
   /setQuizCount\(/.test(html) && /setQuizTimer\(/.test(html) && /No timer/.test(html)
   && /Questions per subject/.test(html) && /setSimQuestions\(/.test(html) && /setSimMinutes\(/.test(html));

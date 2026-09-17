@@ -17,6 +17,7 @@ import {
 
 import { CURRICULUM } from './data/curriculum.mjs';
 import { PASTQ } from './data/pastq.mjs';
+import { BUDDY_KB_EXTRA } from './data/buddy-kb-extra.mjs';
 import { escapeHtml, localISO } from './modules/utils.mjs';
 import { chartSvgCore, progressChartSvg, showChartTip, hideChartTip, activityHeatSvg } from './modules/charts.mjs';
 import './styles.css';
@@ -79,10 +80,6 @@ const state = {
   settings: { research: true, geminiApiKey: '', geminiModel: 'gemini-2.5-flash', paystackKey: '' }
 };
 
-/* Live Gemini models (free tier). Buddy tries the chosen one first, then falls
-   back down this list if Google has retired it — so a key never "just stops working". */
-const GEMINI_MODELS = ['gemini-2.5-flash', 'gemini-2.5-flash-lite', 'gemini-3.1-flash-lite', 'gemini-3-flash-preview'];
-const FOUNDER_GEMINI_KEY = ''; // Prosper: paste your free key from aistudio.google.com here so every student gets the smart Buddy
 
 const EXAM_OPTIONS = {
   SS: [
@@ -875,10 +872,11 @@ Summary point: "Excessive use of social media reduces young people's study time.
 <li>Study the hardest subject first, while your attention is fresh.</li></ul>`
   }
 ];
+BUDDY_KB.push(...BUDDY_KB_EXTRA);
+
 
 /* ---------- Buddy helper: text → HTML ---------- */
-/* Gemini sometimes answers with raw LaTeX ($\frac{1}{2}$, ^{2}, \times…), which shows
-   up as broken "fra$"-style junk on screen. Translate the common bits to plain text. */
+/* plainMath strips LaTeX-style markup so maths always renders as clean readable text. */
 function plainMath(text) {
   if (typeof text !== 'string') return text;
   return text
@@ -906,6 +904,35 @@ function mdToHtml(text) {
 }
 
 /* ---------- Knowledge lookup ---------- */
+const BUDDY_ALIASES = [
+  ['pythagoras', ['pythagurus', 'pytagoras', 'pitagoras', 'pythogoras', 'phytagoras']],
+  ['photosynthesis', ['photosintesis', 'fotosynthesis', 'photosyntesis']],
+  ['simultaneous', ['simultenous', 'simultanous']],
+  ['quadratic', ['quadratric', 'quardratic']],
+  ['logarithm', ['logarithim', 'logaritm']],
+  ['probability', ['probabilty', 'probablity']],
+  ['electricity', ['electricty', 'electrcity']],
+  ['digestion', ['digeston', 'digesion']],
+  ['respiration', ['respiraton', 'resperation']],
+  ['government', ['goverment', 'governmant']],
+  ['accounting', ['acounting', 'accountin']], ['insurance', ['insurence', 'insuarance']],
+  ['equilibrium', ['equilibrum', 'equillibrium']], ['entrepreneur', ['entreprenuer', 'entreprener']],
+  ['timetable', ['time table']], ['concentration', ['consentration']],
+  ['examination', ['examnation']], ['temperature', ['temprature', 'temperture']],
+  ['chlorophyll', ['chlorofil', 'chlorophyl']], ['haemoglobin', ['hemoglobin']],
+  ['chromatography', ['chromatograhy']], ['constitution', ['constituion']],
+  ['latitude', ['lattitude']], ['longitude', ['longtitude']],
+  ['depreciation', ['depreciaton']], ['liability', ['liabilty']],
+  ['percentage', ['persentage', 'precentage']], ['trigonometry', ['trigonomerty', 'trignometry']],
+  ['statistics', ['statics']], ['flashcards', ['flash cards', 'flashcard']],
+  ['mock exam', ['moc exam', 'mocks exam']]
+];
+function applyAliases(q) {
+  let out = q;
+  for (const [std, variants] of BUDDY_ALIASES) for (const v of variants) out = out.replace(new RegExp('\\b' + v + '\\b', 'g'), std);
+  return out;
+}
+
 function normalise(q) {
   return String(q || '').toLowerCase()
     .replace(/[^a-z0-9\s+*/=.,\-]/g, ' ')
@@ -914,7 +941,7 @@ function normalise(q) {
 }
 
 function scoreKb(qRaw) {
-  const q = normalise(qRaw);
+  const q = applyAliases(normalise(qRaw));
   if (!q) return [];
   const words = q.split(' ').filter(w => w.length > 2);
   const isJSS = String(state.profile.classLevel || '').startsWith('JSS');
@@ -996,6 +1023,13 @@ function solveSimultaneous(a1, b1, c1, a2, b2, c2) {
 }
 
 /* ---------- Buddy response builder ---------- */
+function buddyReply2(title) {
+  const e = BUDDY_KB.find(x => x.title === title);
+  return e
+    ? { html: `<span class="tag">${e.subject}</span><h4>${e.title}</h4>${e.body}`, chips: ['Build me a study plan', 'How to memorise formulas', examStrategyChip()] }
+    : { html: '<p>I am here for you.</p>', chips: [] };
+}
+
 function buddyReply(rawInput) {
   const input = String(rawInput || '').trim();
   const q = normalise(input);
@@ -1013,6 +1047,26 @@ function buddyReply(rawInput) {
     return {
       html: mdToHtml(`Hello${state.profile.name ? ' **' + state.profile.name.split(' ')[0] + '**' : ''}! 👋 Buddy here.\n\nI can explain any topic across **all your subjects — junior and senior**, solve a quadratic or a pair of simultaneous equations step by step, coach you from your own quiz stats, or help you plan your revision.\n\nWhat are we working on today?`),
       chips: ['Explain centripetal force', 'Solve x^2 - 5x + 6', 'Redox reactions', examTipsChip()]
+    };
+  }
+  if (/\bhow are you|how far|how you dey|hows it going\b/.test(raw)) {
+    const streak = (state.profile && state.profile.streak) || 0;
+    return {
+      html: mdToHtml(`I'm great now that you're here! 😄${streak > 1 ? ' And look at you — **' + streak + '-day streak**! 🔥 That is exactly how exams get won.' : ' Ready when you are.'}\n\nWhat are we conquering today — a topic, a quiz, or a full mock?`),
+      chips: ['Explain photosynthesis', 'Give me a quiz', examStrategyChip(), 'Build me a study plan']
+    };
+  }
+  if (/\b(i am|im|i'm) (scared|afraid|nervous|anxious)|exam fear|fear of failure\b/.test(raw)) return buddyReply2('Beating Exam Fear');
+  if (/\b(i am|im|i'm) (tired|sleepy|bored)|no motivation|i give up\b/.test(raw)) {
+    return {
+      html: mdToHtml(`Hey, listen — every champion has days like this. You do not need motivation, you need a **tiny start**: one topic, one quiz, ten flashcards. Momentum does the rest. 💪\n\nEven 15 focused minutes today keeps your streak alive and tomorrow easier.`),
+      chips: ['Give me something quick', 'Show my weakest topic', 'Build me a study plan']
+    };
+  }
+  if (/\b(tell me a joke|make me laugh|joke)\b/.test(raw)) {
+    return {
+      html: mdToHtml(`Why did the fraction refuse to argue with the decimal?\n\nBecause it knew it could never be **exact**. 😄\n\nOkay, my jokes need revision — my Maths does not. Want a real workout?`),
+      chips: ['Solve x^2 - 5x + 6', 'Explain the mole concept', 'Give me a quiz']
     };
   }
   if (/\b(what should i (study|do|revise)|where (do|should) i start|my weak|weakest|recommend|coach me)\b/.test(raw)) return smartCoachReply();
@@ -1082,7 +1136,7 @@ function buddyReply(rawInput) {
 
   // Knowledge base match
   const hits = scoreKb(input);
-  if (hits.length) {
+  if (hits.length && hits[0].score >= 1.5) { // single common-word title overlap is not a real match
     const top = hits[0].entry;
     const others = hits.slice(1, 3).filter(h => h.score >= hits[0].score * 0.5);
     const related = findRelated(top);
@@ -1102,6 +1156,36 @@ function buddyReply(rawInput) {
         <p><i>Ask a follow-up, or open the Practice Exam for ${top.subject} to test yourself right away.</i></p>`,
       chips
     };
+  }
+
+  // Topic brain: match any of the 132 syllabus topics by title/tags
+  {
+    const words = new Set(q.split(' ').filter(w => w.length > 3));
+    let best = null, bestScore = 0;
+    for (const [sub, data] of Object.entries(CURRICULUM)) {
+      for (const lvl of Object.keys(data.topics || {})) {
+        for (const t of (data.topics[lvl] || [])) {
+          const titleWords = t.title.toLowerCase().split(/[^a-z]+/).filter(w => w.length > 3);
+          let sc = 0;
+          titleWords.forEach(tw => { if (words.has(tw)) sc += 2; else if (q.includes(tw) && tw.length > 5) sc += 1; });
+          (t.tags || []).forEach(tg => { if (q.includes(String(tg).toLowerCase())) sc += 1; });
+          if (sc > bestScore) { bestScore = sc; best = { sub, title: t.title, topic: t }; }
+        }
+      }
+    }
+    if (best && bestScore >= 3) {
+      const paras = String(best.topic.content || '').match(/<p>[\s\S]*?<\/p>/g) || [];
+      const summary = paras.slice(0, 2).join('');
+      const safeSub = best.sub.replace(/'/g, '');
+      const safeTitle = best.title.replace(/'/g, '');
+      return {
+        html: `<span class="tag">${best.sub}</span><h4>${best.title}</h4>${summary}
+          <div class="mt-3 flex flex-wrap gap-2">
+            <button type="button" onclick="openTopic('${safeSub}', '${safeTitle}')" class="rounded-xl bg-indigo-600 px-3.5 py-2 text-[11px] font-black text-white transition hover:bg-indigo-500">📖 Read the full lesson</button>
+          </div>`,
+        chips: [`Explain ${best.title.toLowerCase()} more simply`, `Quiz me on ${best.title.toLowerCase()}`]
+      };
+    }
   }
 
   // Subject fallback: give a menu for that subject
@@ -1152,110 +1236,16 @@ function safeMath(input) {
 const SMALLTALK_RE = /^(hi|hello|hey|howdy|sup|good\s+(morning|afternoon|evening)|thanks?|thank you|well done|good job|appreciate|how are you|what'?s up|whats up|good night|bye|love you)\b/;
 
 /* ==================================================================
-   BUDDY AI ANSWERS — built-in syllabus engine first; anything it does
-   not know goes to the Gemini tutor (no web scraping, no sources).
+   BUDDY ANSWER COMPOSER — 100% built-in brain: hand-written lessons,
+   the 132-topic syllabus index, solvers and coaching. No AI, no web.
    ================================================================== */
-async function geminiCall(model, key, body) {
-  const res = await fetch(
-    'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent?key=' + encodeURIComponent(key),
-    { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-  const json = await res.json().catch(() => null);
-  if (!res.ok) {
-    const err = new Error((json && json.error && json.error.message) || ('Gemini responded ' + res.status));
-    err.status = res.status;
-    throw err;
-  }
-  const text = json.candidates && json.candidates[0] && json.candidates[0].content
-    && json.candidates[0].content.parts && json.candidates[0].content.parts.map(p => p.text || '').join('\n');
-  return text && text.trim() ? text.trim() : null;
-}
-
-function geminiModelChain() {
-  const chosen = (state.settings.geminiModel || GEMINI_MODELS[0]).trim() || GEMINI_MODELS[0];
-  return [chosen, ...GEMINI_MODELS.filter(m => m !== chosen)];
-}
-
-function geminiRetryable(err) {
-  const m = String((err && err.message) || '').toLowerCase();
-  // retired model, or Google throttling ("high demand", quota, overload) → try next model
-  return err.status === 404 || err.status === 429 || err.status === 503
-    || /not found|deprecated|retired|no longer|unsupported|has been shut|high demand|resource exhausted|try again|overloaded|unavailable|capacity/i.test(m);
-}
-
-async function geminiAnswer(question) {
-  const key = (state.settings.geminiApiKey || FOUNDER_GEMINI_KEY || '').trim();
-  if (!key) return null;
-  const prompt = [
-    `You are Buddy, a brilliant and friendly Nigerian secondary-school tutor. The student is in ${state.profile.classLevel || 'secondary'} and is preparing for ${buddyExamLine()}.`,
-    'Answer ANY question a student can ask — Mathematics, Physics, Chemistry, Biology, English, Literature, Economics, Commerce, Financial Accounting, Government, Geography, Agricultural Science, Computer Studies, Civic Education, Christian and Islamic Studies, current affairs or general knowledge.',
-    'For study questions use this exact structure: a one-sentence definition, the key formula or rule (if any), one worked example with real numbers, and one common exam trap.',
-    'For small talk, answer briefly and warmly like a real person, then invite a study question.',
-    'Never use LaTeX or code markup: no dollar signs, no backslash commands, no curly braces around powers. Write plain readable text like x^2, 3/4, sqrt(x), pi, × and ÷, and write naira amounts as N500.',
-    'Keep it under 250 words. Use simple, correct Nigerian English. Never mention that you are an AI or a model.',
-    'If a question is harmful or not safe for a student, decline gently in one line and steer back to studying.',
-    '',
-    'STUDENT QUESTION: ' + question
-  ].join('\n');
-  const body = {
-    contents: [{ role: 'user', parts: [{ text: prompt }] }],
-    generationConfig: { temperature: 0.4, maxOutputTokens: 900 }
-  };
-  let lastErr = null;
-  for (const model of geminiModelChain()) {
-    try {
-      const text = await geminiCall(model, key, body);
-      if (model !== state.settings.geminiModel) {  // remember the model that actually works
-        state.settings.geminiModel = model;
-        saveSettings();
-      }
-      return text;
-    } catch (err) {
-      lastErr = err;
-      if (!geminiRetryable(err)) return { error: err.message };  // bad key, quota, etc. — don't retry
-    }
-  }
-  return { error: (lastErr && lastErr.message) || 'Gemini unavailable' };
-}
-
-function setGeminiModel(value) {
-  state.settings.geminiModel = value;
-  saveSettings();
-  toast('Buddy will use ' + value);
-}
-
-async function testGemini() {
-  const input = document.getElementById('gemini-key');
-  const key = ((input && input.value) || state.settings.geminiApiKey || '').trim();
-  if (!key) { toast('Paste your Gemini API key first 🙂'); return; }
-  toast('Testing your Gemini key…');
-  let lastErr = null;
-  for (const model of geminiModelChain()) {
-    try {
-      await geminiCall(model, key, {
-        contents: [{ role: 'user', parts: [{ text: 'Reply with the single word: ready' }] }],
-        generationConfig: { maxOutputTokens: 10 }
-      });
-      state.settings.geminiApiKey = key;
-      state.settings.geminiModel = model;
-      saveSettings();
-      renderPage();
-      toast('✅ Gemini connected! Buddy will use ' + model);
-      return;
-    } catch (err) {
-      lastErr = err;
-      if (!geminiRetryable(err)) break;
-    }
-  }
-  toast('❌ ' + ((lastErr && lastErr.message) || 'Gemini could not be reached'));
-}
-
-/** Build the full Buddy answer: built-in syllabus engine first, AI tutor for anything else. */
+/** Build the full Buddy answer — 100% built-in: no AI services, no internet. */
 async function composeAnswer(question) {
   const local = buddyReply(question);
   const chips = new Set(local.chips || []);
   const raw = String(question || '').trim().toLowerCase();
 
-  // Small talk and plain arithmetic get a human reply — fast, no AI needed.
+  // Small talk and plain arithmetic get a human reply — fast and free.
   const arith = safeMath(raw);
   if (SMALLTALK_RE.test(raw) || arith) {
     if (arith) {
@@ -1268,19 +1258,7 @@ async function composeAnswer(question) {
     }
     return { html: local.html, chips: [...chips].slice(0, 4) };
   }
-
-  // The built-in engine has a prepared lesson → use it (deterministic, syllabus-perfect).
-  if (!local.miss) return { html: local.html, chips: [...chips].slice(0, 4) };
-
-  // No prepared lesson → the AI tutor answers (needs a Gemini key).
-  const answer = await geminiAnswer(question);
-  if (answer && !answer.error) {
-    return { html: `<span class="tag">Buddy · tutor</span>${mdToHtml(answer)}`, chips: [...chips].slice(0, 4) };
-  }
-  const note = answer && answer.error
-    ? `<div class="box" style="border-left-color:#f59e0b">${escapeHtml(answer.error)} — here is what I can offer offline instead.</div>`
-    : '';
-  return { html: local.html + note, chips: [...chips].slice(0, 4) };
+  return { html: local.html, chips: [...chips].slice(0, 4) };
 }
 
 function round4(n) { return Math.round(n * 10000) / 10000; }
@@ -3264,30 +3242,11 @@ function renderAssistant(el) {
           <div class="text-sm font-bold text-white">Buddy</div>
           <div class="flex items-center gap-1.5 text-[11px] text-emerald-400"><span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span> Online · ${BUDDY_KB.length} lessons in memory</div>
         </div>
-        <button type="button" onclick="toggleGeminiPanel()" title="Buddy settings"
-          class="rounded-lg bg-white/10 px-2.5 py-1.5 text-[11px] font-bold text-slate-200 transition hover:bg-white/20">⚙️</button>
         <button type="button" onclick="clearChat()" class="rounded-lg bg-white/10 px-2.5 py-1.5 text-[11px] font-bold text-slate-200 transition hover:bg-white/20">Clear</button>
       </div>
 
       <div class="flex flex-wrap items-center gap-2 border-b border-slate-200 bg-slate-50 px-4 py-2">
-        <span class="text-[11px] text-slate-400">${state.settings.geminiApiKey ? '✨ Gemini synthesis active' : 'Sources: Wikipedia + DuckDuckGo'}</span>
-        <div id="gemini-panel" class="hidden w-full rounded-xl border border-indigo-100 bg-white p-3">
-          <label class="block text-[11px] font-bold text-slate-700" for="gemini-key">Optional: Gemini API key (Buddy writes its own answers from the sources)</label>
-          <p class="mt-0.5 text-[10px] text-slate-500">Get a free key at aistudio.google.com. Without it Buddy quotes Wikipedia &amp; DuckDuckGo directly and still cites every source. Stored privately in your own account.</p>
-          <div class="mt-2 flex gap-2">
-            <input type="password" id="gemini-key" value="${escapeHtml(state.settings.geminiApiKey || '')}" placeholder="AIza…"
-              class="flex-1 rounded-lg border border-slate-200 px-2.5 py-1.5 text-[11px] outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100" />
-            <button type="button" onclick="saveGeminiKey()" class="rounded-lg bg-indigo-600 px-3 py-1.5 text-[11px] font-bold text-white transition hover:bg-indigo-700">Save</button>
-          </div>
-          <div class="mt-2 flex flex-wrap items-center gap-2">
-            <label class="text-[10px] font-bold text-slate-500" for="gemini-model">Model</label>
-            <select id="gemini-model" onchange="setGeminiModel(this.value)"
-              class="rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-[11px] font-semibold text-slate-700 outline-none focus:border-indigo-400">
-              ${GEMINI_MODELS.map(m => `<option value="${m}" ${(state.settings.geminiModel || GEMINI_MODELS[0]) === m ? 'selected' : ''}>${m}</option>`).join('')}
-            </select>
-            <button type="button" onclick="testGemini()" class="rounded-lg bg-emerald-600 px-3 py-1.5 text-[11px] font-bold text-white transition hover:bg-emerald-700">🔌 Test key</button>
-            <span class="text-[10px] text-slate-400">If a model is ever retired or busy, Buddy auto-switches to the next one.</span>
-          ${monetizationOn ? `
+${monetizationOn ? `
           <div class="mt-3 border-t border-slate-100 pt-3">
             <label class="block text-[11px] font-bold text-slate-700" for="paystack-key">Owner only: Paystack public key (turns on Pro card payments)</label>
             <div class="mt-1 flex gap-2">
@@ -3418,15 +3377,6 @@ async function askBuddy(text, forceResearch) {
   }
 }
 
-function saveGeminiKey() {
-  const input = document.getElementById('gemini-key');
-  if (!input) return;
-  state.settings.geminiApiKey = input.value.trim();
-  saveSettings();
-  toast(state.settings.geminiApiKey ? 'Gemini key saved — Buddy will now write its own answers' : 'Gemini key cleared — Buddy will quote sources directly');
-  renderPage();
-}
-
 async function saveSettings() {
   saveLocal();
   if (state.mode !== 'firebase' || !db || !state.uid) return;
@@ -3450,10 +3400,6 @@ function clearChat() {
   renderPage();
 }
 
-function toggleGeminiPanel() {
-  const panel = document.getElementById('gemini-panel');
-  if (panel) panel.classList.toggle('hidden');
-}
 
 /* ==================================================================
    PAGE: PROFILE & SYNC
@@ -5345,12 +5291,11 @@ Object.assign(window, {
   setSimPreset, setSimMode, setSimQuestions, setSimMinutes, startExamSimFromPanel, openExamSetup, closeExamSetup, EXAM_PRESETS, SIM_MODES,
   setQuizCount, setQuizTimer, openFocusModal, closeFocusModal, focusModalBackdrop, startFocus, stopFocus, updateFocusPill, setExamDate,
   selectQuizAnswer, submitQuiz, retakeQuiz, examJump, examPrev, examNext, submitExam,
-  sendChatMessage, askBuddy, clearChat, saveGeminiKey, toggleGeminiPanel, backToStudy,
+  sendChatMessage, askBuddy, clearChat, backToStudy,
   openUpgrade, closeUpgrade, upgradeBackdrop, choosePlan, founderUnlock, whatsappUpgrade, savePaystackKey,
   activateViaBuddy, pingFounderPaid, copyOpayAccount, openKeyEntry, closeKeyEntry, keyBackdrop, redeemActivationKey,
   activationKeyFor, monthBucket, proActive, OPAY_ACCOUNT,
   dismissFreezeIce, installStudyOS, dismissInstall,
-  setGeminiModel, testGemini,
 });
 
 /* Test hook (used by the automated checks) */
@@ -5360,7 +5305,7 @@ window.__STUDYOS_TEST__ = {
   gradeQuiz, mergeQuizStats, initials, startPastQuiz, examJump, examPrev, examNext, submitExam,
   scoreKb, buddyReply, plainMath, solveQuadratic, solveSimultaneous, extractCoeffs,
   topicsFor, quizFor, pastFor, PASTQ, buildQuiz, shuffled, flashFor, mdToHtml, escapeHtml, fmtQuad,
-  composeAnswer, geminiAnswer,
+  composeAnswer,
   CURRICULUM, BUDDY_KB, OPTIONS, LEVEL_CATALOGUE, EXAM_OPTIONS,
   subjectsForLevel, selectableSubjects, subjectIsAvailable, hydrateFromDoc,
   examsForLevel, renderOnboardStep, levelTopics, topicQuiz, cardsFor, buildStudyPlan,
@@ -5373,9 +5318,7 @@ window.__STUDYOS_TEST__ = {
 };
 
 /* Small hooks the verification harness uses to drive settings deterministically. */
-window.__setGemini = key => { state.settings.geminiApiKey = key; };
 window.__researchOn = () => state.settings.research;
-window.__geminiKey = () => state.settings.geminiApiKey;
 
 boot();
 
