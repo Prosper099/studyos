@@ -3900,7 +3900,7 @@ function activatePlan(plan, ref) {
   saveProfile({});
   closeUpgrade();
   renderPage();
-  toast(plan === 'pack' ? 'JAMB Premium Pack active — go and smash it! 🎯' : 'Welcome to StudyOS Pro! ⭐');
+  toast(plan === 'pack' ? 'The StudyOS Bundle is yours — forever. Go and smash it! 🎯' : 'Welcome to StudyOS Pro! ⭐');
 }
 function founderUnlock() {
   const inp = document.getElementById('founder-code');
