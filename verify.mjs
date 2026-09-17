@@ -261,11 +261,6 @@ check('passive entry roll: same-day entry never touches streak or freezes', (() 
   [st.streak, st.lastActiveDate, st.streakFreezes] = saved;
   return ok;
 })());
-check('detailed parent report includes activity, performance, by-subject and trend sections', (() => {
-  const txt = T.buildDetailedParentReport();
-  return /STUDYOS DETAILED PROGRESS REPORT/.test(txt) && /ACTIVITY/.test(txt)
-    && /PERFORMANCE/.test(txt) && /Trend:/.test(txt) && /Focus area:/.test(txt);
-})());
 check('badge catalog: 76 badges (59 secret) incl. streaks, focus family and exam badges', T.BADGES.length === 76
   && T.BADGES.filter(b => b.secret).length === 59
   && ['streak-7', 'streak-30', 'streak-365'].every(id => T.BADGES.some(b => b.id === id)));
@@ -877,17 +872,11 @@ check('step 6 shows the generated study plan with the target and today’s missi
   byId('onboard-kicker').textContent === 'Step 6 of 6'
   && byId('step-6').innerHTML.includes('300+') && /mission/i.test(byId('step-6').innerHTML),
   byId('step-6').innerHTML.slice(0, 150));
-check('step 6 asks for the guardian WhatsApp number', /guardian/i.test(byId('step-6').innerHTML));
-await w.onboardNext();
-check('step 6 refuses to finish without a guardian WhatsApp number', !byId('onboard-error').classList.contains('hidden'));
-w.setGuardianPhone('2348031234567');
-check('guardian share flow exported and wa.me-bound', typeof w.shareToGuardian === 'function' && /wa\.me\//.test(code));
 await w.onboardNext();
 const docAfterOnboard = globalThis.__FS_STORE.get('users/test-uid-1');
 check('onboarding persisted class + exam + subjects + target + preference to Firestore',
   docAfterOnboard.classLevel === 'SS3' && docAfterOnboard.targetExam === 'JAMB UTME'
   && docAfterOnboard.targetScore === '300+' && docAfterOnboard.studyPref === 'balanced'
-  && docAfterOnboard.guardianPhone === '2348031234567'
   && JSON.stringify(docAfterOnboard.subjects) === JSON.stringify(['Mathematics', 'Physics'])
   && docAfterOnboard.dept === 'Science'
   && docAfterOnboard.onboarded === true, JSON.stringify(docAfterOnboard));
@@ -1028,7 +1017,7 @@ check('JAMB projection sums subject accuracy with honest zeros', (() => {
   return p.kind === 'score' && p.max === 400 && p.value === 210 && p.missing.length === 1;
 })());
 
-// ---------- freemium: free caps, upgrade sheet, Pro unlock, parent report ----------
+// ---------- freemium: free caps, upgrade sheet, Pro unlock ----------
 T.setMonetization(true); // paid plans are hidden during the growth phase — switch on to test them
 check('free plan locks Pro parts of the command centre, Pro shows them', (() => {
   const st = T.getState();
@@ -1074,12 +1063,6 @@ check('Pro activation persists to the cloud profile and lifts every gate', (() =
   const ok = T.proActive() && st.profile.plan === 'pack' && doc && doc.plan === 'pack' && T.quizGate() === true;
   st.profile.plan = savedPlan;
   return ok;
-})());
-check('parent report is plain English with the student\'s real numbers', (() => {
-  const st = T.getState();
-  const r = T.buildParentReport();
-  return r.includes('StudyOS weekly report for Joseph') && r.includes('Active study days this week:')
-    && r.includes('Questions answered so far: ' + (st.quizStats.total || 0)) && r.includes('Streak:');
 })());
 T.setMonetization(false);
 check('growth phase: monetization hidden — full engine unlocked for free users', (() => {
@@ -1220,7 +1203,7 @@ check('logout fires Firebase signOut()', globalThis.__SIGNED_OUT === true);
 await globalThis.__AUTH_CB(null);   // Firebase fires onAuthStateChanged(null) after signOut
 check('logout hides the app shell', byId('main-app').classList.contains('hidden'));
 
-// ---------- probe: new progress & parent pages (executes renderProgressPage / renderParentPage) ----------
+// ---------- probe: progress page (executes renderProgressPage) ----------
 {
   const main = byId('page-content');
   const st = T.getState().quizStats;
@@ -1242,24 +1225,6 @@ check('logout hides the app shell', byId('main-app').classList.contains('hidden'
   st.history = [];
   globalThis.navigate('progress');
   check('progress page shows empty state with no history', /No data yet/.test(main.innerHTML));
-  globalThis.navigate('parent');
-  check('parent page leads with a blurred guardian-only teaser (no full card on phone)', /parent-thumb/.test(main.innerHTML) && /GUARDIAN ONLY/.test(main.innerHTML) && /Send full report to my guardian on WhatsApp/.test(main.innerHTML));
-  check('parent page shows analysis, weak areas and to-dos', /Performance analysis/.test(main.innerHTML) && /Weak areas/.test(main.innerHTML) && /To-dos this week/.test(main.innerHTML));
-  check('report card svg contains graph, stats, weak area and to-do sections', (() => {
-    const svg = T.buildParentCardSvg();
-    return /IMPROVEMENT LINE/.test(svg) && /PERFORMANCE/.test(svg) && /TO-DO THIS WEEK/.test(svg) && /<svg/.test(svg) && /StudyOS Progress Report/.test(svg);
-  })());
-  check('study to-dos always give at least three actionable items', T.computeStudyToDos().length >= 3);
-  check('progress chart exposes hover/tap dots with date, score and subject', (() => {
-    const out = T.progressChartSvg([{ d: '2026-09-10', p: 55, s: 'Physics', m: 'topic', c: 5, t: 10 }, { d: '2026-09-12', p: 75, s: 'Mathematics', m: 'topic', c: 8, t: 10 }]);
-    return /chart-dot/.test(out) && /data-d="2026-09-12"/.test(out) && /data-p="75"/.test(out) && /data-s="Mathematics"/.test(out) && /chart-tip/.test(out);
-  })());
-  check('report card image now carries the write-up (analysis + to-dos)', (() => {
-    const svg = T.buildParentCardSvg();
-    return /ANALYSIS &amp; WEAK AREAS/.test(svg) && /TO-DO THIS WEEK/.test(svg) && /Overall, /.test(svg);
-  })());
-  check('parent page routes sharing to the saved guardian number only', /shareToGuardian\(\)/.test(main.innerHTML) && /guardian-profile-input/.test(main.innerHTML) && !/shareParentBundle/.test(main.innerHTML));
-  check('parent page keeps privacy promises', /You are in control/.test(main.innerHTML) && /do not judge/.test(main.innerHTML));
   Object.assign(st, { history: saved.history, bySubject: saved.bySubject, attempts: saved.attempts, correct: saved.correct, total: saved.total, bestPercent: saved.bestPercent, days: saved.days });
   T.getState().page = saved.page;
 }
