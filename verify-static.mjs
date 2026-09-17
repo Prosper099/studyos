@@ -129,6 +129,8 @@ const feature = [
   ['streak freeze ice-shatter overlay', /id="freeze-overlay"/],
   ['passive streak check on app entry', /checkStreakOnEntry\(\);/],
   ['chart dot tooltip markup', /chart-dot[\s\S]*chart-tip/],
+  ['full exam simulations live in the exam command centre', /EXAM_PRESETS[\s\S]{0,6000}startExamSim/],
+  ['calendar activity heatmap with hover cells, stats and legend', /hm-cell[\s\S]{0,4000}Best run:/],
   ['PWA manifest linked', /rel="manifest" href="\.?\/manifest\.webmanifest"/],
   ['PWA theme color + iOS metas', /name="theme-color"[\s\S]{0,300}apple-mobile-web-app-capable/],
   ['install card with install + dismiss handlers', /installStudyOS\(\)[\s\S]{0,400}dismissInstall\(\)/],

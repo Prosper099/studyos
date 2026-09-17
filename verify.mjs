@@ -1230,6 +1230,17 @@ check('logout hides the app shell', byId('main-app').classList.contains('hidden'
   globalThis.navigate('progress');
   check('progress page renders full view (chart, subjects, recent results)', /Improvement line/.test(main.innerHTML) && /Recent results/.test(main.innerHTML) && /Accuracy by subject/.test(main.innerHTML));
   check('progress page computes an upward trend', /Up \d+ points/.test(main.innerHTML));
+  check('activity heatmap is a Monday-first calendar grid with labels, legend and real stats', (() => {
+    const h = main.innerHTML;
+    return h.includes('hm-cell')
+      && h.includes("rowLabel(0, 'Mon')") === false
+      && /font-weight="700"[^>]*>Mon</.test(h) && />Wed</.test(h) && />Fri</.test(h)
+      && />Sep</.test(h)
+      && h.includes('Less') && h.includes('More')
+      && h.includes('>2</b> active days')
+      && h.includes('Best run:') && h.includes('Most active:') && h.includes('Wednesday')
+      && h.includes('Fri, Sep 11 — 1 activity');
+  })());
   st.history = [];
   globalThis.navigate('progress');
   check('progress page shows empty state with no history', /No data yet/.test(main.innerHTML));
