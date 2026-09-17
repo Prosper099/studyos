@@ -1,0 +1,14 @@
+{
+  "name": "StudyOS — Nigeria's study companion",
+  "short_name": "StudyOS",
+  "description": "Lessons, flashcards, CBT exams and study plans for JAMB, WAEC, NECO, Post-UTME and BECE.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#4f46e5",
+  "icons": [
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
