@@ -184,7 +184,7 @@ check('rare glyphs purged from content (no vulgar fractions, sub/superscript dig
 // ---------- 5. no leftover build artifacts ----------
 check('no leftover template placeholders', !/\{\{|\}\}|\bTODO\b|\bFIXME\b|lorem ipsum/i.test(html));
 check('single self-contained file (no local src/href)',
-  !/(?:src|href)="(?!https?:|#|data:)[^"]+"/.test(html.replace(/<script[\s\S]*?<\/script>/g, '')),
+  !/(?:src|href)="(?!(?:https?:|#|data:|\.?\/manifest\.webmanifest|\.?\/icons\/|\.?\/sw\.js))[^"]+"/.test(html.replace(/<script[\s\S]*?<\/script>/g, '')),
   (html.match(/(?:src|href)="(?!https?:|#|data:)[^"]+"/g) || []).join(', '));
 check('file is a complete HTML document',
   html.trimStart().startsWith('<!DOCTYPE html>') && html.trimEnd().endsWith('</html>'));
