@@ -1069,6 +1069,14 @@ function buddyReply(rawInput) {
       chips: ['Solve x^2 - 5x + 6', 'Explain the mole concept', 'Give me a quiz']
     };
   }
+  if (/\b(give me a quiz|quiz me|test me|start a quiz|practice quiz)\b/.test(raw)) {
+    const sub = Object.keys(CURRICULUM).find(x => raw.includes(x.toLowerCase())) || state.selectedSubject || 'Mathematics';
+    navigate('quiz');
+    return {
+      html: mdToHtml(`Let's go! 🎯 I've opened the **quiz page** — choose **${sub}** (or any other subject), set your length and timer, and fire. Come back to me with anything you miss and I'll break it down.`),
+      chips: ['Explain my weakest topic', 'Build me a study plan', examStrategyChip()]
+    };
+  }
   if (/\b(what should i (study|do|revise)|where (do|should) i start|my weak|weakest|recommend|coach me)\b/.test(raw)) return smartCoachReply();
   if (/\bhow am i doing|my progress|my report|my stats|progress report\b/.test(raw)) return progressReportReply();
   if (/\b(thanks?|thank you|well done|good job|appreciate)\b/.test(raw)) {
@@ -3813,7 +3821,7 @@ function predictedScore() {
    switch subjects mid-sitting exactly like the real CBT hall, a single
    master clock and a per-subject scorecard at the end. */
 const EXAM_PRESETS = [
-  { key: 'jamb',   name: 'JAMB UTME sitting',    exam: 'JAMB UTME',    levels: ['SS'],  maxSubjects: 4, perSubject: (sub) => (sub === 'English' ? 60 : 40), mins: 120, label: 'Use of English 60 + 40 per subject · up to 4 subjects · 2-hour clock (real UTME shape)' },
+  { key: 'jamb',   name: 'JAMB UTME sitting',    exam: 'JAMB UTME',    levels: ['SS'],  maxSubjects: 4, perSubject: (sub) => (sub === 'English' ? 60 : 40), mins: 120, label: 'Use of English 60 + 40 per subject · up to 4 subjects · 2-hour clock' },
   { key: 'waec',   name: 'WAEC WASSCE sitting',  exam: 'WAEC WASSCE',  levels: ['SS'],  maxSubjects: 6, perSubject: () => 50, minsPerSubject: 60, label: '50 objective questions per subject · 1 hour per paper' },
   { key: 'neco',   name: 'NECO SSCE sitting',    exam: 'NECO SSCE',    levels: ['SS'],  maxSubjects: 6, perSubject: () => 50, minsPerSubject: 60, label: '50 objective questions per subject · 1 hour per paper' },
   { key: 'nabteb', name: 'NABTEB sitting',       exam: 'NABTEB',       levels: ['SS'],  maxSubjects: 6, perSubject: () => 50, minsPerSubject: 60, label: '50 objective questions per subject · 1 hour per paper' },
@@ -4008,7 +4016,7 @@ function examSimSetupPanel() {
         </div>
         ${cd ? `<span class="rounded-full bg-indigo-50 px-3 py-1 text-[10px] font-black text-indigo-700">⏳ ${cd.days} days to go</span>` : ''}
       </div>
-      <p class="mt-2 rounded-xl bg-indigo-50 px-3 py-2 text-[11px] font-semibold text-indigo-700">Real ${open.exam}: ${open.label}. Real WAEC/NECO/JAMB past questions are mixed into every paper.</p>
+      <p class="mt-2 rounded-xl bg-indigo-50 px-3 py-2 text-[11px] font-semibold text-indigo-700">${open.exam} format: ${open.label}.</p>
       <h4 class="mt-4 text-[11px] font-black uppercase tracking-wide text-indigo-700">How do you want to sit it?</h4>
       <div class="mt-1.5 grid gap-2 sm:grid-cols-3">
         ${Object.entries(SIM_MODES).map(([k, m]) => `
@@ -4034,7 +4042,7 @@ function examSimSetupPanel() {
         </label>
       </div>
       <button type="button" onclick="startExamSimFromPanel()" class="mt-5 w-full rounded-xl bg-indigo-600 px-6 py-3 text-xs font-black text-white transition hover:bg-indigo-500 sm:w-auto">🚀 Start ${open.name} · ${SIM_MODES[sel.mode].name}${sel.customQ ? ' · ' + sel.customQ + ' questions per subject' : ''}${sel.customMin ? ' · ' + sel.customMin + ' min' : ''}</button>
-      <p class="mt-2 text-[10px] font-semibold text-slate-400">${String(state.profile.classLevel || '').startsWith('JSS') ? 'Only questions from your class level go into this paper — nothing senior, ever.' : 'Papers are built from your saved subjects plus real past questions.'}</p>
+      <p class="mt-2 text-[10px] font-semibold text-slate-400">${String(state.profile.classLevel || '').startsWith('JSS') ? 'Only questions from your class level go into this paper — nothing senior, ever.' : 'Papers are built from your saved subjects.'}</p>
     </section>`;
 }
 

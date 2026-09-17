@@ -55,8 +55,9 @@ JSS students only ever see BECE-appropriate content; SS students see JAMB/WAEC/N
   animations, confetti, and an automatic retry pile for missed cards.
 - **Duolingo-style streaks** — flame celebrations, ❄️ streak freezes earned from tasks,
   and a badge shelf (task badges plus 7/30/365-day streak badges).
-- **Study Buddy** — an on-device tutor with a built-in knowledge engine that can research
-  live (Wikipedia + DuckDuckGo) when it doesn't know something. Optional Gemini API key.
+- **Study Buddy** — a 100% on-device tutor: ~110 hand-written syllabus lessons, a topic
+  brain over all 132 topics, step-by-step algebra solvers, study coaching and app help.
+  No AI services, no internet research — answers are curriculum-perfect and instant.
 - **Google Sign-In + cloud sync** — streaks, preferences and quiz stats sync to Firestore
   under `users/{uid}`. Works fully offline in Demo Mode (localStorage fallback).
 - **Premium engine** — a complete freemium + Paystack checkout system is built in but
