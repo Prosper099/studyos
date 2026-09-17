@@ -486,8 +486,8 @@ export default {
             { q: 'State the sum and product of roots relationships.', a: 'For ax^2 + bx + c = 0 with roots α and β: α + β = -b/a and αβ = c/a. Handy for building an equation from its roots: x^2 - (sum)x + (product) = 0.' }
           ],
           quiz: [
-            { q: 'Solve x^2 - 5x + 6 = 0.', options: ['2 and 3', '-2 and -3', '1 and 6', '-1 and -6'], correct: 0,
-              exp: '(x - 2)(x - 3) = 0, so x = 2 or 3.' },
+            { q: 'Factorise completely: x^2 + 7x + 12.', options: ['(x + 3)(x + 4)', '(x + 2)(x + 6)', '(x + 1)(x + 12)', '(x - 3)(x - 4)'], correct: 0,
+              exp: 'Find two numbers that multiply to 12 and add to 7: they are 3 and 4, so x^2 + 7x + 12 = (x + 3)(x + 4).' },
             { q: 'Find the discriminant of 2x^2 + 3x - 5 = 0.', options: ['49', '31', '-31', '19'], correct: 0,
               exp: 'Δ = b^2 - 4ac = 9 - 4(2)(-5) = 9 + 40 = 49.' },
             { q: 'If the discriminant of a quadratic is negative, the equation has...', options: ['no real roots', 'two equal roots', 'two distinct real roots', 'one root only'], correct: 0,

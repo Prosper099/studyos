@@ -129,6 +129,7 @@ const feature = [
   ['streak freeze ice-shatter overlay', /id="freeze-overlay"/],
   ['passive streak check on app entry', /checkStreakOnEntry\(\);/],
   ['chart dot tooltip markup', /chart-dot[\s\S]*chart-tip/],
+  ['class-level-safe exam and quiz pools', /topicBankFor[\s\S]{0,4000}simQuestionsFor/],
   ['full exam simulations live on the practice exam page', /EXAM_PRESETS[\s\S]{0,8000}startExamSimFromPanel/],
   ['calendar activity heatmap with hover cells, stats and legend', /hm-cell[\s\S]{0,4000}Best run:/],
   ['PWA manifest linked', /rel="manifest" href="\.?\/manifest\.webmanifest"/],

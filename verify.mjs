@@ -1304,6 +1304,22 @@ check('study mode has no clock and explains each answer immediately', (() => {
     && h.includes('Finish study session');
 })());
 w.exitExamSim();
+check('JSS1 exams only ever serve JSS1 questions, with no repeats', (() => {
+  const st = T.getState();
+  const saved = { lvl: st.profile.classLevel, subs: st.profile.subjects, page: st.page, sub: st.selectedSubject };
+  st.profile.classLevel = 'JSS1';
+  st.profile.subjects = ['Mathematics', 'Basic Science', 'English Language', 'Basic Technology'];
+  w.startExamSim('bece', 'mock');
+  const sim = T.getState().examSim;
+  const qs = sim ? sim.sections.flatMap(x => x.questions) : [];
+  const texts = qs.map(q => String(q.q).replace(/\s+/g, ' ').trim().toLowerCase());
+  w.exitExamSim();
+  st.profile.classLevel = saved.lvl; st.profile.subjects = saved.subs;
+  st.selectedSubject = saved.sub; st.page = saved.page;
+  w.backToQuizList();
+  return qs.length >= 40 && qs.every(q => q.level === 'JSS1' && !q.src)
+    && new Set(texts).size === texts.length;
+})());
 w.startExamSim('jamb', 'mock');
 w.submitExamSim();
 check('mock mode shows the scorecard but keeps explanations hidden', (() => {
