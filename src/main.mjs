@@ -18,6 +18,7 @@ import {
 import { CURRICULUM } from './data/curriculum.mjs';
 import { PASTQ } from './data/pastq.mjs';
 import { BUDDY_KB_EXTRA } from './data/buddy-kb-extra.mjs';
+import { BUDDY_AVATAR } from './data/buddy-avatar.mjs';
 import { escapeHtml, localISO } from './modules/utils.mjs';
 import { chartSvgCore, progressChartSvg, showChartTip, hideChartTip, activityHeatSvg } from './modules/charts.mjs';
 import './styles.css';
@@ -3246,7 +3247,7 @@ function renderAssistant(el) {
   const hero = `
     <div class="buddy-hero-hero flex min-h-full flex-col items-center justify-center px-4 py-10">
       <div class="flex flex-col items-center gap-6 text-center md:flex-row md:gap-7 md:text-left">
-        <div class="buddy-orb" aria-hidden="true">🤖</div>
+        <div class="buddy-orb" role="img" aria-label="Buddy"><img src="${BUDDY_AVATAR}" alt="" class="h-full w-full rounded-full object-cover" /></div>
         <div>
           <h2 class="max-w-xl text-3xl font-medium leading-tight md:text-4xl"><span class="bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">What should we work on today${firstName ? ', ' + firstName : ''}?</span></h2>
           <div class="buddy-taglines mt-2">
@@ -3269,7 +3270,7 @@ function renderAssistant(el) {
     ${pageHeader('Buddy AI Tutor', 'Your built-in academic assistant. Ask for a definition, a formula, a worked example or exam strategy.')}
     <div class="mx-auto flex h-[calc(100vh-16rem)] min-h-[26rem] max-w-3xl flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-card">
       <div class="flex items-center gap-3 border-b border-slate-200 px-4 py-3">
-        <div class="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-600 text-base">🤖</div>
+        <div class="h-9 w-9 shrink-0 overflow-hidden rounded-full shadow-sm"><img src="${BUDDY_AVATAR}" alt="Buddy" class="h-full w-full object-cover" /></div>
         <div class="min-w-0 flex-1">
           <div class="text-sm font-bold text-slate-900">Buddy</div>
           <div class="flex items-center gap-1.5 text-[11px] text-emerald-600"><span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span> Online · ${BUDDY_KB.length} lessons in memory</div>
