@@ -64,24 +64,69 @@ export function hideChartTip() {
   document.querySelectorAll('.chart-tip').forEach(t => t.classList.add('hidden'));
   document.querySelectorAll('.cpg.cp-on').forEach(g => { if (!g.classList.contains('cp-fix')) g.classList.remove('cp-on'); });
 }
+const HM_DOWS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+const HM_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const HM_DAY_NAMES = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+/** Calendar activity heatmap: 7 rows (Mon→Sun) × 12 week columns, GitHub-style
+ *  clarity without GitHub's look. Reads the existing per-day activity counts
+ *  (state.quizStats.days) — nothing about how activity is tracked changes. */
 export function activityHeatSvg(days) {
-  const weeks = 12, cell = 13, gap = 4;
-  const d0 = new Date();
-  const start = new Date(d0); start.setDate(d0.getDate() - (weeks * 7 - 1));
+  const weeks = 12;
+  const cell = 12, gap = 4, pitch = cell + gap;
+  const labelW = 26, topH = 14;
+  const today = new Date();
+  const mondayThisWeek = new Date(today);
+  mondayThisWeek.setDate(today.getDate() - ((today.getDay() + 6) % 7));
+  const start = new Date(mondayThisWeek);
+  start.setDate(mondayThisWeek.getDate() - (weeks - 1) * 7);
   const iso = x => localISO(x);
-  let rects = '';
-  for (let i = 0; i < weeks * 7; i++) {
-    const dt = new Date(start); dt.setDate(start.getDate() + i);
-    const n = (days || {})[iso(dt)] || 0;
-    const col = n === 0 ? '#f1f5f9' : n === 1 ? '#bbf7d0' : n === 2 ? '#4ade80' : '#16a34a';
-    const x = Math.floor(i / 7) * (cell + gap), y = (i % 7) * (cell + gap);
-    rects += `<rect x="${x}" y="${y}" width="${cell}" height="${cell}" rx="3" fill="${col}"><title>${iso(dt)} — ${n} activit${n === 1 ? 'y' : 'ies'}</title></rect>`;
+  const todayIso = iso(today);
+  const fmt = x => `${HM_DOWS[(x.getDay() + 6) % 7]}, ${HM_MONTHS[x.getMonth()]} ${x.getDate()}`;
+  const level = n => (n <= 0 ? '#f1f5f9' : n === 1 ? '#dcfce7' : n <= 3 ? '#bbf7d0' : n <= 6 ? '#4ade80' : '#15803d');
+  let cells = '';
+  let monthLabels = '';
+  let prevMonth = -1;
+  let activeDays = 0, run = 0, bestRun = 0;
+  const dowTotals = [0, 0, 0, 0, 0, 0, 0];
+  for (let w = 0; w < weeks; w++) {
+    const monday = new Date(start); monday.setDate(start.getDate() + w * 7);
+    if (w === 0 || monday.getMonth() !== prevMonth) {
+      monthLabels += `<text x="${labelW + w * pitch + 1}" y="9.5" font-size="8.5" font-weight="700" fill="#94a3b8">${HM_MONTHS[monday.getMonth()]}</text>`;
+      prevMonth = monday.getMonth();
+    }
+    for (let r = 0; r < 7; r++) {
+      const dt = new Date(start); dt.setDate(start.getDate() + w * 7 + r);
+      const x = labelW + w * pitch, y = topH + r * pitch;
+      if (iso(dt) > todayIso) {
+        cells += `<rect x="${x}" y="${y}" width="${cell}" height="${cell}" rx="3" fill="#f8fafc" stroke="#eef2f7" stroke-width="1"/>`;
+        continue;
+      }
+      const n = (days || {})[iso(dt)] || 0;
+      if (n > 0) { activeDays += 1; dowTotals[(dt.getDay() + 6) % 7] += n; }
+      run = n > 0 ? run + 1 : 0;
+      if (run > bestRun) bestRun = run;
+      cells += `<rect class="hm-cell" x="${x}" y="${y}" width="${cell}" height="${cell}" rx="3" fill="${level(n)}"><title>${fmt(dt)} — ${n === 0 ? 'no activity' : `${n} activit${n === 1 ? 'y' : 'ies'}`}</title></rect>`;
+    }
   }
-  const W3 = weeks * (cell + gap), H3 = 7 * (cell + gap);
-  return `<svg viewBox="0 0 ${W3} ${H3}" class="w-full" role="img" aria-label="Study activity heatmap">${rects}</svg>
-    <div class="mt-1 flex items-center justify-end gap-1 text-[10px] font-semibold text-slate-400">less
-      <span class="inline-block h-2.5 w-2.5 rounded" style="background:#f1f5f9"></span>
-      <span class="inline-block h-2.5 w-2.5 rounded" style="background:#bbf7d0"></span>
-      <span class="inline-block h-2.5 w-2.5 rounded" style="background:#4ade80"></span>
-      <span class="inline-block h-2.5 w-2.5 rounded" style="background:#16a34a"></span> more</div>`;
+  const best = Math.max(...dowTotals);
+  const mostActive = best > 0 ? HM_DAY_NAMES[dowTotals.indexOf(best)] : '—';
+  const W = labelW + weeks * pitch - gap, H = topH + 7 * pitch - gap;
+  const rowLabel = (r, name) => `<text x="${labelW - 7}" y="${topH + r * pitch + 8.8}" font-size="8" font-weight="700" fill="#a3b0c2" text-anchor="end">${name}</text>`;
+  const swatch = bg => `<span class="inline-block h-2.5 w-2.5 rounded-[3px]" style="background:${bg}"></span>`;
+  return `
+    <style>.hm-cell{transition:filter .12s ease}.hm-cell:hover{filter:brightness(.88);stroke:#475569;stroke-width:1.25;stroke-opacity:1}</style>
+    <svg viewBox="0 0 ${W} ${H}" style="width:100%;max-width:330px" role="img" aria-label="Study activity over the last 12 weeks">
+      ${monthLabels}
+      ${rowLabel(0, 'Mon')}${rowLabel(2, 'Wed')}${rowLabel(4, 'Fri')}
+      ${cells}
+    </svg>
+    <div class="mt-2.5 flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
+      <div class="flex flex-wrap gap-1.5">
+        <span class="rounded-lg bg-slate-50 px-2.5 py-1 text-[10px] font-semibold text-slate-500">🗓 <b class="font-black text-slate-900">${activeDays}</b> active day${activeDays === 1 ? '' : 's'}</span>
+        <span class="rounded-lg bg-slate-50 px-2.5 py-1 text-[10px] font-semibold text-slate-500">⚡ Best run: <b class="font-black text-slate-900">${bestRun}</b> day${bestRun === 1 ? '' : 's'}</span>
+        <span class="rounded-lg bg-slate-50 px-2.5 py-1 text-[10px] font-semibold text-slate-500">⭐ Most active: <b class="font-black text-slate-900">${mostActive}</b></span>
+      </div>
+      <div class="flex items-center gap-1 text-[10px] font-semibold text-slate-400">Less ${swatch('#f1f5f9')}${swatch('#dcfce7')}${swatch('#bbf7d0')}${swatch('#4ade80')}${swatch('#15803d')} More</div>
+    </div>`;
 }
