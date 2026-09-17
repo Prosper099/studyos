@@ -3796,7 +3796,7 @@ function redeemActivationKey(raw) {
   const plan = code[0] === 'P' ? 'pack' : 'pro';
   const email = (state.profile.email || '').toLowerCase().trim();
   const ok = [monthBucket(0), monthBucket(-1)].some(b => activationKeyFor(email, plan, b) === code);
-  if (!ok) { toast('This key is not for this account or it has expired — ping Prosper on WhatsApp.'); return; }
+  if (!ok) { toast('This key is not valid for this account, or it has expired. Please contact the founder on WhatsApp for assistance.'); return; }
   activatePlan(plan, 'key:' + code);
 }
 function activateViaBuddy() {
