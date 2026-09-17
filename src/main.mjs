@@ -3401,12 +3401,6 @@ function renderAssistant(el) {
                 class="flex-1 rounded-lg border border-slate-200 px-2.5 py-1.5 text-[11px] outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100" />
               <button type="button" onclick="savePaystackKey(document.getElementById('paystack-key').value)" class="rounded-lg bg-slate-900 px-3 py-1.5 text-[11px] font-bold text-white transition hover:bg-slate-700">Save</button>
             </div>
-            <label class="mt-3 block text-[11px] font-bold text-slate-700">Owner only: Bundle key generator (student pays ₦${PRO_PACK_NGN.toLocaleString()} to the OPay account, then you send this)</label>
-            <div class="mt-1 flex flex-wrap gap-2">
-              <input type="email" id="keygen-email" placeholder="student's email" class="flex-1 rounded-lg border border-slate-200 px-2.5 py-1.5 text-[11px] outline-none focus:border-emerald-400" />
-              <button type="button" onclick="makeActivationKey()" class="rounded-lg bg-emerald-600 px-3 py-1.5 text-[11px] font-bold text-white transition hover:bg-emerald-500">Generate key</button>
-            </div>
-            <div id="keygen-out" class="mt-1"></div>
           </div>` : ''}
           </div>
         </div>
@@ -3830,17 +3824,7 @@ function openKeyEntry() {
 }
 function closeKeyEntry() { const m = document.getElementById('key-modal'); if (m) { m.classList.add('hidden'); m.classList.remove('flex'); } }
 function keyBackdrop(event) { if (event && event.target === event.currentTarget) closeKeyEntry(); }
-function makeActivationKey() {
-  const email = ((document.getElementById('keygen-email') || {}).value || '').trim();
-  if (!email) { toast('Type the student email first.'); return; }
-  const code = activationKeyFor(email, 'pack', monthBucket(0));
-  const out = document.getElementById('keygen-out');
-  if (out) out.innerHTML = `<div class="mt-1 flex flex-wrap items-center gap-2"><span class="rounded-lg bg-emerald-50 px-2 py-1 font-mono text-xs font-black tracking-widest text-emerald-700">${code}</span><button type="button" onclick="sendKeyOnWhatsApp('${email.replace(/'/g, '')}', '${code}')" class="rounded-lg bg-emerald-600 px-2.5 py-1.5 text-[10px] font-bold text-white transition hover:bg-emerald-500">Send on WhatsApp</button></div><p class="mt-1 text-[10px] text-slate-400">The key works while it is still ${monthBucket(0)} (or ${monthBucket(-1)} as grace). One redemption unlocks the Bundle permanently.</p>`;
-}
-function sendKeyOnWhatsApp(email, code) {
-  const text = `Hi! Your StudyOS activation key is ${code}. Open StudyOS, tap Activate → Enter key, and paste it. The full Bundle is yours forever! 🎉`;
-  window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
-}
+
 function proActive() { return !monetizationOn || ((state.profile.plan === 'pro' || state.profile.plan === 'pack') && (!state.profile.planUntil || state.profile.planUntil > Date.now())); }
 function dailyQuizzesUsed() { return (state.daily && state.daily.quizzes) || 0; }
 function dailyBuddyUsed() { return (state.daily && state.daily.buddy) || 0; }
@@ -5487,7 +5471,7 @@ Object.assign(window, {
   sendChatMessage, askBuddy, clearChat, setResearch, saveGeminiKey, toggleGeminiPanel,
   openUpgrade, closeUpgrade, upgradeBackdrop, choosePlan, founderUnlock, whatsappUpgrade, savePaystackKey,
   activateViaBuddy, pingFounderPaid, copyOpayAccount, openKeyEntry, closeKeyEntry, keyBackdrop, redeemActivationKey,
-  makeActivationKey, sendKeyOnWhatsApp, activationKeyFor, monthBucket, proActive, OPAY_ACCOUNT,
+  activationKeyFor, monthBucket, proActive, OPAY_ACCOUNT,
   dismissFreezeIce, installStudyOS, dismissInstall,
   setGeminiModel, testGemini,
 });
@@ -5507,7 +5491,7 @@ window.__STUDYOS_TEST__ = {
   examCountdown, subjectReadiness, gradeBand, predictedScore, targetNumber, examCommandCenter, examDateEstimate,
   proActive, quizGate, buddyGate, activatePlan, FREE_DAILY_QUIZZES, FREE_DAILY_BUDDY, closeUpgrade, setMonetization,
   activateViaBuddy, pingFounderPaid, copyOpayAccount, openKeyEntry, closeKeyEntry, keyBackdrop,
-  redeemActivationKey, makeActivationKey, sendKeyOnWhatsApp, activationKeyFor, monthBucket, proActive, OPAY_ACCOUNT,
+  redeemActivationKey, activationKeyFor, monthBucket, proActive, OPAY_ACCOUNT,
   getState: () => state
 };
 
