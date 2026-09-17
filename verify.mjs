@@ -1226,7 +1226,7 @@ check('mission shows a live progress counter', /\d\/3 done/.test(page()) || page
   const last = st.chat[st.chat.length - 1];
   check('Activate sends the student to Buddy with the account, the paid-ping and the key button',
     st.page === 'assistant' && last && last.html.includes(T.OPAY_ACCOUNT)
-    && last.html.includes('I have paid') && last.html.includes('Enter key'));
+    && last.html.includes('Payment sent') && last.html.includes('Enter key'));
   T.openKeyEntry();
   check('the activation popup opens ready for the key', !byId('key-modal').classList.contains('hidden'));
   T.closeKeyEntry();
