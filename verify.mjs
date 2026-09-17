@@ -725,66 +725,6 @@ check('solveSimultaneous rejects parallel lines', T.solveSimultaneous(1, 1, 2, 2
 check('extractCoeffs reads 2x^2 + 3x - 5', JSON.stringify(T.extractCoeffs('solve 2x^2 + 3x - 5')) === JSON.stringify({ a: 2, b: 3, c: -5 }));
 check('extractCoeffs handles implicit coefficient x^2 - 5x + 6', JSON.stringify(T.extractCoeffs('x^2 - 5x + 6')) === JSON.stringify({ a: 1, b: -5, c: 6 }));
 
-// ---------- Buddy live internet research ----------
-const T2 = T;
-check('researchOnline pulls Wikipedia extracts', await (async () => {
-  const r = await T2.researchOnline('centripetal force');
-  return r.sources.some(x => x.from === 'Wikipedia' && /curved path/.test(x.text));
-})());
-check('researchOnline also pulls DuckDuckGo and de-duplicates', await (async () => {
-  const r = await T2.researchOnline('centripetal force');
-  const urls = r.sources.map(x => x.url.toLowerCase());
-  return r.sources.some(x => x.from === 'DuckDuckGo') && new Set(urls).size === urls.length;
-})());
-check('researchOnline never throws and caps results at 5', await (async () => {
-  const r = await T2.researchOnline('centripetal force');
-  return r.sources.length > 0 && r.sources.length <= 5;
-})());
-check('composeAnswer cites sources when research is ON', await (async () => {
-  globalThis.__researchStateOn = true;
-  const r = await T2.composeAnswer('explain centripetal force');
-  return r.html.includes('Sources') && r.html.includes('en.wikipedia.org') && r.html.includes('Live from the web');
-})());
-check('Gemini key produces a synthesised answer', await (async () => {
-  const before = globalThis.__geminiKey();
-  globalThis.__setGemini('AIza-good-key');
-  const r = await T2.composeAnswer('explain centripetal force');
-  globalThis.__setGemini(before || '');
-  return /Buddy · live research/.test(r.html) && r.html.includes('friction');
-})());
-check('a bad Gemini key degrades gracefully instead of breaking', await (async () => {
-  const before = globalThis.__geminiKey();
-  globalThis.__setGemini('BAD_KEY');
-  const r = await T2.composeAnswer('explain centripetal force');
-  globalThis.__setGemini(before || '');
-  return /Gemini key issue/.test(r.html) && r.html.includes('Sources');
-})());
-check('askBuddy(forceResearch=false) uses the built-in lesson only', await (async () => {
-  const before = globalThis.__FETCH_LOG.length;
-  await globalThis.askBuddy('explain centripetal force', false);
-  globalThis.__timers.splice(0).forEach(fn => fn());
-  await new Promise(r => setImmediate(r));
-  return globalThis.__FETCH_LOG.length === before;
-})());
-check('askBuddy(forceResearch=true) hits the network', await (async () => {
-  const before = globalThis.__FETCH_LOG.length;
-  await globalThis.askBuddy('explain redox reactions', true);
-  await new Promise(r => setImmediate(r));
-  return globalThis.__FETCH_LOG.length > before;
-})());
-check('"Search the web:" chip prefix forces research on', await (async () => {
-  const before = globalThis.__FETCH_LOG.length;
-  await globalThis.askBuddy('Search the web: latest JAMB syllabus changes');
-  await new Promise(r => setImmediate(r));
-  return globalThis.__FETCH_LOG.length > before;
-})());
-check('research toggle changes app state and persists', (() => {
-  globalThis.setResearch(false);
-  const off = globalThis.__researchOn() === false;
-  globalThis.setResearch(true);
-  return off && globalThis.__researchOn() === true;
-})());
-
 // ---------- misc helpers ----------
 check('initials("Joseph Adeyemi") → JA', T.initials('Joseph Adeyemi') === 'JA');
 check('initials("") → S', T.initials('') === 'S');
@@ -1079,29 +1019,57 @@ check('road-to card stays off the dashboard for both plans; exam interface carri
   return !freeHtml.includes('Your road to') && !proHtml.includes('Your road to')
     && quizHtml.includes('days to');
 })());
-check('free plan caps quizzes at the daily limit and opens the upgrade sheet', (() => {
+check('free plan: every quiz is a 5-question taste, never the full paper', (() => {
   const st = T.getState();
-  const savedPlan = st.profile.plan, savedDaily = st.daily;
+  const savedPlan = st.profile.plan, savedSetup = st.quizSetup;
   st.profile.plan = 'free';
-  st.daily = { date: T.localISO(), lessons: 0, cards: 0, quizzes: T.FREE_DAILY_QUIZZES, focus: 0, readTopic: '', buddy: 0 };
+  st.quizSetup = { count: 50, minutes: 0 };
+  const n = T.buildQuiz('Mathematics', 'mock', 'SS3', 0).length;
+  st.profile.plan = savedPlan; st.quizSetup = savedSetup;
+  return n === 5;
+})());
+check('free plan: Buddy does not answer — it offers the Bundle instead', (() => {
+  const st = T.getState();
+  const savedPlan = st.profile.plan, savedPage = st.page;
+  st.profile.plan = 'free';
+  w.askBuddy('explain inertia');
+  const limited = !byId('upgrade-modal').classList.contains('hidden') && T.buddyGate() === false;
+  T.closeUpgrade();
+  st.profile.plan = savedPlan; w.navigate(savedPage);
+  return limited;
+})());
+check('free plan: lesson notes stay locked behind the Bundle', (() => {
+  const st = T.getState();
+  const savedPlan = st.profile.plan, savedSub = st.selectedSubject;
+  st.profile.plan = 'free';
+  const title = T.topicsFor('Mathematics', 'SS3')[0].title;
+  w.openTopic('Mathematics', title);
+  const html = page();
+  const locked = html.includes('StudyOS Bundle') && html.includes("openUpgrade('notes')");
+  st.profile.plan = savedPlan; st.selectedSubject = savedSub;
+  w.backToStudy();
+  return locked;
+})());
+check('free plan: flashcards stay locked behind the Bundle', (() => {
+  const st = T.getState();
+  const savedPlan = st.profile.plan;
+  st.profile.plan = 'free';
+  w.navigate('flashcards');
+  const locked = page().includes('StudyOS Bundle') && page().includes("openUpgrade('cards')");
+  st.profile.plan = savedPlan;
+  w.navigate('home');
+  return locked;
+})());
+check('free plan: full exam simulations wait for the Bundle', (() => {
+  const st = T.getState();
+  const savedPlan = st.profile.plan;
+  st.profile.plan = 'free';
   const qBefore = st.quiz;
-  w.startMockQuiz();
+  w.startExamSim('jamb', 'mock');
   const blocked = st.quiz === qBefore && !byId('upgrade-modal').classList.contains('hidden');
   T.closeUpgrade();
-  st.profile.plan = savedPlan; st.daily = savedDaily;
+  st.profile.plan = savedPlan;
   return blocked;
-})());
-check('free plan caps Buddy questions and keeps the counter honest', (() => {
-  const st = T.getState();
-  const savedPlan = st.profile.plan, savedDaily = st.daily, savedPage = st.page;
-  st.profile.plan = 'free';
-  st.daily = { date: T.localISO(), lessons: 0, cards: 0, quizzes: 0, focus: 0, readTopic: '', buddy: T.FREE_DAILY_BUDDY };
-  w.askBuddy('explain inertia');
-  const limited = !byId('upgrade-modal').classList.contains('hidden') && st.daily.buddy === T.FREE_DAILY_BUDDY;
-  T.closeUpgrade();
-  st.profile.plan = savedPlan; st.daily = savedDaily;
-  w.navigate(savedPage);
-  return limited;
 })());
 check('Pro activation persists to the cloud profile and lifts every gate', (() => {
   const st = T.getState();
@@ -1165,7 +1133,7 @@ w.navigate('assistant');
 check('Buddy chat renders its greeting and suggestion chips',
   page().includes('Buddy') && page().includes('id="chat-chips"'));
 check('Buddy chat exposes the input form', page().includes('id="chat-input"') && page().includes('sendChatMessage'));
-w.askBuddy('explain centripetal force');
+await w.askBuddy('explain centripetal force');
 (globalThis.__timers.splice(0).forEach(fn => fn()));
 check('Buddy answered in the chat log with the centripetal-force lesson',
   byId('chat-box').innerHTML.includes('Centripetal Force')

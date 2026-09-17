@@ -83,11 +83,6 @@ const feature = [
   ['serverTimestamp()', /serverTimestamp\(\)/],
   ['book logo SVG', /<svg[^>]*viewBox="0 0 48 48"[\s\S]*?<path d="M24 15\.4/],
   ['logo used in boot, auth, sidebar and favicon', (html.match(/viewBox="0 0 48 48"/g) || []).length >= 4 && /<link rel="icon" href="data:image\/svg\+xml/],
-  ['Wikipedia research endpoint', /en\.wikipedia\.org\/w\/api\.php[\s\S]*origin=\*/],
-  ['DuckDuckGo research endpoint', /api\.duckduckgo\.com/],
-  ['optional Gemini synthesis', /generativelanguage\.googleapis\.com\/v1beta\/models/],
-  ['live research toggle in the chat UI', /setResearch\(/],
-  ['sources are cited with links', /sourcesHtml\(/],
   ['lesson pages offer live research', /Research live/],
   ['onboarding step 1 classes SS1-JSS3', /[\"']SS1[\"'],\s*[\"']SS2[\"'],\s*[\"']SS3[\"'],\s*[\"']JSS1[\"'],\s*[\"']JSS2[\"'],\s*[\"']JSS3[\"']/],
   ['onboarding step 2 senior list (JAMB, WAEC, NECO, Post-UTME, General)', /SS: \[[\s\S]*JAMB UTME[\s\S]*WAEC WASSCE[\s\S]*NECO[\s\S]*Post-UTME[\s\S]*[\"']General[\"']/],
@@ -150,6 +145,8 @@ check('open-licence attribution footer present (OpenStax CC BY 4.0 + question ba
 // ---------- 4c. CBT personalisation: setup chips, timer, focus mode ----------
 check('activation popup ships closed and monetization ships off',
   /id="key-modal"[^>]*\bhidden\b/.test(html) && /monetizationOn = false/.test(html));
+check('Buddy has no internet research left',
+  !html.includes('researchOnline') && !html.includes('Live internet research') && !html.includes('Search the web'));
 check('quiz list has question-count and timer dropdowns',
   /setQuizCount\(/.test(html) && /setQuizTimer\(/.test(html) && /No timer/.test(html)
   && /Questions per subject/.test(html) && /setSimQuestions\(/.test(html) && /setSimMinutes\(/.test(html));
@@ -174,9 +171,8 @@ check('past questions run in a JAMB-style exam interface',
   && /examJump,[\s\S]{0,200}examPrev,[\s\S]{0,200}examNext,[\s\S]{0,200}submitExam/.test(html));
 check('Internet Archive is on the resources shelf (EduPodia removed)',
   /archive\.org/.test(html) && !/edupodia/i.test(html));
-check('LaTeX sanitizer + prompt guard fix broken AI math text',
-  /function plainMath/.test(html) && /escapeHtml\(plainMath\(text\)\)/.test(html)
-  && /Never use LaTeX/.test(html));
+check('LaTeX sanitizer keeps Buddy math plain text',
+  /function plainMath/.test(html) && /escapeHtml\(plainMath\(text\)\)/.test(html));
 check('no Firestore wording in student-facing UI',
   !/Cloud Firestore/.test(html) && !/Firestore sync/.test(html) && /Cloud sync: active/.test(html));
 check('rare glyphs purged from content (no vulgar fractions, sub/superscript digits)',
