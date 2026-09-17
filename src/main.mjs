@@ -3401,6 +3401,16 @@ function renderAssistant(el) {
                 class="flex-1 rounded-lg border border-slate-200 px-2.5 py-1.5 text-[11px] outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100" />
               <button type="button" onclick="savePaystackKey(document.getElementById('paystack-key').value)" class="rounded-lg bg-slate-900 px-3 py-1.5 text-[11px] font-bold text-white transition hover:bg-slate-700">Save</button>
             </div>
+            <label class="mt-3 block text-[11px] font-bold text-slate-700">Owner only: activation key generator (student pays to the OPay account, then you send this)</label>
+            <div class="mt-1 flex flex-wrap gap-2">
+              <input type="email" id="keygen-email" placeholder="student's email" class="flex-1 rounded-lg border border-slate-200 px-2.5 py-1.5 text-[11px] outline-none focus:border-emerald-400" />
+              <select id="keygen-plan" class="rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-[11px] font-semibold text-slate-700">
+                <option value="pro">Pro · 30 days</option>
+                <option value="pack">JAMB Pack · 180 days</option>
+              </select>
+              <button type="button" onclick="makeActivationKey()" class="rounded-lg bg-emerald-600 px-3 py-1.5 text-[11px] font-bold text-white transition hover:bg-emerald-500">Generate key</button>
+            </div>
+            <div id="keygen-out" class="mt-1"></div>
           </div>` : ''}
           </div>
         </div>
@@ -3648,7 +3658,7 @@ function renderProfile(el) {
           <h3 class="mb-1 text-sm font-bold text-slate-900">👨‍👩‍ Family &amp; plan</h3>
           <p class="mb-3 text-[11px] text-slate-400">When you are ready for the full engine, go Pro.</p>
           <div class="flex flex-wrap items-center gap-2">
-            ${monetizationOn ? (proActive() ? `<span class="rounded-full bg-amber-50 px-3 py-1.5 text-[11px] font-black text-amber-700">⭐ ${state.profile.plan === 'pack' ? 'JAMB Premium Pack active' : 'Pro active'}</span>` : `<button type="button" onclick="openUpgrade('plan')" class="rounded-xl bg-slate-900 px-4 py-2 text-[11px] font-black text-white transition hover:bg-slate-800">⭐ Upgrade to Pro — ₦${PRO_MONTHLY_NGN.toLocaleString()}/mo</button>`) : ''}
+            ${monetizationOn ? (proActive() ? `<span class="rounded-full bg-amber-50 px-3 py-1.5 text-[11px] font-black text-amber-700">⭐ ${state.profile.plan === 'pack' ? 'JAMB Premium Pack active' : 'Pro active'}</span>` : `<button type="button" onclick="openUpgrade('plan')" class="rounded-xl bg-slate-900 px-4 py-2 text-[11px] font-black text-white transition hover:bg-slate-800">⭐ Activate Pro — ₦${PRO_MONTHLY_NGN.toLocaleString()}/mo</button>`) : ''}
           </div>
           ${monetizationOn && !proActive() ? `<p class="mt-2 text-[10px] text-slate-400">Free today: ${Math.max(0, FREE_DAILY_QUIZZES - dailyQuizzesUsed())} quiz${FREE_DAILY_QUIZZES - dailyQuizzesUsed() === 1 ? '' : 'zes'} left · ${Math.max(0, FREE_DAILY_BUDDY - dailyBuddyUsed())} Buddy questions left.</p>` : ''}
         </section>
@@ -3767,7 +3777,79 @@ let monetizationOn = false; // GROWTH PHASE: every feature is free for everyone.
 function setMonetization(on) { monetizationOn = !!on; renderPage(); }
 const FREE_DAILY_QUIZZES = 3, FREE_DAILY_BUDDY = 20;
 const PRO_UNLOCK_CODE = 'STUDYOS-PRO-2026'; // founder stop-gap — change before launch
-function proActive() { return !monetizationOn || state.profile.plan === 'pro' || state.profile.plan === 'pack'; }
+
+// ---------- manual activation loop: Buddy shows the OPay account, founder sends a key ----------
+const OPAY_ACCOUNT = '0000000000';   // TODO(prosper): put your real OPay account number here
+const OPAY_NAME = 'Prosper';         // TODO(prosper): your OPay account name
+const FOUNDER_WA = '2340000000000';  // TODO(prosper): your WhatsApp number, international format e.g. 2348031234567
+const ACTIVATION_SECRET = 's0-act-7f3e91b4c2d8a5'; // change only if keys ever leak
+function _actHash(str) { let h = 2166136261 >>> 0; for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; } return h >>> 0; }
+function monthBucket(offset) { const d = new Date(); d.setMonth(d.getMonth() + (offset || 0)); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'); }
+function activationKeyFor(email, plan, bucket) {
+  const base = [ACTIVATION_SECRET, String(email || '').toLowerCase().trim(), plan === 'pack' ? 'pack' : 'pro', bucket || monthBucket(0)].join('|');
+  const alpha = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let a = _actHash(base), b = _actHash(base + '#r2');
+  let code = '';
+  for (let i = 0; i < 4; i++) { code += alpha[a % 32]; a = Math.floor(a / 32); }
+  for (let i = 0; i < 3; i++) { code += alpha[b % 32]; b = Math.floor(b / 32); }
+  return (plan === 'pack' ? 'P' : 'S') + code;
+}
+function redeemActivationKey(raw) {
+  const code = String(raw || '').trim().toUpperCase().replace(/[\s-]/g, '');
+  if (!/^[SP][A-Z2-9]{7}$/.test(code)) { toast('That key does not look right — it is 8 characters, like S12AB3CD.'); return; }
+  const plan = code[0] === 'P' ? 'pack' : 'pro';
+  const email = (state.profile.email || '').toLowerCase().trim();
+  const ok = [monthBucket(0), monthBucket(-1)].some(b => activationKeyFor(email, plan, b) === code);
+  if (!ok) { toast('This key is not for this account or it has expired — ping Prosper on WhatsApp.'); return; }
+  activatePlan(plan, 'key:' + code);
+}
+function activateViaBuddy(plan) {
+  const want = plan === 'pack' ? 'pack' : 'pro';
+  closeUpgrade();
+  if (state.page !== 'assistant') navigate('assistant');
+  const amt = want === 'pack' ? PRO_PACK_NGN : PRO_MONTHLY_NGN;
+  const what = want === 'pack' ? 'the JAMB Premium Pack (covers you till your UTME ends)' : 'StudyOS Pro (30 days)';
+  pushChat('buddy', `<p>Let's get you activated! 🚀</p>
+    <p class="mt-2"><b>1.</b> Transfer <b>₦${amt.toLocaleString()}</b> to this OPay account:</p>
+    <p class="mt-1 inline-block rounded-xl bg-amber-50 px-3 py-2 text-sm font-black text-amber-800">${OPAY_ACCOUNT} — ${OPAY_NAME}</p>
+    <p class="mt-2"><b>2.</b> Tap <b>I have paid</b> — it pings Prosper on WhatsApp with your email so he can confirm the payment.</p>
+    <p class="mt-1"><b>3.</b> He replies with your <b>activation key</b>. Come back here, tap <b>Enter key</b>, paste it — and ${what} is yours! ⭐</p>
+    <div class="mt-3 flex flex-wrap gap-2">
+      <button type="button" onclick="pingFounderPaid('${want}')" class="rounded-xl bg-emerald-600 px-4 py-2 text-[11px] font-black text-white transition hover:bg-emerald-500">💸 I have paid — ping Prosper</button>
+      <button type="button" onclick="openKeyEntry()" class="rounded-xl bg-indigo-600 px-4 py-2 text-[11px] font-black text-white transition hover:bg-indigo-500">🔑 Enter key</button>
+      <button type="button" onclick="copyOpayAccount()" class="rounded-xl bg-slate-100 px-4 py-2 text-[11px] font-black text-slate-600 transition hover:bg-slate-200">📋 Copy account</button>
+    </div>`, []);
+}
+function pingFounderPaid(plan) {
+  const amt = plan === 'pack' ? PRO_PACK_NGN : PRO_MONTHLY_NGN;
+  const what = plan === 'pack' ? 'JAMB Pack' : 'Pro (30 days)';
+  const text = `Hi Prosper! I paid N${amt} to the OPay account for StudyOS ${what}. My email: ${state.profile.email || 'not set'}. Please send my activation key. 🙏`;
+  window.open('https://wa.me/' + FOUNDER_WA + '?text=' + encodeURIComponent(text), '_blank');
+}
+function copyOpayAccount() {
+  try { navigator.clipboard.writeText(OPAY_ACCOUNT); toast('Account number copied — ' + OPAY_ACCOUNT); }
+  catch { toast('Account number: ' + OPAY_ACCOUNT); }
+}
+function openKeyEntry() {
+  closeUpgrade();
+  const m = document.getElementById('key-modal');
+  if (m) { m.classList.remove('hidden'); m.classList.add('flex'); const i = document.getElementById('activation-key'); if (i) i.value = ''; }
+}
+function closeKeyEntry() { const m = document.getElementById('key-modal'); if (m) { m.classList.add('hidden'); m.classList.remove('flex'); } }
+function keyBackdrop(event) { if (event && event.target === event.currentTarget) closeKeyEntry(); }
+function makeActivationKey() {
+  const email = ((document.getElementById('keygen-email') || {}).value || '').trim();
+  const plan = ((document.getElementById('keygen-plan') || {}).value) || 'pro';
+  if (!email) { toast('Type the student email first.'); return; }
+  const code = activationKeyFor(email, plan, monthBucket(0));
+  const out = document.getElementById('keygen-out');
+  if (out) out.innerHTML = `<div class="mt-1 flex flex-wrap items-center gap-2"><span class="rounded-lg bg-emerald-50 px-2 py-1 font-mono text-xs font-black tracking-widest text-emerald-700">${code}</span><button type="button" onclick="sendKeyOnWhatsApp('${email.replace(/'/g, '')}', '${code}')" class="rounded-lg bg-emerald-600 px-2.5 py-1.5 text-[10px] font-bold text-white transition hover:bg-emerald-500">Send on WhatsApp</button></div><p class="mt-1 text-[10px] text-slate-400">The key works while it is still ${monthBucket(0)} (or ${monthBucket(-1)} as grace). Pro runs 30 days from the moment they redeem; the Pack runs 180 days.</p>`;
+}
+function sendKeyOnWhatsApp(email, code) {
+  const text = `Hi! Your StudyOS activation key is ${code}. Open StudyOS, tap Activate → Enter key, and paste it. Enjoy ${String(code)[0] === 'P' ? 'the JAMB Pack' : 'Pro'}! 🎉`;
+  window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
+}
+function proActive() { return !monetizationOn || ((state.profile.plan === 'pro' || state.profile.plan === 'pack') && (!state.profile.planUntil || state.profile.planUntil > Date.now())); }
 function dailyQuizzesUsed() { return (state.daily && state.daily.quizzes) || 0; }
 function dailyBuddyUsed() { return (state.daily && state.daily.buddy) || 0; }
 function quizGate() {
@@ -3821,6 +3903,8 @@ function activatePlan(plan, ref) {
   state.profile.plan = plan;
   state.profile.planRef = ref || '';
   state.profile.planSince = localISO();
+  const days = ref === 'founder' ? 3650 : (plan === 'pack' ? 180 : 30);
+  state.profile.planUntil = Date.now() + days * 86400000;
   saveProfile({});
   closeUpgrade();
   renderPage();
@@ -5410,6 +5494,8 @@ Object.assign(window, {
   selectQuizAnswer, submitQuiz, retakeQuiz, examJump, examPrev, examNext, submitExam,
   sendChatMessage, askBuddy, clearChat, setResearch, saveGeminiKey, toggleGeminiPanel,
   openUpgrade, closeUpgrade, upgradeBackdrop, choosePlan, founderUnlock, whatsappUpgrade, savePaystackKey,
+  activateViaBuddy, pingFounderPaid, copyOpayAccount, openKeyEntry, closeKeyEntry, keyBackdrop, redeemActivationKey,
+  makeActivationKey, sendKeyOnWhatsApp, activationKeyFor, monthBucket, proActive, OPAY_ACCOUNT,
   dismissFreezeIce, installStudyOS, dismissInstall,
   setGeminiModel, testGemini,
 });
@@ -5428,6 +5514,8 @@ window.__STUDYOS_TEST__ = {
   markGot, markLater, pushHistory, progressChartSvg, activityHeatSvg, shuffleOptions, localISO,
   examCountdown, subjectReadiness, gradeBand, predictedScore, targetNumber, examCommandCenter, examDateEstimate,
   proActive, quizGate, buddyGate, activatePlan, FREE_DAILY_QUIZZES, FREE_DAILY_BUDDY, closeUpgrade, setMonetization,
+  activateViaBuddy, pingFounderPaid, copyOpayAccount, openKeyEntry, closeKeyEntry, keyBackdrop,
+  redeemActivationKey, makeActivationKey, sendKeyOnWhatsApp, activationKeyFor, monthBucket, proActive, OPAY_ACCOUNT,
   getState: () => state
 };
 
