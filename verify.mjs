@@ -886,9 +886,9 @@ T.getState().profile.plan = 'pro'; // main flow runs as Pro so free-tier caps ne
 // quiz flow through the UI handlers (quiz page opens in list mode; pick the mock bank)
 w.changeSubject('Physics');
 w.navigate('quiz');
-check('quiz list offers the mixed exam bank plus per-topic quizzes for SS3 Physics',
-  byId('page-content').innerHTML.includes('startMockQuiz()')
-  && byId('page-content').innerHTML.includes('startTopicQuiz(')
+check('quiz list offers per-topic quizzes and points drills to the exam centre for SS3 Physics',
+  byId('page-content').innerHTML.includes('startTopicQuiz(')
+  && byId('page-content').innerHTML.includes('Exam Command Centre')
   && !byId('page-content').innerHTML.includes('Quiz being written'));
 check('quiz list degrades gracefully when a topic quiz is unwritten (mutated)', (() => {
   const t = T.CURRICULUM['Physics'].topics['SS3'][0];
@@ -926,9 +926,17 @@ check('retake clears the submitted state', byId('page-content').innerHTML.includ
 
 // real past-question drill (embedded WAEC/NECO/JAMB papers, fully offline)
 w.backToQuizList();
-check('quiz list offers the real past-question drill for banked subjects',
-  byId('page-content').innerHTML.includes('startPastQuiz()')
-  && byId('page-content').innerHTML.includes('Real WAEC/JAMB past questions'));
+check('drills moved out of the quiz list into the exam centre', (() => {
+  const h = byId('page-content').innerHTML;
+  return !h.includes('startPastQuiz()') && !h.includes('startMockQuiz()')
+    && h.includes('Exam Command Centre');
+})());
+w.navigate('home');
+check('exam centre hosts full simulations plus the mixed mock and past drills', (() => {
+  const h = byId('page-content').innerHTML;
+  return h.includes('Full exam simulations') && h.includes('startExamSim(')
+    && h.includes('JAMB UTME sitting') && h.includes('drillMock()') && h.includes('drillPast()');
+})());
 w.startPastQuiz();
 const rawPast = T.pastFor('Physics');
 const pastQuiz = T.getState().quiz.questions; // runtime (shuffled) questions
@@ -1228,6 +1236,35 @@ check('logout hides the app shell', byId('main-app').classList.contains('hidden'
   Object.assign(st, { history: saved.history, bySubject: saved.bySubject, attempts: saved.attempts, correct: saved.correct, total: saved.total, bestPercent: saved.bestPercent, days: saved.days });
   T.getState().page = saved.page;
 }
+
+
+// ---------- full exam simulation (subject switching + master clock + scorecard) ----------
+w.backToQuizList();
+w.navigate('home');
+w.startExamSim('quick');
+check('simulation opens with subject tabs, palette and master clock', (() => {
+  const h = byId('page-content').innerHTML;
+  const sim = T.getState().examSim;
+  return !!sim && sim.sections.length >= 1 && h.includes('simSubject(')
+    && h.includes('sim-clock') && h.includes('Question palette') && h.includes('Submit sitting');
+})());
+check('switching subject mid-sitting keeps answers (premium exam feel)', (() => {
+  const sim = T.getState().examSim;
+  w.simSelect(0, sim.sections[0].questions[0].correct);
+  const kept = T.getState().examSim.answers['0-0'] === sim.sections[0].questions[0].correct;
+  if (sim.sections.length > 1) w.simSubject(1); else w.simJump(1);
+  const h = byId('page-content').innerHTML;
+  return kept && h.includes('Question palette');
+})());
+w.submitExamSim();
+check('scorecard grades per subject with bars and projected score', (() => {
+  const h = byId('page-content').innerHTML;
+  const r = T.getState().examSim.result;
+  return h.includes('Sitting scorecard') && h.includes('Per subject')
+    && r.perSubject.length >= 1 && r.total >= 10;
+})());
+w.exitExamSim();
+check('exiting the simulation clears the sitting', !T.getState().examSim);
 
 // ---------- report ----------
 const failed = checks.filter(c => !c.ok);

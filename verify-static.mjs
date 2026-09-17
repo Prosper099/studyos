@@ -139,7 +139,7 @@ for (const [name, re] of feature) check(name, typeof re === 'boolean' ? re : re.
 // ---------- 4b. real past-question bank + content attribution ----------
 check('real past-question bank embedded with exam-body + year attribution',
   /(?:const|var|let) PASTQ = \{/.test(html) && /src"?: "(WAEC|NECO|JAMB) (19|20)\d\d"/.test(html)
-  && /Open past question drill/.test(html) && /startPastQuiz\(\)/.test(html));
+  && /Past question drill/.test(html) && /drillPast\(\)/.test(html));
 check('open-licence attribution footer present (OpenStax CC BY 4.0 + question banks)',
   /Content credits/.test(html) && /OpenStax/.test(html) && /CC BY 4\.0/.test(html)
   && /smartest\.ng/.test(html) && /exambuddy\.com\.ng/.test(html));
