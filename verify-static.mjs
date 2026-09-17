@@ -129,7 +129,7 @@ const feature = [
   ['streak freeze ice-shatter overlay', /id="freeze-overlay"/],
   ['passive streak check on app entry', /checkStreakOnEntry\(\);/],
   ['chart dot tooltip markup', /chart-dot[\s\S]*chart-tip/],
-  ['full exam simulations live in the exam command centre', /EXAM_PRESETS[\s\S]{0,6000}startExamSim/],
+  ['full exam simulations live on the practice exam page', /EXAM_PRESETS[\s\S]{0,8000}startExamSimFromPanel/],
   ['calendar activity heatmap with hover cells, stats and legend', /hm-cell[\s\S]{0,4000}Best run:/],
   ['PWA manifest linked', /rel="manifest" href="\.?\/manifest\.webmanifest"/],
   ['PWA theme color + iOS metas', /name="theme-color"[\s\S]{0,300}apple-mobile-web-app-capable/],
@@ -141,7 +141,7 @@ for (const [name, re] of feature) check(name, typeof re === 'boolean' ? re : re.
 // ---------- 4b. real past-question bank + content attribution ----------
 check('real past-question bank embedded with exam-body + year attribution',
   /(?:const|var|let) PASTQ = \{/.test(html) && /src"?: "(WAEC|NECO|JAMB) (19|20)\d\d"/.test(html)
-  && /Past question drill/.test(html) && /drillPast\(\)/.test(html));
+  && /simQuestionsFor/.test(html) && /pastFor\(/.test(html));
 check('open-licence attribution footer present (OpenStax CC BY 4.0 + question banks)',
   /Content credits/.test(html) && /OpenStax/.test(html) && /CC BY 4\.0/.test(html)
   && /smartest\.ng/.test(html) && /exambuddy\.com\.ng/.test(html));

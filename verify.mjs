@@ -886,9 +886,9 @@ T.getState().profile.plan = 'pro'; // main flow runs as Pro so free-tier caps ne
 // quiz flow through the UI handlers (quiz page opens in list mode; pick the mock bank)
 w.changeSubject('Physics');
 w.navigate('quiz');
-check('quiz list offers per-topic quizzes and points drills to the exam centre for SS3 Physics',
+check('quiz list offers per-topic quizzes plus the simulation setup panel for SS3 Physics',
   byId('page-content').innerHTML.includes('startTopicQuiz(')
-  && byId('page-content').innerHTML.includes('Exam Command Centre')
+  && byId('page-content').innerHTML.includes('startExamSimFromPanel()')
   && !byId('page-content').innerHTML.includes('Quiz being written'));
 check('quiz list degrades gracefully when a topic quiz is unwritten (mutated)', (() => {
   const t = T.CURRICULUM['Physics'].topics['SS3'][0];
@@ -926,16 +926,31 @@ check('retake clears the submitted state', byId('page-content').innerHTML.includ
 
 // real past-question drill (embedded WAEC/NECO/JAMB papers, fully offline)
 w.backToQuizList();
-check('drills moved out of the quiz list into the exam centre', (() => {
+check('practice exam page is the pre-exam interface (exam picker + study/mock/practice modes)', (() => {
   const h = byId('page-content').innerHTML;
-  return !h.includes('startPastQuiz()') && !h.includes('startMockQuiz()')
-    && h.includes('Exam Command Centre');
+  return h.includes('Full exam simulations') && h.includes('setSimPreset(') && h.includes('setSimMode(')
+    && h.includes('Study mode') && h.includes('Mock mode') && h.includes('Practice mode')
+    && h.includes('startExamSimFromPanel()')
+    && !h.includes('startPastQuiz()') && !h.includes('startMockQuiz()');
 })());
 w.navigate('home');
-check('exam centre hosts full simulations plus the mixed mock and past drills', (() => {
+check('dashboard no longer hosts the simulation lab or drills', (() => {
   const h = byId('page-content').innerHTML;
-  return h.includes('Full exam simulations') && h.includes('startExamSim(')
-    && h.includes('JAMB UTME sitting') && h.includes('drillMock()') && h.includes('drillPast()');
+  return !h.includes('startExamSim(') && !h.includes('drillPast(') && !h.includes('drillMock(');
+})());
+check('exam presets follow the class level (SS sees JAMB etc, JSS sees BECE only)', (() => {
+  const st = T.getState();
+  const savedLvl = st.profile.classLevel;
+  const savedPage = st.page;
+  const savedSub = st.selectedSubject;
+  st.page = 'quiz';
+  st.profile.classLevel = 'SS3'; w.backToQuizList();
+  const ssH = byId('page-content').innerHTML;
+  st.profile.classLevel = 'JSS2'; w.backToQuizList();
+  const jssH = byId('page-content').innerHTML;
+  st.profile.classLevel = savedLvl; st.page = savedPage; st.selectedSubject = savedSub; w.backToQuizList();
+  return ssH.includes('JAMB UTME sitting') && ssH.includes('WAEC WASSCE sitting') && !ssH.includes('BECE sitting')
+    && jssH.includes('BECE sitting') && !jssH.includes('JAMB UTME sitting');
 })());
 w.startPastQuiz();
 const rawPast = T.pastFor('Physics');
@@ -1249,10 +1264,11 @@ check('logout hides the app shell', byId('main-app').classList.contains('hidden'
 }
 
 
-// ---------- full exam simulation (subject switching + master clock + scorecard) ----------
+// ---------- full exam simulation (modes, subject switching, scorecard, review) ----------
 w.backToQuizList();
-w.navigate('home');
-w.startExamSim('quick');
+w.setSimPreset('jamb');
+w.setSimMode('practice');
+w.startExamSimFromPanel();
 check('simulation opens with subject tabs, palette and master clock', (() => {
   const h = byId('page-content').innerHTML;
   const sim = T.getState().examSim;
@@ -1274,8 +1290,27 @@ check('scorecard grades per subject with bars and projected score', (() => {
   return h.includes('Sitting scorecard') && h.includes('Per subject')
     && r.perSubject.length >= 1 && r.total >= 10;
 })());
+check('practice mode reviews every answer after submitting', byId('page-content').innerHTML.includes('Review answers'));
 w.exitExamSim();
 check('exiting the simulation clears the sitting', !T.getState().examSim);
+w.startExamSim('jamb', 'study');
+check('study mode has no clock and explains each answer immediately', (() => {
+  const sim = T.getState().examSim;
+  const noClock = !byId('page-content').innerHTML.includes('sim-clock');
+  w.simSelect(0, sim.sections[0].questions[0].correct);
+  const h = byId('page-content').innerHTML;
+  return noClock && h.includes('Study mode') && h.includes('Correct!')
+    && /How the answer comes about|No stored explanation/.test(h)
+    && h.includes('Finish study session');
+})());
+w.exitExamSim();
+w.startExamSim('jamb', 'mock');
+w.submitExamSim();
+check('mock mode shows the scorecard but keeps explanations hidden', (() => {
+  const h = byId('page-content').innerHTML;
+  return h.includes('Sitting scorecard') && !h.includes('Review answers') && h.includes('keeps explanations hidden');
+})());
+w.exitExamSim();
 
 // ---------- report ----------
 const failed = checks.filter(c => !c.ok);
