@@ -1863,6 +1863,34 @@ function pastFor(subject) {
   return (PASTQ[subject] || []).map((q, i) => ({ ...q, id: `past-${subject.slice(0, 3).toLowerCase()}-${i}` }));
 }
 
+/** Class levels in school order; students are quizzed from the floor of their
+ *  stage up to their own class — a JSS1 student never meets SS content and an
+ *  SS2 student never meets SS3-only topics. */
+const LEVEL_ORDER = ['JSS1', 'JSS2', 'JSS3', 'SS1', 'SS2', 'SS3'];
+function levelsUpTo(classLevel) {
+  const lvl = LEVEL_ORDER.includes(classLevel) ? classLevel : 'SS3';
+  const stage = lvl.startsWith('JSS') ? ['JSS1', 'JSS2', 'JSS3'] : ['SS1', 'SS2', 'SS3'];
+  return stage.filter(l => LEVEL_ORDER.indexOf(l) <= LEVEL_ORDER.indexOf(lvl));
+}
+
+/** Every topic-quiz question from the stage floor up to the student's class. */
+function topicBankFor(subject, classLevel) {
+  const s = CURRICULUM[subject] || CURRICULUM['Mathematics'];
+  const out = [];
+  for (const lvl of levelsUpTo(classLevel)) {
+    (s.topics[lvl] || []).forEach((t, ti) => (t.quiz || []).forEach((q, qi) => {
+      out.push({ ...q, id: `${subject.slice(0, 3).toLowerCase()}-${lvl}-${ti}-${qi}`, level: lvl, topic: t.title });
+    }));
+  }
+  return out;
+}
+
+/** The class-appropriate mixed bank: JSS mixes JSS topics; SS uses the exam mock bank. */
+function mixedFor(subject) {
+  const lvl = state.profile.classLevel || 'SS3';
+  return String(lvl).startsWith('JSS') ? topicBankFor(subject, lvl) : quizFor(subject);
+}
+
 function startPastQuiz() {
   if (!quizGate()) return;
   if (String(state.profile.classLevel || '').startsWith('JSS')) { toast('The real-paper drill opens from SS1 — topic quizzes are your gym for now!'); return; }
@@ -2125,18 +2153,22 @@ function shuffleOptions(q) {
 function buildQuiz(subject, mode, level, topicIdx) {
   const count = state.quizSetup.count > 0 ? state.quizSetup.count : Infinity;
   let pool = [];
+  const cls = state.profile.classLevel || 'SS3';
+  const isJss = String(cls).startsWith('JSS');
   if (mode === 'topic') {
     pool = topicQuiz(subject, level, topicIdx);
-    if (pool.length < count) pool = pool.concat(shuffled(quizFor(subject).concat(String(state.profile.classLevel || '').startsWith('JSS') ? [] : pastFor(subject))));
+    if (pool.length < count) pool = pool.concat(shuffled(topicBankFor(subject, cls).concat(isJss ? [] : quizFor(subject).concat(pastFor(subject)))));
   } else if (mode === 'mock') {
-    pool = shuffled(quizFor(subject));
+    pool = shuffled(mixedFor(subject));
   } else {
     pool = shuffled(pastFor(subject));
   }
   const uniq = [];
   const seen = new Set();
+  const seenText = new Set();
   for (const q of pool) {
-    if (!seen.has(q.id)) { seen.add(q.id); uniq.push(q); }
+    const text = String(q.q || '').replace(/\s+/g, ' ').trim().toLowerCase();
+    if (!seen.has(q.id) && !seenText.has(text)) { seen.add(q.id); seenText.add(text); uniq.push(q); }
   }
   return uniq.slice(0, Math.min(count === Infinity ? uniq.length : count, uniq.length)).map(shuffleOptions);
 }
@@ -2892,7 +2924,7 @@ function renderQuiz(el) {
     return;
   }
 
-  const quiz = (qz.questions && qz.questions.length) ? qz.questions : (qz.mode === 'mock' ? quizFor(subject) : qz.mode === 'past' ? pastFor(subject) : topicQuiz(subject, qz.level, qz.topicIdx));
+  const quiz = (qz.questions && qz.questions.length) ? qz.questions : (qz.mode === 'mock' ? mixedFor(subject) : qz.mode === 'past' ? pastFor(subject) : topicQuiz(subject, qz.level, qz.topicIdx));
   const quizTitle = qz.mode === 'mock' ? `Mixed exam practice` : qz.mode === 'past' ? `Real past questions (WAEC/JAMB/NECO)` : qz.topicTitle;
   if (!quiz.length) {
     el.innerHTML = `
@@ -3913,14 +3945,21 @@ function simClockFmt(ms) {
 }
 
 /** Mixed paper for one subject: real past questions first, topped up from the mock bank. */
+/** Exam paper for one subject: a JSS student's paper is built ONLY from JSS
+ *  topic banks up to their class (no senior content, ever). Senior papers mix
+ *  real WAEC/NECO/JAMB past questions first, then the mock bank, then the
+ *  student's SS topic banks — every question text is deduplicated. */
 function simQuestionsFor(subject, n) {
-  const isJss = String(state.profile.classLevel || '').startsWith('JSS');
-  const pool = shuffled(pastFor(subject)).concat(shuffled(quizFor(subject)));
-  if (isJss) return shuffled(quizFor(subject)).slice(0, n);
+  const lvl = state.profile.classLevel || 'SS3';
+  const isJss = String(lvl).startsWith('JSS');
+  const pool = isJss
+    ? shuffled(topicBankFor(subject, lvl))
+    : shuffled(pastFor(subject)).concat(shuffled(quizFor(subject)), shuffled(topicBankFor(subject, lvl)));
   const seen = new Set(); const out = [];
   for (const q of pool) {
-    if (seen.has(q.id)) continue;
-    seen.add(q.id);
+    const key = String(q.q || '').replace(/\s+/g, ' ').trim().toLowerCase();
+    if (!key || seen.has(key)) continue;
+    seen.add(key);
     out.push(shuffleOptions(q));
     if (out.length >= n) break;
   }
