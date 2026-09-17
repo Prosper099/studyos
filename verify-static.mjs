@@ -148,6 +148,8 @@ check('open-licence attribution footer present (OpenStax CC BY 4.0 + question ba
   && /smartest\.ng/.test(html) && /exambuddy\.com\.ng/.test(html));
 
 // ---------- 4c. CBT personalisation: setup chips, timer, focus mode ----------
+check('activation popup ships closed and monetization ships off',
+  /id="key-modal"[^>]*\bhidden\b/.test(html) && /monetizationOn = false/.test(html));
 check('quiz list has question-count and timer dropdowns',
   /setQuizCount\(/.test(html) && /setQuizTimer\(/.test(html) && /No timer/.test(html)
   && /Questions per subject/.test(html) && /setSimQuestions\(/.test(html) && /setSimMinutes\(/.test(html));
