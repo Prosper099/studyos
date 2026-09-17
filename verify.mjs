@@ -1162,6 +1162,28 @@ check('stale streak resets on the next study activity (no freeze banked)',
 w.navigate('home');
 check('mission shows a live progress counter', /\d\/3 done/.test(page()) || page().includes('COMPLETE 3/3'));
 
+// ---------- smart Buddy: built-in brain first, AI tutor for anything else ----------
+{
+  const st = T.getState();
+  const savedKey = st.settings.geminiApiKey;
+  st.settings.geminiApiKey = 'TEST_KEY';
+  const smart = await T.composeAnswer('Who painted the Mona Lisa?');
+  check('AI tutor answers questions beyond the built-in lessons',
+    smart.html.includes('Buddy · tutor') && smart.html.includes('inward force'), smart.html.slice(0, 80));
+  st.settings.geminiApiKey = 'BAD_KEY';
+  const bad = await T.composeAnswer('Who painted the Mona Lisa?');
+  check('a broken AI key degrades to an honest offline answer',
+    bad.html.includes('do not have a prepared lesson'), bad.html.slice(0, 80));
+  st.settings.geminiApiKey = '';
+  const off = await T.composeAnswer('Who painted the Mona Lisa?');
+  check('without an AI key Buddy stays useful offline',
+    off.html.includes('do not have a prepared lesson') && !off.html.includes('Buddy · tutor'));
+  const lesson = await T.composeAnswer('explain centripetal force');
+  check('syllabus topics still come from the deterministic built-in brain',
+    lesson.html.includes('Centripetal') && !lesson.html.includes('Buddy · tutor'));
+  st.settings.geminiApiKey = savedKey;
+}
+
 // ---------- manual activation loop (Buddy -> OPay -> WhatsApp key) ----------
 {
   const st = T.getState();
