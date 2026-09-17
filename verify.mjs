@@ -886,9 +886,9 @@ T.getState().profile.plan = 'pro'; // main flow runs as Pro so free-tier caps ne
 // quiz flow through the UI handlers (quiz page opens in list mode; pick the mock bank)
 w.changeSubject('Physics');
 w.navigate('quiz');
-check('quiz list offers per-topic quizzes plus the simulation setup panel for SS3 Physics',
+check('quiz list offers per-topic quizzes plus the exam picker for SS3 Physics',
   byId('page-content').innerHTML.includes('startTopicQuiz(')
-  && byId('page-content').innerHTML.includes('startExamSimFromPanel()')
+  && byId('page-content').innerHTML.includes('openExamSetup(')
   && !byId('page-content').innerHTML.includes('Quiz being written'));
 check('quiz list degrades gracefully when a topic quiz is unwritten (mutated)', (() => {
   const t = T.CURRICULUM['Physics'].topics['SS3'][0];
@@ -926,29 +926,34 @@ check('retake clears the submitted state', byId('page-content').innerHTML.includ
 
 // real past-question drill (embedded WAEC/NECO/JAMB papers, fully offline)
 w.backToQuizList();
-check('practice exam page is the pre-exam interface (exam picker + study/mock/practice modes)', (() => {
+check('practice exam page opens with the exam picker; opening an exam reveals modes + settings', (() => {
   const h = byId('page-content').innerHTML;
-  return h.includes('Full exam simulations') && h.includes('setSimPreset(') && h.includes('setSimMode(')
-    && h.includes('Study mode') && h.includes('Mock mode') && h.includes('Practice mode')
-    && h.includes('startExamSimFromPanel()')
-    && !h.includes('startPastQuiz()') && !h.includes('startMockQuiz()');
+  if (!h.includes('Full exam simulations') || !h.includes('openExamSetup(')
+    || h.includes('startPastQuiz()') || h.includes('startMockQuiz()')) return false;
+  w.openExamSetup('jamb');
+  const o = byId('page-content').innerHTML;
+  const ok = o.includes('setSimMode(') && o.includes('Study mode') && o.includes('Mock mode') && o.includes('Practice mode')
+    && o.includes('Questions per subject') && o.includes('Time for the whole exam')
+    && o.includes('Real exam') && o.includes('startExamSimFromPanel()') && o.includes('closeExamSetup()');
+  w.closeExamSetup();
+  return ok;
 })());
 w.navigate('home');
 check('dashboard no longer hosts the simulation lab or drills', (() => {
   const h = byId('page-content').innerHTML;
   return !h.includes('startExamSim(') && !h.includes('drillPast(') && !h.includes('drillMock(');
 })());
-check('exam interface lets the student tune questions per paper and total time', (() => {
+check('opening an exam lets the student set questions per subject and exam time', (() => {
   w.navigate('quiz'); w.backToQuizList();
-  const h = byId('page-content').innerHTML;
-  if (!h.includes('setSimQuestions(') || !h.includes('setSimMinutes(') || !h.includes('Questions per paper')) return false;
+  w.openExamSetup('jamb');
   w.setSimQuestions(10); w.setSimMinutes(20);
-  w.setSimPreset('jamb'); w.setSimMode('practice');
+  w.setSimMode('practice');
   w.startExamSimFromPanel();
   const sim = T.getState().examSim;
   const ok = !!sim && sim.sections.every(x => x.questions.length <= 10) && sim.totalMin === 20;
   w.exitExamSim();
   w.setSimQuestions(0); w.setSimMinutes(0);
+  w.closeExamSetup();
   return ok;
 })());
 check('exam presets follow the class level (SS sees JAMB etc, JSS sees BECE only)', (() => {
