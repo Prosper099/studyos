@@ -1162,26 +1162,25 @@ check('stale streak resets on the next study activity (no freeze banked)',
 w.navigate('home');
 check('mission shows a live progress counter', /\d\/3 done/.test(page()) || page().includes('COMPLETE 3/3'));
 
-// ---------- smart Buddy: built-in brain first, AI tutor for anything else ----------
+// ---------- smart Buddy: 100% built-in brain, no AI, no internet ----------
 {
-  const st = T.getState();
-  const savedKey = st.settings.geminiApiKey;
-  st.settings.geminiApiKey = 'TEST_KEY';
-  const smart = await T.composeAnswer('Who painted the Mona Lisa?');
-  check('AI tutor answers questions beyond the built-in lessons',
-    smart.html.includes('Buddy · tutor') && smart.html.includes('inward force'), smart.html.slice(0, 80));
-  st.settings.geminiApiKey = 'BAD_KEY';
-  const bad = await T.composeAnswer('Who painted the Mona Lisa?');
-  check('a broken AI key degrades to an honest offline answer',
-    bad.html.includes('do not have a prepared lesson'), bad.html.slice(0, 80));
-  st.settings.geminiApiKey = '';
-  const off = await T.composeAnswer('Who painted the Mona Lisa?');
-  check('without an AI key Buddy stays useful offline',
-    off.html.includes('do not have a prepared lesson') && !off.html.includes('Buddy · tutor'));
-  const lesson = await T.composeAnswer('explain centripetal force');
-  check('syllabus topics still come from the deterministic built-in brain',
-    lesson.html.includes('Centripetal') && !lesson.html.includes('Buddy · tutor'));
-  st.settings.geminiApiKey = savedKey;
+  const t1 = await T.composeAnswer('explain photosynthesis');
+  check('Buddy explains core topics from its built-in brain',
+    /chlorophyll/i.test(t1.html) && /glucose/i.test(t1.html) && t1.html.length > 400);
+  const t2 = await T.composeAnswer('explain pythagurus teorem');
+  check('Buddy understands common typos and shortforms', /Pythagoras/i.test(t2.html));
+  const t3 = await T.composeAnswer('how can I memorize formulas');
+  check('Buddy coaches study skills like a real buddy', /Flashcards|repetition|mnemonic/i.test(t3.html));
+  const t4 = await T.composeAnswer('how do I sit for a mock exam');
+  check('Buddy knows the StudyOS app itself', /Practice Exam/.test(t4.html));
+  const t5 = await T.composeAnswer('what is the capital of Brazil');
+  check('unknown questions get an honest fallback — no internet, no guessing',
+    t5.html.includes('do not have a prepared lesson'), 'got=' + t5.html.slice(0, 160));
+  const t6 = await T.composeAnswer('how are you');
+  check('Buddy greets like a friend', /great now that you're here/.test(t6.html));
+  const t7 = await T.composeAnswer('tell me about the court system and arms of government');
+  check('the expanded knowledge base covers arts and commercial subjects too',
+    /Legislature|Executive|Judiciary/i.test(t7.html));
 }
 
 // ---------- manual activation loop (Buddy -> OPay -> WhatsApp key) ----------
