@@ -3779,9 +3779,9 @@ const FREE_DAILY_QUIZZES = 3, FREE_DAILY_BUDDY = 20;
 const PRO_UNLOCK_CODE = 'STUDYOS-PRO-2026'; // founder stop-gap — change before launch
 
 // ---------- manual activation loop: Buddy shows the OPay account, founder sends a key ----------
-const OPAY_ACCOUNT = '0000000000';   // TODO(prosper): put your real OPay account number here
-const OPAY_NAME = 'Prosper';         // TODO(prosper): your OPay account name
-const FOUNDER_WA = '2340000000000';  // TODO(prosper): your WhatsApp number, international format e.g. 2348031234567
+const OPAY_ACCOUNT = '9118980906';
+const OPAY_NAME = 'Prosper Chibuikem Ndubuizu';
+const FOUNDER_WA = '2349118980906'; // 09118980906 in international format
 const ACTIVATION_SECRET = 's0-act-7f3e91b4c2d8a5'; // change only if keys ever leak
 function _actHash(str) { let h = 2166136261 >>> 0; for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; } return h >>> 0; }
 function monthBucket(offset) { const d = new Date(); d.setMonth(d.getMonth() + (offset || 0)); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'); }

@@ -1208,6 +1208,15 @@ check('mission shows a live progress counter', /\d\/3 done/.test(page()) || page
   st.profile.plan = 'free'; st.profile.planUntil = 0;
   T.redeemActivationKey(T.activationKeyFor('someone-else@studyos.app', 'pro', T.monthBucket(0)));
   check('a key generated for another email does not unlock this student', st.profile.plan === 'free');
+  check('while everything is free, no page shows the account, the key box or Activate buttons', (() => {
+    T.setMonetization(false);
+    for (const p of ['home', 'quiz', 'assistant', 'profile']) {
+      w.navigate(p);
+      const html = page();
+      if (html.includes(T.OPAY_ACCOUNT) || html.includes('Activate Pro') || html.includes('Enter your activation key')) return false;
+    }
+    return true;
+  })());
   T.setMonetization(true);
   st.profile.plan = 'pro'; st.profile.planUntil = Date.now() - 5000;
   check('expired Pro drops back to the free tier', T.proActive() === false);
