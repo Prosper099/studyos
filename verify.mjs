@@ -1194,57 +1194,13 @@ check('stale streak resets on the next study activity (no freeze banked)',
 w.navigate('home');
 check('mission shows a live progress counter', /\d\/3 done/.test(page()) || page().includes('COMPLETE 3/3'));
 
-// ---------- CBT exam hall ----------
+// ---------- one exam interface (legacy CBT hall removed) ----------
 w.backToQuizList();
 w.navigate('quiz');
-check('exam page offers Quick Start and Custom Exam', page().includes('Quick Start') && page().includes('Custom Exam'));
-w.toggleCustomExam();
-check('custom exam wizard shows the five configuration steps',
-  page().includes('1 · Select class') && page().includes('2 · Select exam type') && page().includes('3 · Select subjects')
-  && page().includes('4 · Questions per subject') && page().includes('5 · Set timer'));
-w.setExamClass('SS3');
-w.setExamType('JAMB UTME');
-w.toggleExamSubject('Physics');
-w.toggleExamSubject('Chemistry');
-w.setExamCount('Physics', 40);
-{
-  const shown = (T.getState().examPrefs.counts || {}).Physics;
-  const bank = page().match(/Physics <span[^>]*>\((\d+) in bank\)/);
-  check('questions-per-subject caps at the real question bank', bank && shown <= Number(bank[1]),
-    'shown=' + shown + ' bank=' + (bank ? bank[1] : '?'));
-}
-w.setExamCount('Physics', 10);
-w.setExamMinutes(30);
-w.startCbtExam();
-check('exam hall has an Exit button', page().includes('exitCbtExam()'));
-w.exitCbtExam();
-check('Exit returns to the exam setup page', T.getState().quiz.mode === 'list'
-    && (page().includes('Quick Start') || page().includes('Configure your exam')));
-w.startCbtExam();
-{
-  const qz = T.getState().quiz;
-  check('CBT paper builds tagged multi-subject questions', qz.mode === 'cbt' && qz.questions.length >= 10
-    && qz.questions.every(q => q.subject && q.topic), 'n=' + qz.questions.length);
-  check('CBT hall header shows STUDYOS EXAM, position and timer',
-    page().includes('STUDYOS EXAM') && page().includes('Question 1 / ' + qz.questions.length) && page().includes('quiz-timer'));
-  w.selectQuizAnswer(qz.questions[0].id, qz.questions[0].correct);
-  w.toggleMarkReview(qz.questions[1].id);
-  check('navigator distinguishes answered and marked questions',
-    page().includes('Question Navigator') && page().includes('marked'));
-  qz.deadline = Date.now() - 1000;
-  w.quizTimerTick();
-  check('timer at zero auto-submits with the time-up banner',
-    qz.submitted === true && qz.timeUp === true && page().includes("Time's up!"), 'submitted=' + qz.submitted);
-  check('results show subject performance and StudyOS analysis',
-    page().includes('Subject Performance') && page().includes('StudyOS Analysis') && page().includes('Review Mistakes'));
-  w.planFromExam();
-  check('plan button biases the daily mission toward the weakest subject',
-    T.getState().page === 'home' && ['Physics', 'Chemistry'].includes(T.getState().examPrefs.lastWeak),
-    'lastWeak=' + T.getState().examPrefs.lastWeak);
-  w.navigate('quiz');
-  w.backToQuizList();
-}
-
+check('legacy CBT hall removed — the exam picker is the single exam interface',
+  !byId('page-content').innerHTML.includes('Quick Start')
+  && !byId('page-content').innerHTML.includes('Configure your exam')
+  && byId('page-content').innerHTML.includes('openExamSetup('));
 // logout
 await w.handleLogout();
 check('logout fires Firebase signOut()', globalThis.__SIGNED_OUT === true);

@@ -2884,24 +2884,23 @@ function renderQuiz(el) {
     el.innerHTML = `
       ${pageHeader('Practice Exam', 'Your personal CBT centre — sit full exam simulations or drill topic by topic.')}
       ${examSimSetupPanel()}
-      ${cbtSetupHtml()}
       ${subjectSelector('quiz')}
       <section class="mb-4 rounded-2xl border border-violet-200 bg-gradient-to-br from-violet-50 to-indigo-50 p-5 shadow-card animate-fadeUp">
-        <div class="flex flex-wrap items-center gap-x-8 gap-y-4">
-          <div>
+        <div class="flex flex-wrap items-end gap-x-8 gap-y-4">
+          <label class="block">
             <h3 class="text-[11px] font-black uppercase tracking-wide text-violet-700">Questions per quiz</h3>
-            <div class="mt-1.5 flex flex-wrap gap-1.5">
-              ${[10, 25, 50].map(num => `<button type="button" onclick="setQuizCount(${num})" class="rounded-full px-3 py-1.5 text-[11px] font-bold transition ${state.quizSetup.count === num ? 'bg-violet-600 text-white' : 'bg-white text-slate-600 ring-1 ring-inset ring-slate-200 hover:bg-slate-50'}">${num}</button>`).join('')}
-              <button type="button" onclick="setQuizCount(0)" class="rounded-full px-3 py-1.5 text-[11px] font-bold transition ${state.quizSetup.count === 0 ? 'bg-violet-600 text-white' : 'bg-white text-slate-600 ring-1 ring-inset ring-slate-200 hover:bg-slate-50'}">All</button>
-            </div>
-          </div>
-          <div>
+            <select onchange="setQuizCount(Number(this.value))" class="mt-1.5 block w-48 rounded-xl border border-violet-200 bg-white px-3 py-2 text-xs font-bold text-slate-700 shadow-sm">
+              ${[10, 25, 50].map(num => `<option value="${num}" ${state.quizSetup.count === num ? 'selected' : ''}>${num} questions</option>`).join('')}
+              <option value="0" ${state.quizSetup.count === 0 ? 'selected' : ''}>All questions</option>
+            </select>
+          </label>
+          <label class="block">
             <h3 class="text-[11px] font-black uppercase tracking-wide text-indigo-700">Timer</h3>
-            <div class="mt-1.5 flex flex-wrap gap-1.5">
-              ${[10, 20, 30, 45, 60].map(min => `<button type="button" onclick="setQuizTimer(${min})" class="rounded-full px-3 py-1.5 text-[11px] font-bold transition ${state.quizSetup.minutes === min ? 'bg-indigo-600 text-white' : 'bg-white text-slate-600 ring-1 ring-inset ring-slate-200 hover:bg-slate-50'}">${min} min</button>`).join('')}
-              <button type="button" onclick="setQuizTimer(0)" class="rounded-full px-3 py-1.5 text-[11px] font-bold transition ${state.quizSetup.minutes === 0 ? 'bg-indigo-600 text-white' : 'bg-white text-slate-600 ring-1 ring-inset ring-slate-200 hover:bg-slate-50'}">No timer</button>
-            </div>
-          </div>
+            <select onchange="setQuizTimer(Number(this.value))" class="mt-1.5 block w-48 rounded-xl border border-indigo-200 bg-white px-3 py-2 text-xs font-bold text-slate-700 shadow-sm">
+              ${[10, 20, 30, 45, 60].map(min => `<option value="${min}" ${state.quizSetup.minutes === min ? 'selected' : ''}>${min} minutes</option>`).join('')}
+              <option value="0" ${state.quizSetup.minutes === 0 ? 'selected' : ''}>No timer</option>
+            </select>
+          </label>
         </div>
         <p class="mt-3 text-[11px] leading-relaxed text-slate-500">${state.quizSetup.minutes > 0 ? `Papers auto-submit when the ${state.quizSetup.minutes}-minute timer hits zero — exactly like a real CBT centre. ` : 'Add a timer to train under real exam pressure. '}Your settings apply to topic quizzes, mixed practice and past papers, and longer quizzes mix in extra questions automatically.</p>
       </section>
@@ -4135,21 +4134,21 @@ function examSimSetupPanel() {
           <span class="mt-0.5 block text-[10px] leading-snug text-slate-500">${m.blurb}</span>
         </button>`).join('')}
       </div>
-      <div class="mt-4 flex flex-wrap items-start gap-x-8 gap-y-3">
-        <div>
+      <div class="mt-4 grid gap-4 sm:grid-cols-2">
+        <label class="block">
           <span class="block text-[10px] font-black uppercase tracking-wide text-slate-400">Questions per subject</span>
-          <div class="mt-1 flex flex-wrap gap-1.5">
-            ${[10, 20, 30, 40, 50].map(n => `<button type="button" onclick="setSimQuestions(${n})" class="rounded-full px-3 py-1.5 text-[11px] font-bold transition ${sel.customQ === n ? 'bg-indigo-600 text-white' : 'bg-slate-50 text-slate-600 ring-1 ring-inset ring-slate-200 hover:bg-slate-100'}">${n}</button>`).join('')}
-            <button type="button" onclick="setSimQuestions(0)" class="rounded-full px-3 py-1.5 text-[11px] font-bold transition ${sel.customQ === 0 ? 'bg-indigo-600 text-white' : 'bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-200 hover:bg-emerald-100'}">Real exam</button>
-          </div>
-        </div>
-        <div>
+          <select onchange="setSimQuestions(Number(this.value))" class="mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-xs font-bold text-slate-700 shadow-sm">
+            <option value="0" ${sel.customQ === 0 ? 'selected' : ''}>Real exam (${open.key === 'jamb' ? 'English 60 + 40 each' : open.perSubject('X') + ' per subject'})</option>
+            ${[10, 20, 30, 40, 50].map(n => `<option value="${n}" ${sel.customQ === n ? 'selected' : ''}>${n} questions</option>`).join('')}
+          </select>
+        </label>
+        <label class="block">
           <span class="block text-[10px] font-black uppercase tracking-wide text-slate-400">Time for the whole exam</span>
-          <div class="mt-1 flex flex-wrap gap-1.5">
-            ${[20, 30, 45, 60, 90, 120].map(n => `<button type="button" onclick="setSimMinutes(${n})" class="rounded-full px-3 py-1.5 text-[11px] font-bold transition ${sel.customMin === n ? 'bg-indigo-600 text-white' : 'bg-slate-50 text-slate-600 ring-1 ring-inset ring-slate-200 hover:bg-slate-100'}">${n} min</button>`).join('')}
-            <button type="button" onclick="setSimMinutes(0)" class="rounded-full px-3 py-1.5 text-[11px] font-bold transition ${sel.customMin === 0 ? 'bg-indigo-600 text-white' : 'bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-200 hover:bg-emerald-100'}">Real exam (${realMin >= 60 ? Math.floor(realMin / 60) + 'h' + (realMin % 60 ? ' ' + realMin % 60 + 'm' : '') : realMin + ' min'})</button>
-          </div>
-        </div>
+          <select onchange="setSimMinutes(Number(this.value))" class="mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-xs font-bold text-slate-700 shadow-sm">
+            <option value="0" ${sel.customMin === 0 ? 'selected' : ''}>Real exam (${realMin >= 60 ? Math.floor(realMin / 60) + 'h' + (realMin % 60 ? ' ' + (realMin % 60) + 'm' : '') : realMin + ' min'})</option>
+            ${[20, 30, 45, 60, 90, 120].map(n => `<option value="${n}" ${sel.customMin === n ? 'selected' : ''}>${n} minutes</option>`).join('')}
+          </select>
+        </label>
       </div>
       <button type="button" onclick="startExamSimFromPanel()" class="mt-5 w-full rounded-xl bg-indigo-600 px-6 py-3 text-xs font-black text-white transition hover:bg-indigo-500 sm:w-auto">🚀 Start ${open.name} · ${SIM_MODES[sel.mode].name}${sel.customQ ? ' · ' + sel.customQ + ' questions per subject' : ''}${sel.customMin ? ' · ' + sel.customMin + ' min' : ''}</button>
       <p class="mt-2 text-[10px] font-semibold text-slate-400">${String(state.profile.classLevel || '').startsWith('JSS') ? 'Only questions from your class level go into this paper — nothing senior, ever.' : 'Papers are built from your saved subjects plus real past questions.'}</p>
