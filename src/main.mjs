@@ -53,6 +53,8 @@ const state = {
   uid: null,
   page: 'home',
   authTab: 'login',
+  installAvailable: false,
+  installed: false,
   onboard: { step: 1, classLevel: '', targetExam: '', subjects: [], targetScore: '', studyPref: '', guardianPhone: '' },
   selectedSubject: 'Mathematics',
   profile: {
@@ -2406,6 +2408,8 @@ function renderHome(el) {
       ${examCommandCenter()}
 
       ${missionSection()}
+
+      ${installCardHtml()}
 
       <section class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         ${cards.map(c => `
@@ -5235,6 +5239,57 @@ document.addEventListener('click', e => {
 }, true);
 
 /* Expose handlers used by inline onclick attributes */
+
+/* ==================================================================
+   PWA — install prompt + service worker
+   ================================================================== */
+function installCardHtml() {
+  if (!state.installAvailable || state.installed || localStorage.getItem('studyos.installDismissed') === '1') return '';
+  return `
+    <section class="rounded-2xl border border-emerald-200 bg-emerald-50/70 p-4">
+      <div class="flex items-center gap-3">
+        <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-emerald-600 text-xl">📲</div>
+        <div class="min-w-0 flex-1">
+          <h3 class="text-sm font-bold text-slate-900">Install StudyOS on this device</h3>
+          <p class="text-[11px] leading-relaxed text-slate-600">One tap — it lives like an app on the home screen, opens full-screen and keeps working offline.</p>
+        </div>
+        <button type="button" onclick="installStudyOS()" class="shrink-0 rounded-xl bg-emerald-600 px-4 py-2.5 text-xs font-black text-white transition hover:bg-emerald-500">Install</button>
+        <button type="button" onclick="dismissInstall()" aria-label="Dismiss install prompt" class="shrink-0 rounded-xl bg-white px-3 py-2.5 text-xs font-black text-slate-400 transition hover:bg-slate-100">✕</button>
+      </div>
+    </section>`;
+}
+let deferredInstallPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  state.installAvailable = true;
+  if (state.page === 'home' && typeof renderPage === 'function') renderPage();
+});
+window.addEventListener('appinstalled', () => {
+  deferredInstallPrompt = null;
+  state.installAvailable = false;
+  state.installed = true;
+  toast('StudyOS installed — see you on the home screen! 🎉');
+  if (state.page === 'home' && typeof renderPage === 'function') renderPage();
+});
+function installStudyOS() {
+  if (!deferredInstallPrompt) { toast('Use your browser menu → "Add to Home Screen"'); return; }
+  deferredInstallPrompt.prompt();
+  deferredInstallPrompt = null;
+  state.installAvailable = false;
+  renderPage();
+}
+function dismissInstall() {
+  localStorage.setItem('studyos.installDismissed', '1');
+  state.installAvailable = false;
+  renderPage();
+}
+if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator && (import.meta.env ? import.meta.env.PROD : false)) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => { /* offline shell is a bonus, never fatal */ });
+  });
+}
+
 Object.assign(window, {
   navigate, changeSubject, openTopic, toggleDrawer, closeDrawer,
   handleGoogleSignIn, handleLogout, startDemoMode,
@@ -5249,7 +5304,7 @@ Object.assign(window, {
   selectQuizAnswer, submitQuiz, retakeQuiz, examJump, examPrev, examNext, submitExam,
   sendChatMessage, askBuddy, clearChat, setResearch, saveGeminiKey, toggleGeminiPanel,
   openUpgrade, closeUpgrade, upgradeBackdrop, choosePlan, founderUnlock, whatsappUpgrade, savePaystackKey, shareParentReport,
-  dismissFreezeIce, shareToGuardian, setGuardianPhone,
+  dismissFreezeIce, shareToGuardian, setGuardianPhone, installStudyOS, dismissInstall,
   setGeminiModel, testGemini,
 });
 

@@ -132,7 +132,11 @@ const feature = [
   ['onboarding asks for the guardian WhatsApp number', /guardian-input[\s\S]{0,400}country code first/],
   ['passive streak check on app entry', /checkStreakOnEntry\(\);/],
   ['chart dot tooltip markup', /chart-dot[\s\S]*chart-tip/],
-  ['parent page keeps the write-up in the shared text', /parentWriteupText|TO-DO THIS WEEK/]
+  ['parent page keeps the write-up in the shared text', /parentWriteupText|TO-DO THIS WEEK/],
+  ['PWA manifest linked', /rel="manifest" href="\/manifest\.webmanifest"/],
+  ['PWA theme color + iOS metas', /name="theme-color"[\s\S]{0,300}apple-mobile-web-app-capable/],
+  ['install card with install + dismiss handlers', /installStudyOS\(\)[\s\S]{0,400}dismissInstall\(\)/],
+  ['service worker registered for production', /serviceWorker[\s\S]{0,240}sw\.js/]
 ];
 for (const [name, re] of feature) check(name, typeof re === 'boolean' ? re : re.test(html));
 
