@@ -3241,10 +3241,29 @@ function retakeQuiz() {
    PAGE: BUDDY AI TUTOR
    ================================================================== */
 function renderAssistant(el) {
+  const empty = !state.chat.length;
+  const firstName = state.profile.name ? escapeHtml(state.profile.name.split(' ')[0]) : '';
+  const hero = `
+    <div class="buddy-hero-hero flex min-h-full flex-col items-center justify-center px-4 py-10 text-center">
+      <div class="flex flex-col items-center gap-5 md:flex-row md:gap-7 md:text-left">
+        <div class="buddy-orb" aria-hidden="true">🤖</div>
+        <div>
+          <h2 class="text-3xl font-black leading-tight text-white md:text-4xl">What should we work on today${firstName ? ', ' + firstName : ''}?</h2>
+          <div class="buddy-taglines">
+            <span>Let's make ${escapeHtml(state.profile.targetExam || 'your exam')} count. 🔥</span>
+            <span>One topic, one quiz, one win at a time.</span>
+            <span>Your syllabus, explained your way — no guesswork.</span>
+          </div>
+        </div>
+      </div>
+      <div class="mt-8 flex max-w-xl flex-wrap justify-center gap-2">
+        ${['Centripetal force', 'Solve x^2 - 5x + 6', 'How to memorise formulas', 'Build me a study plan'].map(c => `<button type="button" onclick="askBuddy('${c.replace(/'/g, "\\'")}')" class="buddy-sugg">${c}</button>`).join('')}
+      </div>
+    </div>`;
   el.innerHTML = `
     ${pageHeader('Buddy AI Tutor', 'Your built-in academic assistant. Ask for a definition, a formula, a worked example or exam strategy.')}
-    <div class="mx-auto flex h-[calc(100vh-16rem)] min-h-[26rem] max-w-3xl flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-card">
-      <div class="flex items-center gap-3 border-b border-slate-200 bg-slate-900 px-4 py-3">
+    <div class="mx-auto flex h-[calc(100vh-16rem)] min-h-[26rem] max-w-3xl flex-col overflow-hidden rounded-2xl buddy-dark-card border border-slate-800 shadow-card">
+      <div class="flex items-center gap-3 border-b border-white/10 px-4 py-3">
         <div class="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-600 text-base">🤖</div>
         <div class="min-w-0 flex-1">
           <div class="text-sm font-bold text-white">Buddy</div>
@@ -3252,41 +3271,34 @@ function renderAssistant(el) {
         </div>
         <button type="button" onclick="clearChat()" class="rounded-lg bg-white/10 px-2.5 py-1.5 text-[11px] font-bold text-slate-200 transition hover:bg-white/20">Clear</button>
       </div>
-
-      <div class="flex flex-wrap items-center gap-2 border-b border-slate-200 bg-slate-50 px-4 py-2">
-${monetizationOn ? `
-          <div class="mt-3 border-t border-slate-100 pt-3">
-            <label class="block text-[11px] font-bold text-slate-700" for="paystack-key">Owner only: Paystack public key (turns on Pro card payments)</label>
-            <div class="mt-1 flex gap-2">
-              <input type="password" id="paystack-key" value="${escapeHtml(state.settings.paystackKey || '')}" placeholder="pk_live_…"
-                class="flex-1 rounded-lg border border-slate-200 px-2.5 py-1.5 text-[11px] outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100" />
-              <button type="button" onclick="savePaystackKey(document.getElementById('paystack-key').value)" class="rounded-lg bg-slate-900 px-3 py-1.5 text-[11px] font-bold text-white transition hover:bg-slate-700">Save</button>
-            </div>
-          </div>` : ''}
-          </div>
+      ${monetizationOn ? `
+      <div class="border-b border-slate-200 bg-slate-50 px-4 py-2">
+        <label class="block text-[11px] font-bold text-slate-700" for="paystack-key">Owner only: Paystack public key (turns on Pro card payments)</label>
+        <div class="mt-1 flex gap-2">
+          <input type="password" id="paystack-key" value="${escapeHtml(state.settings.paystackKey || '')}" placeholder="pk_live_…"
+            class="flex-1 rounded-lg border border-slate-200 px-2.5 py-1.5 text-[11px] outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100" />
+          <button type="button" onclick="savePaystackKey(document.getElementById('paystack-key').value)" class="rounded-lg bg-slate-900 px-3 py-1.5 text-[11px] font-bold text-white transition hover:bg-slate-700">Save</button>
         </div>
-      </div>
-
-      <div id="chat-box" class="nice-scroll flex-1 space-y-3 overflow-y-auto bg-slate-50 p-4"></div>
-
-      <div class="border-t border-slate-200 bg-white p-3">
+      </div>` : ''}
+      <div id="chat-box" class="nice-scroll flex-1 space-y-3 buddy-hero overflow-y-auto p-4">${empty ? hero : ''}</div>
+      <div class="buddy-foot p-3">
         <div id="chat-chips" class="mb-2 flex gap-2 overflow-x-auto pb-1 no-scrollbar"></div>
         <form onsubmit="sendChatMessage(event)" class="flex items-end gap-2">
           <textarea id="chat-input" rows="1" placeholder="Ask Buddy anything about your subjects…"
-            class="nice-scroll max-h-28 flex-1 resize-none rounded-xl border border-slate-200 p-2.5 text-xs outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
+            class="nice-scroll max-h-28 flex-1 resize-none rounded-xl border p-2.5 text-xs outline-none border-[#2a3a5c] bg-[#18233a] text-slate-100 placeholder:text-[#8091b0] transition focus:border-indigo-400"
             oninput="this.style.height='auto'; this.style.height=Math.min(this.scrollHeight,112)+'px'"></textarea>
-          <button type="submit" class="shrink-0 rounded-xl bg-indigo-600 px-4 py-2.5 text-xs font-bold text-white transition hover:bg-indigo-700">Send</button>
+          <button type="submit" class="shrink-0 rounded-xl bg-indigo-500 px-4 py-2.5 text-xs font-bold text-white transition hover:bg-indigo-400">Send</button>
         </form>
       </div>
     </div>`;
 
   const box = $('#chat-box');
-  if (!state.chat.length) {
-    pushChat('buddy', mdToHtml(`Hi${state.profile.name ? ' **' + state.profile.name.split(' ')[0] + '**' : ''}! I'm **Buddy** 🤖\n\nI know the core syllabus for **${(state.profile.subjects && state.profile.subjects.length ? state.profile.subjects : Object.keys(CURRICULUM)).join(', ')}** — definitions, formulas, worked examples and the traps examiners love. I can **solve equations step by step**, and every answer comes straight from your syllabus — clean and exam-focused.\n\nWhat would you like to learn today?`), ['Centripetal force', 'Quadratic equations', 'Redox reactions', 'JAMB exam strategy']);
-  } else {
+  if (state.chat.length) {
     state.chat.forEach(m => appendBubble(box, m.role, m.html));
-    renderChips(state.chat.length ? state.chat[state.chat.length - 1].chips : []);
+    renderChips(state.chat[state.chat.length - 1].chips);
     scrollChat();
+  } else {
+    renderChips([]);
   }
 }
 
@@ -3301,7 +3313,11 @@ function appendBubble(box, role, html) {
 function pushChat(role, html, chips) {
   state.chat.push({ role, html, chips: chips || [] });
   const box = $('#chat-box');
-  if (box) appendBubble(box, role, html);
+  if (box) {
+    const hero = box.querySelector && box.querySelector('.buddy-hero-hero');
+    if (hero) hero.remove();
+    appendBubble(box, role, html);
+  }
   if (chips) renderChips(chips);
   scrollChat();
 }
