@@ -1178,6 +1178,11 @@ check('mission shows a live progress counter', /\d\/3 done/.test(page()) || page
     t5.html.includes('do not have a prepared lesson'), 'got=' + t5.html.slice(0, 160));
   const t6 = await T.composeAnswer('how are you');
   check('Buddy greets like a friend', /great now that you're here/.test(t6.html));
+  const savedPage = T.getState().page;
+  const t8 = await T.composeAnswer('give me a quiz');
+  check('Buddy turns quiz requests into action instead of a dead end',
+    T.getState().page === 'quiz' && /quiz page/i.test(t8.html));
+  T.getState().page = savedPage;
   const t7 = await T.composeAnswer('tell me about the court system and arms of government');
   check('the expanded knowledge base covers arts and commercial subjects too',
     /Legislature|Executive|Judiciary/i.test(t7.html));
