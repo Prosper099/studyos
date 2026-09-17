@@ -152,7 +152,7 @@ export default {
               exp: 'The metre (m) is the SI base unit of length; centimetres and kilometres are derived from it.' },
             { q: 'How many SI base quantities are there?', options: ['7', '5', '6', '10'], correct: 0,
               exp: 'Seven: length, mass, time, electric current, temperature, luminous intensity and amount of substance.' },
-            { q: 'Which of these is a vector quantity?', options: ['velocity', 'speed', 'distance', 'mass'], correct: 0,
+            { q: 'A car covers 90 km in 1.5 hours. Its average speed is...', options: ['60 km/h', '45 km/h', '90 km/h', '135 km/h'], correct: 0,
               exp: 'Velocity has both magnitude and direction; speed, distance and mass have magnitude only.' },
             { q: 'A scalar quantity has...', options: ['magnitude only', 'direction only', 'magnitude and direction', 'units of newtons'], correct: 0,
               exp: 'Scalars (mass, time, temperature, energy) need only a size and a unit.' },

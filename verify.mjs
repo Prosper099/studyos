@@ -1245,6 +1245,17 @@ check('logout hides the app shell', byId('main-app').classList.contains('hidden'
 }
 
 
+check('no question repeats across topic quizzes, mixed banks and past papers', (() => {
+  const norm = q => String(q.q || '').replace(/\s+/g, ' ').trim().toLowerCase().replace(/[?.!]+$/, '');
+  for (const [sub, s] of Object.entries(T.CURRICULUM)) {
+    const seen = new Set();
+    const pools = [];
+    for (const arr of Object.values(s.topics || {})) for (const t of arr) pools.push(...(t.quiz || []));
+    pools.push(...(s.mock || [])); pools.push(...T.pastFor(sub));
+    for (const q of pools) { const k = norm(q); if (seen.has(k)) return false; seen.add(k); }
+  }
+  return true;
+})());
 check('every subject offers 50+ class-appropriate questions at every class entry', (() => {
   const stages = { JSS: ['JSS1', 'JSS2', 'JSS3'], SS: ['SS1', 'SS2', 'SS3'] };
   for (const [sub, s] of Object.entries(T.CURRICULUM)) {
