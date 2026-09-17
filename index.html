@@ -55,22 +55,49 @@
 
 <!-- styles live in src/styles.css (imported by src/main.mjs, inlined at build) -->
 <style>
-  /* Buddy hero — deep-navy welcome canvas */
-  .buddy-dark-card { background: #0b1322; }
-  .buddy-hero { background: radial-gradient(900px 420px at 50% -10%, #1d2c4f 0%, #101a30 55%, #0b1322 100%); }
-  .buddy-orb { display: flex; height: 5.5rem; width: 5.5rem; flex-shrink: 0; align-items: center; justify-content: center; border-radius: 9999px; font-size: 2.6rem;
-    background: radial-gradient(circle at 30% 30%, #4f6df5, #27407c 70%);
-    box-shadow: 0 0 0 6px rgba(79,109,245,.15), 0 0 34px rgba(79,109,245,.45);
-    animation: buddy-pulse 3.2s ease-in-out infinite; }
-  @keyframes buddy-pulse { 0%,100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-6px) scale(1.04); } }
-  .buddy-taglines { position: relative; height: 1.7rem; margin-top: .65rem; overflow: hidden; }
-  .buddy-taglines span { position: absolute; inset: 0; opacity: 0; font-size: .9rem; font-weight: 600; color: #9fb3d9; animation: buddy-cycle 9s linear infinite; }
-  .buddy-taglines span:nth-child(2) { animation-delay: 3s; }
-  .buddy-taglines span:nth-child(3) { animation-delay: 6s; }
-  @keyframes buddy-cycle { 0% {opacity:0; transform:translateY(6px);} 4% {opacity:1; transform:translateY(0);} 29% {opacity:1;} 33% {opacity:0; transform:translateY(-6px);} 100% {opacity:0;} }
-  .buddy-sugg { border-radius: 9999px; border: 1px solid rgba(148,163,184,.35); background: rgba(255,255,255,.06); padding: .5rem 1rem; font-size: .75rem; font-weight: 700; color: #dbe4f5; transition: all .2s; }
-  .buddy-sugg:hover { background: rgba(79,109,245,.25); border-color: #4f6df5; }
-  .buddy-foot { background: transparent; }
+  /* Buddy hero — light StudyOS canvas */
+  .buddy-hero { background: linear-gradient(135deg, #eef2ff 0%, #ffffff 50%, #f5f3ff 100%); }
+  .buddy-hero .buddy-taglines { display: grid; }
+  .buddy-hero .buddy-taglines > span {
+    grid-area: 1 / 1;
+    color: #64748b;
+    font-size: 0.875rem;
+    opacity: 0;
+    transform: translateY(8px);
+    animation: buddy-cycle 9s ease-in-out infinite;
+  }
+  .buddy-hero .buddy-taglines > span:nth-child(2) { animation-delay: 3s; }
+  .buddy-hero .buddy-taglines > span:nth-child(3) { animation-delay: 6s; }
+  @keyframes buddy-cycle {
+    0% { opacity: 0; transform: translateY(8px); }
+    4%, 29% { opacity: 1; transform: translateY(0); }
+    34%, 100% { opacity: 0; transform: translateY(-8px); }
+  }
+  .buddy-orb {
+    display: flex; align-items: center; justify-content: center;
+    width: 4rem; height: 4rem; border-radius: 9999px; flex-shrink: 0;
+    font-size: 1.875rem; line-height: 1;
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    box-shadow: 0 0 0 10px rgba(99,102,241,0.10), 0 12px 32px rgba(99,102,241,0.30);
+    animation: buddy-pulse 2.6s ease-in-out infinite;
+  }
+  @keyframes buddy-pulse {
+    0%, 100% { transform: translateY(0); box-shadow: 0 0 0 10px rgba(99,102,241,0.10), 0 12px 32px rgba(99,102,241,0.30); }
+    50% { transform: translateY(-5px); box-shadow: 0 0 0 16px rgba(99,102,241,0.06), 0 18px 40px rgba(99,102,241,0.35); }
+  }
+  .buddy-sugg {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    color: #475569;
+    transition: border-color .18s ease, color .18s ease, transform .18s ease, box-shadow .18s ease;
+  }
+  .buddy-foot { background: #f8fafc; border-top: 1px solid #e2e8f0; }
+  .buddy-sugg:hover {
+    border-color: #a5b4fc;
+    color: #4338ca;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(99,102,241,0.14);
+  }
 </style>
 </head>
 
