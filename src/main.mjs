@@ -3245,18 +3245,18 @@ function renderAssistant(el) {
   const firstName = state.profile.name ? escapeHtml(state.profile.name.split(' ')[0]) : '';
   const hero = `
     <div class="buddy-hero-hero flex min-h-full flex-col items-center justify-center px-4 py-10 text-center">
-      <div class="flex flex-col items-center gap-5 md:flex-row md:gap-7 md:text-left">
+      <div class="flex flex-col items-center">
         <div class="buddy-orb" aria-hidden="true">🤖</div>
         <div>
-          <h2 class="text-3xl font-medium leading-tight md:text-4xl"><span class="bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">What should we work on today${firstName ? ', ' + firstName : ''}?</span></h2>
-          <div class="buddy-taglines">
+          <h2 class="mt-6 max-w-2xl text-3xl font-medium leading-tight md:text-4xl"><span class="bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">What should we work on today${firstName ? ', ' + firstName : ''}?</span></h2>
+          <div class="buddy-taglines mt-2">
             <span>Let's make ${escapeHtml(state.profile.targetExam || 'your exam')} count. 🔥</span>
             <span>One topic, one quiz, one win at a time.</span>
             <span>Your syllabus, explained your way — no guesswork.</span>
           </div>
         </div>
       </div>
-      <div class="mt-8 flex max-w-xl flex-wrap justify-center gap-2">
+      <div class="mt-7 flex max-w-2xl flex-wrap justify-center gap-2">
         ${['Centripetal force', 'Solve x^2 - 5x + 6', 'How to memorise formulas', 'Build me a study plan'].map(c => `<button type="button" onclick="askBuddy('${c.replace(/'/g, "\\'")}')" class="buddy-sugg">${c}</button>`).join('')}
       </div>
     </div>`;
