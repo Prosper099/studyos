@@ -3807,16 +3807,16 @@ function activateViaBuddy() {
   pushChat('buddy', `<p>Let's get you activated! 🚀</p>
     <p class="mt-2"><b>1.</b> Transfer <b>₦${amt.toLocaleString()}</b> to this OPay account:</p>
     <p class="mt-1 inline-block rounded-xl bg-amber-50 px-3 py-2 text-sm font-black text-amber-800">${OPAY_ACCOUNT} — ${OPAY_NAME}</p>
-    <p class="mt-2"><b>2.</b> Tap <b>I have paid</b> — it pings Prosper on WhatsApp with your email so he can confirm the payment.</p>
-    <p class="mt-1"><b>3.</b> He replies with your <b>activation key</b>. Come back here, tap <b>Enter key</b>, paste it — and ${what} is yours! ⭐</p>
+    <p class="mt-2"><b>2.</b> Tap <b>Payment sent</b> — your WhatsApp opens with a ready-written confirmation message to the founder, including your account email.</p>
+    <p class="mt-1"><b>3.</b> Once the payment is verified, the founder replies with your <b>activation key</b>. Return here, tap <b>Enter key</b> and paste it — and ${what} is yours! ⭐</p>
     <div class="mt-3 flex flex-wrap gap-2">
-      <button type="button" onclick="pingFounderPaid()" class="rounded-xl bg-emerald-600 px-4 py-2 text-[11px] font-black text-white transition hover:bg-emerald-500">💸 I have paid — ping Prosper</button>
+      <button type="button" onclick="pingFounderPaid()" class="rounded-xl bg-emerald-600 px-4 py-2 text-[11px] font-black text-white transition hover:bg-emerald-500">✅ Payment sent — request activation key</button>
       <button type="button" onclick="openKeyEntry()" class="rounded-xl bg-indigo-600 px-4 py-2 text-[11px] font-black text-white transition hover:bg-indigo-500">🔑 Enter key</button>
       <button type="button" onclick="copyOpayAccount()" class="rounded-xl bg-slate-100 px-4 py-2 text-[11px] font-black text-slate-600 transition hover:bg-slate-200">📋 Copy account</button>
     </div>`, []);
 }
 function pingFounderPaid() {
-  const text = `Hi Prosper! I paid N${PRO_PACK_NGN} to the OPay account for the StudyOS Bundle (one-time). My email: ${state.profile.email || 'not set'}. Please send my activation key. 🙏`;
+  const text = `Hello, I have completed the payment of ₦${PRO_PACK_NGN.toLocaleString()} for the StudyOS Bundle (one-time) via OPay. My account email: ${state.profile.email || 'not set'}. Kindly send my activation key. Thank you.`;
   window.open('https://wa.me/' + FOUNDER_WA + '?text=' + encodeURIComponent(text), '_blank');
 }
 function copyOpayAccount() {
@@ -3909,7 +3909,7 @@ function founderUnlock() {
   else toast('That code is not right — check with the founder.');
 }
 function whatsappUpgrade() {
-  window.open('https://wa.me/?text=' + encodeURIComponent('Hello Prosper! I want to upgrade to StudyOS Pro. My account: ' + (state.profile.email || '')), '_blank');
+  window.open('https://wa.me/?text=' + encodeURIComponent('Hello, I would like to activate the StudyOS Bundle (₦5,000, one-time). My account email: ' + (state.profile.email || 'not set') + '. Please advise on the next step. Thank you.'), '_blank');
 }
 function savePaystackKey(v) {
   state.settings.paystackKey = (v || '').trim();
