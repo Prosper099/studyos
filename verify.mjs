@@ -1030,14 +1030,19 @@ check('exam countdown is a sensible SS3 estimate and honours a set date', (() =>
 })());
 check('grade bands follow WAEC cut-offs',
   T.gradeBand(82) === 'A1' && T.gradeBand(72) === 'B2' && T.gradeBand(52) === 'C6' && T.gradeBand(39) === 'F9');
-check('JAMB projection sums subject accuracy with honest zeros', (() => {
+check('JAMB projection models the full 180-question UTME across four papers (measured + estimated)', (() => {
   const st = T.getState();
   const savedQ = st.quizStats, savedS = st.profile.subjects;
   st.profile.subjects = ['Mathematics', 'English Language', 'Physics', 'Chemistry'];
-  st.quizStats = { ...savedQ, bySubject: { Mathematics: { correct: 80, total: 100 }, 'English Language': { correct: 70, total: 100 }, Physics: { correct: 60, total: 100 } } };
+  st.quizStats = { attempts: 3, correct: 210, total: 300, bestPercent: 80, bySubject: { Mathematics: { correct: 80, total: 100 }, 'English Language': { correct: 70, total: 100 }, Physics: { correct: 60, total: 100 } }, byTopic: {} };
   const p = T.predictedScore();
   st.quizStats = savedQ; st.profile.subjects = savedS;
-  return p.kind === 'score' && p.max === 400 && p.value === 210 && p.missing.length === 1;
+  const chem = p.entries.find(e => e.sub === 'Chemistry');
+  const eng = p.entries.find(e => e.sub === 'English Language');
+  return p.kind === 'score' && p.max === 400 && p.value === 280
+    && p.entries.length === 4 && p.entries.filter(e => e.measured).length === 3
+    && chem && !chem.measured && chem.pct === 70 && chem.questions === 40
+    && eng && eng.measured && eng.pct === 70 && eng.questions === 60;
 })());
 
 // ---------- freemium: free caps, upgrade sheet, Pro unlock ----------

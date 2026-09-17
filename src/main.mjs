@@ -3898,17 +3898,28 @@ function targetNumber() {
  *  Subjects with no quiz data count as 0 for score exams — labelled as such. */
 function predictedScore() {
   const exam = state.profile.targetExam || '';
+  const st = state.quizStats || { total: 0, correct: 0, bySubject: {} };
+  const overall = st.total ? Math.round((st.correct / st.total) * 100) : null;
+  const bySub = st.bySubject || {};
+  if (exam === 'JAMB UTME' || exam === 'Post-UTME') {
+    // Model the real sitting: Use of English (60 questions) plus three papers
+    // (40 questions each) = 180 questions; each paper is scaled to 100 points,
+    // 400 total. Papers with quiz history are MEASURED; the rest are ESTIMATED
+    // from overall accuracy (or a neutral 50%) instead of being counted as zero.
+    const chosen = (state.profile.subjects && state.profile.subjects.length ? state.profile.subjects : ['Mathematics']);
+    const list = ['English Language', ...chosen.filter(x => x !== 'English Language')].slice(0, 4);
+    const entries = list.map(sub => {
+      const blk = bySub[sub];
+      const measured = !!(blk && blk.total > 0);
+      const pct = measured ? Math.round((blk.correct / blk.total) * 100) : (overall !== null ? overall : 50);
+      return { sub, measured, pct, questions: sub === 'English Language' ? 60 : 40, points: pct };
+    });
+    const total = entries.reduce((sum, e) => sum + e.points, 0);
+    const missing = entries.filter(e => !e.measured).map(e => e.sub);
+    if (exam === 'JAMB UTME') return { kind: 'score', max: 400, value: total, entries, missing, overall };
+    return { kind: 'percent', max: 100, value: entries.length ? total / entries.length : 0, entries, missing, overall };
+  }
   const r = subjectReadiness();
-  if (exam === 'JAMB UTME') {
-    const subs = r.slice(0, 4);
-    return { kind: 'score', max: 400, value: subs.reduce((a, x) => a + (x.acc || 0), 0),
-             missing: subs.filter(x => x.acc === null).map(x => x.sub) };
-  }
-  if (exam === 'Post-UTME') {
-    const subs = r.slice(0, 4);
-    return { kind: 'percent', max: 100, value: subs.reduce((a, x) => a + (x.acc || 0), 0) / Math.max(1, Math.min(4, subs.length)),
-             missing: subs.filter(x => x.acc === null).map(x => x.sub) };
-  }
   if (exam === 'WAEC WASSCE' || exam === 'NECO' || exam === 'BECE') {
     return { kind: 'grades', graded: r.filter(x => x.acc !== null).map(x => ({ sub: x.sub, grade: gradeBand(x.acc) })),
              missing: r.filter(x => x.acc === null).map(x => x.sub) };
@@ -4274,52 +4285,75 @@ function examCommandCenter() {
   const rows = rd.filter(x => x.acc !== null).slice(0, 4);
   const pred = predictedScore();
   const bar = (x) => `
-      <div class="flex items-center gap-2">
-        <span class="w-24 truncate text-[11px] font-bold text-slate-600">${x.sub}</span>
-        <div class="h-2 flex-1 overflow-hidden rounded-full bg-slate-100">
+      <div class="flex items-center gap-3">
+        <span class="w-28 truncate text-xs font-bold text-slate-600">${x.sub}</span>
+        <div class="h-2.5 flex-1 overflow-hidden rounded-full bg-slate-200/70">
           <div class="h-full rounded-full ${x.acc >= 70 ? 'bg-emerald-500' : x.acc >= 50 ? 'bg-amber-500' : 'bg-rose-500'}" style="width:${x.acc}%"></div>
         </div>
-        <span class="w-9 text-right text-[11px] font-black text-slate-700">${x.acc}%</span>
+        <span class="w-10 text-right text-xs font-black text-slate-700">${x.acc}%</span>
       </div>`;
+  const entryCard = (e) => `
+          <div class="rounded-xl bg-white/5 p-3.5">
+            <div class="flex items-center justify-between gap-2">
+              <span class="truncate text-xs font-black text-white">${e.sub}</span>
+              <span class="shrink-0 rounded-full px-2 py-0.5 text-[9px] font-black tracking-wide ${e.measured ? 'bg-emerald-500/20 text-emerald-300' : 'bg-amber-500/20 text-amber-300'}">${e.measured ? 'MEASURED' : 'ESTIMATED'}</span>
+            </div>
+            <div class="mt-2.5 h-1.5 overflow-hidden rounded-full bg-white/10">
+              <div class="h-full rounded-full ${e.pct >= 70 ? 'bg-emerald-400' : e.pct >= 50 ? 'bg-amber-400' : 'bg-rose-400'}" style="width:${e.pct}%"></div>
+            </div>
+            <div class="mt-1.5 flex items-center justify-between text-[10px] font-bold text-slate-400">
+              <span>${e.questions} questions</span>
+              <span>${e.points}/100 pts</span>
+            </div>
+          </div>`;
   const predHtml = pred.kind === 'score' ? `
-        <div class="text-2xl font-black text-slate-900">${pred.value}<span class="text-sm font-bold text-slate-400">/${pred.max}</span></div>
-        <div class="mt-0.5 text-[11px] font-semibold text-slate-500">target ${targetNumber()}+ · if you sat ${exam} today</div>
-        ${pred.missing.length ? `<div class="mt-1 text-[10px] text-slate-400">no quiz data yet: ${pred.missing.join(', ')} (counted as 0)</div>` : ''}`
+        <div class="flex flex-wrap items-end justify-between gap-x-8 gap-y-2">
+          <div>
+            <div class="text-4xl font-black tracking-tight text-white">${pred.value}<span class="text-lg font-bold text-slate-500">/${pred.max}</span></div>
+            <div class="mt-1 text-[11px] font-semibold text-slate-400">projected score if you sat the full UTME today · target ${targetNumber()}+</div>
+          </div>
+          <p class="max-w-[280px] text-[10px] leading-relaxed text-slate-400">Modelled on the real exam: 180 questions — Use of English (60) plus three papers (40 each) — with every paper scaled to 100 points.</p>
+        </div>
+        <div class="mt-5 grid gap-3 sm:grid-cols-2">${pred.entries.map(entryCard).join('')}</div>
+        ${pred.missing.length ? `<p class="mt-4 text-[10px] leading-relaxed text-slate-400">Papers without quiz history are estimated from your overall accuracy (${pred.overall != null ? pred.overall + '%' : 'a neutral 50%'}) until you sit them. Take those quizzes and the projection turns measured.</p>` : ''}`
     : pred.kind === 'percent' ? `
-        <div class="text-2xl font-black text-slate-900">${Math.round(pred.value)}<span class="text-sm font-bold text-slate-400">%</span></div>
-        <div class="mt-0.5 text-[11px] font-semibold text-slate-500">target ${targetNumber()}%+ · current average</div>
-        ${pred.missing.length ? `<div class="mt-1 text-[10px] text-slate-400">no quiz data yet: ${pred.missing.join(', ')}</div>` : ''}`
+        <div class="text-4xl font-black tracking-tight text-white">${Math.round(pred.value)}<span class="text-lg font-bold text-slate-500">%</span></div>
+        <div class="mt-1 text-[11px] font-semibold text-slate-400">projected average if you sat ${exam} today · target ${targetNumber()}%+</div>
+        <div class="mt-5 grid gap-3 sm:grid-cols-2">${(pred.entries || []).map(entryCard).join('')}</div>
+        ${pred.missing.length ? `<p class="mt-4 text-[10px] leading-relaxed text-slate-400">Papers without quiz history are estimated from your overall accuracy until you sit them.</p>` : ''}`
     : pred.kind === 'grades' ? `
-        <div class="flex flex-wrap gap-1.5">${pred.graded.map(g => `<span class="rounded-full ${g.grade <= 'C6' && g.grade >= 'A1' ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-600'} px-2 py-0.5 text-[10px] font-black">${g.sub.split(' ')[0]}: ${g.grade}</span>`).join('') || '<span class="text-[11px] text-slate-400">No quiz data yet.</span>'}</div>
-        <div class="mt-1 text-[11px] font-semibold text-slate-500">predicted grades at current accuracy</div>
-        ${pred.missing.length ? `<div class="mt-1 text-[10px] text-slate-400">not yet quizzed: ${pred.missing.join(', ')}</div>` : ''}`
+        <div class="flex flex-wrap gap-2">${pred.graded.map(g => `<span class="rounded-full ${g.grade <= 'C6' && g.grade >= 'A1' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-rose-500/20 text-rose-300'} px-2.5 py-1 text-[10px] font-black">${g.sub.split(' ')[0]}: ${g.grade}</span>`).join('') || '<span class="text-[11px] text-slate-400">No quiz data yet.</span>'}</div>
+        <div class="mt-2 text-[11px] font-semibold text-slate-400">predicted grades at current accuracy</div>
+        ${pred.missing.length ? `<div class="mt-2 text-[10px] text-slate-400">not yet quizzed: ${pred.missing.join(', ')}</div>` : ''}`
     : `
-        <div class="text-2xl font-black text-slate-900">${state.quizStats.total ? Math.round((state.quizStats.correct / state.quizStats.total) * 100) + '%' : '—'}</div>
-        <div class="mt-0.5 text-[11px] font-semibold text-slate-500">overall accuracy</div>`;
+        <div class="text-4xl font-black tracking-tight text-white">${state.quizStats.total ? Math.round((state.quizStats.correct / state.quizStats.total) * 100) + '%' : '—'}</div>
+        <div class="mt-1 text-[11px] font-semibold text-slate-400">overall accuracy</div>`;
   return `
-    <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-card animate-fadeUp">
-      <div class="mb-4 flex flex-wrap items-center justify-between gap-2">
-        <h3 class="text-sm font-bold text-slate-900">🧭 Your road to ${exam}</h3>
-        ${pro ? (cd ? `<span class="rounded-full bg-indigo-50 px-3 py-1 text-[11px] font-black text-indigo-700">⏳ ${cd.days} day${cd.days === 1 ? '' : 's'} to go${cd.estimated ? ' · est.' : ''}</span>` : '') : `<button type="button" onclick="openUpgrade('plan')" class="rounded-full bg-amber-50 px-3 py-1 text-[11px] font-black text-amber-700 transition hover:bg-amber-100">⭐ Go Pro</button>`}
+    <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-card animate-fadeUp">
+      <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <h3 class="text-base font-black text-slate-900">🧭 Your road to ${exam}</h3>
+        ${pro ? (cd ? `<span class="rounded-full bg-indigo-50 px-4 py-1.5 text-xs font-black text-indigo-700">⏳ ${cd.days} day${cd.days === 1 ? '' : 's'} to go${cd.estimated ? ' · est.' : ''}</span>` : '') : `<button type="button" onclick="openUpgrade('plan')" class="rounded-full bg-amber-50 px-4 py-1.5 text-xs font-black text-amber-700 transition hover:bg-amber-100">⭐ Go Pro</button>`}
       </div>
-      <div class="grid gap-5 md:grid-cols-3">
-        <div>
-          <div class="mb-2 text-[11px] font-black uppercase tracking-wide text-slate-400">Subject readiness</div>
-          ${rows.length ? `<div class="space-y-2">${rows.map(bar).join('')}</div>` : '<p class="text-[11px] text-slate-400">Take a quiz in each subject and your readiness bars appear here.</p>'}
-        </div>
-        <div>
-          <div class="mb-2 text-[11px] font-black uppercase tracking-wide text-slate-400">Today’s session</div>
+      <div class="grid gap-5 lg:grid-cols-5">
+        <div class="rounded-xl border border-slate-100 bg-slate-50/70 p-5 lg:col-span-2">
+          <div class="mb-3 text-[11px] font-black uppercase tracking-wide text-slate-400">Today’s session</div>
           ${pro ? `
-          <div class="text-sm font-bold text-slate-800">${plan.minutes} min · ${plan.quizCount} quiz${plan.quizCount === 1 ? '' : 'zes'}</div>
-          <div class="mt-1 text-[11px] leading-relaxed text-slate-500">Focus: <b>${plan.focus}${plan.focusTopic ? ' → ' + plan.focusTopic : ''}</b></div>
-          <div class="mt-2 text-[11px] leading-relaxed text-slate-500">${weak.weakTop ? `Biggest gap: <b class="text-rose-600">${weak.weakSub} → ${weak.weakTop} (${weak.topPct}%)</b>` : weak.weakSub ? `Biggest gap: <b class="text-rose-600">${weak.weakSub} (${weak.weakPct}%)</b>` : 'Take a few quizzes and your weakest topic shows up here.'}</div>` : lockTeaser('Personal daily plan & weakest-topic radar')}
+          <div class="text-2xl font-black text-slate-900">${plan.minutes} min <span class="text-sm font-bold text-slate-400">·</span> ${plan.quizCount} quiz${plan.quizCount === 1 ? '' : 'zes'}</div>
+          <div class="mt-3 space-y-2 text-xs leading-relaxed text-slate-500">
+            <p>Focus: <b class="text-slate-700">${plan.focus}${plan.focusTopic ? ' → ' + plan.focusTopic : ''}</b></p>
+            <p>${weak.weakTop ? `Biggest gap: <b class="text-rose-600">${weak.weakSub} → ${weak.weakTop} (${weak.topPct}%)</b>` : weak.weakSub ? `Biggest gap: <b class="text-rose-600">${weak.weakSub} (${weak.weakPct}%)</b>` : 'Take a few quizzes and your weakest topic shows up here.'}</p>
+          </div>` : `<div class="rounded-xl bg-white p-4">${lockTeaser('Personal daily plan & weakest-topic radar')}</div>`}
         </div>
-        <div>
-          <div class="mb-2 text-[11px] font-black uppercase tracking-wide text-slate-400">Projection</div>
-          ${pro ? predHtml : lockTeaser('Projected score & predicted grades')}
+        <div class="rounded-xl border border-slate-100 bg-slate-50/70 p-5 lg:col-span-3">
+          <div class="mb-3 text-[11px] font-black uppercase tracking-wide text-slate-400">Subject readiness</div>
+          ${rows.length ? `<div class="space-y-3.5">${rows.map(bar).join('')}</div>` : '<p class="text-xs text-slate-400">Take a quiz in each subject and your readiness bars appear here.</p>'}
         </div>
       </div>
-      ${pro && cd ? `<div class="mt-4 flex items-center gap-2 border-t border-slate-100 pt-3 text-[11px] text-slate-400">
+      <div class="mt-5 rounded-2xl bg-slate-900 p-6">
+        <div class="mb-4 text-[11px] font-black uppercase tracking-wide text-slate-400">Projection</div>
+        ${pro ? predHtml : `<div class="rounded-xl bg-white p-4">${lockTeaser('Projected score & predicted grades')}</div>`}
+      </div>
+      ${pro && cd ? `<div class="mt-5 flex flex-wrap items-center gap-2 text-[11px] text-slate-400">
         <span>${cd.estimated ? 'Exam date estimated —' : 'Exam date:'}</span>
         <input type="date" value="${state.profile.examDate || ''}" onchange="setExamDate(this.value)"
           class="rounded-lg border border-slate-200 px-2 py-1 text-[11px] font-semibold text-slate-600" />
