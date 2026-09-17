@@ -1130,8 +1130,6 @@ check('quiz renders every question with four options',
 w.selectQuizAnswer(before.quizFor('Mathematics')[0].id, 0);
 check('selecting an answer re-renders without submitting', page().includes('Submit Answers'));
 w.navigate('assistant');
-check('Buddy chat renders its greeting and suggestion chips',
-  page().includes('Buddy') && page().includes('id="chat-chips"'));
 check('Buddy chat exposes the input form', page().includes('id="chat-input"') && page().includes('sendChatMessage'));
 await w.askBuddy('explain centripetal force');
 (globalThis.__timers.splice(0).forEach(fn => fn()));
@@ -1178,6 +1176,11 @@ check('mission shows a live progress counter', /\d\/3 done/.test(page()) || page
     t5.html.includes('do not have a prepared lesson'), 'got=' + t5.html.slice(0, 160));
   const t6 = await T.composeAnswer('how are you');
   check('Buddy greets like a friend', /great now that you're here/.test(t6.html));
+  T.getState().chat = [];
+  w.navigate('assistant');
+  check('Buddy opens with the welcome hero — name, animated taglines and suggestions',
+    page().includes('What should we work on today') && page().includes('buddy-orb')
+    && page().includes('id="chat-chips"'));
   const savedPage = T.getState().page;
   const t8 = await T.composeAnswer('give me a quiz');
   check('Buddy turns quiz requests into action instead of a dead end',

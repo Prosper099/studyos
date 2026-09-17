@@ -54,6 +54,24 @@
 </script>
 
 <!-- styles live in src/styles.css (imported by src/main.mjs, inlined at build) -->
+<style>
+  /* Buddy hero — deep-navy welcome canvas */
+  .buddy-dark-card { background: #0b1322; }
+  .buddy-hero { background: radial-gradient(900px 420px at 50% -10%, #1d2c4f 0%, #101a30 55%, #0b1322 100%); }
+  .buddy-orb { display: flex; height: 5.5rem; width: 5.5rem; flex-shrink: 0; align-items: center; justify-content: center; border-radius: 9999px; font-size: 2.6rem;
+    background: radial-gradient(circle at 30% 30%, #4f6df5, #27407c 70%);
+    box-shadow: 0 0 0 6px rgba(79,109,245,.15), 0 0 34px rgba(79,109,245,.45);
+    animation: buddy-pulse 3.2s ease-in-out infinite; }
+  @keyframes buddy-pulse { 0%,100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-6px) scale(1.04); } }
+  .buddy-taglines { position: relative; height: 1.7rem; margin-top: .65rem; overflow: hidden; }
+  .buddy-taglines span { position: absolute; inset: 0; opacity: 0; font-size: .9rem; font-weight: 600; color: #9fb3d9; animation: buddy-cycle 9s linear infinite; }
+  .buddy-taglines span:nth-child(2) { animation-delay: 3s; }
+  .buddy-taglines span:nth-child(3) { animation-delay: 6s; }
+  @keyframes buddy-cycle { 0% {opacity:0; transform:translateY(6px);} 4% {opacity:1; transform:translateY(0);} 29% {opacity:1;} 33% {opacity:0; transform:translateY(-6px);} 100% {opacity:0;} }
+  .buddy-sugg { border-radius: 9999px; border: 1px solid rgba(148,163,184,.35); background: rgba(255,255,255,.06); padding: .5rem 1rem; font-size: .75rem; font-weight: 700; color: #dbe4f5; transition: all .2s; }
+  .buddy-sugg:hover { background: rgba(79,109,245,.25); border-color: #4f6df5; }
+  .buddy-foot { background: transparent; }
+</style>
 </head>
 
 <body class="bg-slate-50 font-sans text-slate-800 antialiased">
