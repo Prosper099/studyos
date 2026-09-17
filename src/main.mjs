@@ -2229,6 +2229,8 @@ if (typeof window !== 'undefined' && window.addEventListener) {
   });
 }
 function backToQuizList() {
+  if (simTimerId) { clearInterval(simTimerId); simTimerId = null; }
+  state.examSim = null;
   state.quiz = { answers: {}, submitted: false, score: 0, result: null, mode: 'list', level: '', topicIdx: 0, topicTitle: '' };
   renderPage();
 }
@@ -2839,6 +2841,7 @@ function advanceFlash() {
    PAGE: PRACTICE QUIZ
    ================================================================== */
 function renderQuiz(el) {
+  if (state.examSim) { renderExamSimPage(el); return; }
   const subject = state.selectedSubject;
   const level = state.profile.classLevel || 'SS3';
   const c = subjectColor(subject);
@@ -2884,22 +2887,7 @@ function renderQuiz(el) {
                 class="self-start rounded-xl ${c.solid} px-4 py-2 text-xs font-bold text-white transition hover:opacity-90">📝 Start ${qLabel} quiz</button>` : `
               <span class="self-start rounded-xl bg-slate-100 px-4 py-2 text-xs font-bold text-slate-400">✍️ Quiz being written</span>`}
           </article>`).join('')}
-        ${level.startsWith('SS') && quizFor(subject).length ? `
-          <article class="flex flex-col rounded-2xl border border-indigo-200 bg-indigo-50/60 p-5 shadow-card animate-fadeUp md:col-span-2">
-            <h3 class="text-sm font-bold text-indigo-900">🎓 Mixed exam practice</h3>
-            <p class="mb-4 mt-1 flex-1 text-xs leading-relaxed text-indigo-700">${quizFor(subject).length} exam-style questions mixing every ${subject} topic — the closest thing to a JAMB/WASSCE drill.</p>
-            <button type="button" onclick="startMockQuiz()" class="self-start rounded-xl bg-indigo-600 px-4 py-2 text-xs font-bold text-white transition hover:bg-indigo-500">Start mixed quiz</button>
-          </article>` : ''}
-        ${String(state.profile.classLevel || '').startsWith('JSS') ? `
-          <article class="flex flex-col rounded-2xl border border-amber-200 bg-amber-50/60 p-5 shadow-card animate-fadeUp md:col-span-2">
-            <h3 class="text-sm font-bold text-amber-900">📜 Real past-question drill</h3>
-            <p class="mb-4 mt-1 flex-1 text-xs leading-relaxed text-amber-700"><strong>The real-paper drill unlocks from SS1</strong> — it drills actual WAEC, NECO and JAMB questions, and that is not your fight yet. Your BECE gym is right here: topic quizzes and flashcards with the same timer and instant marking.</p>
-          </article>` : pastFor(subject).length ? `
-          <article class="flex flex-col rounded-2xl border border-amber-200 bg-amber-50/60 p-5 shadow-card animate-fadeUp md:col-span-2">
-            <h3 class="text-sm font-bold text-amber-900">📜 Real WAEC/JAMB past questions</h3>
-            <p class="mb-4 mt-1 flex-1 text-xs leading-relaxed text-amber-700"><strong>${pastFor(subject).length} actual questions</strong> lifted from published WAEC, NECO and JAMB papers (1988–2025) and embedded offline in StudyOS — every question keeps its exam-body + year attribution, and each answer comes with a worked explanation after you submit.</p>
-            <button type="button" onclick="startPastQuiz()" class="self-start rounded-xl bg-amber-500 px-4 py-2 text-xs font-bold text-white transition hover:bg-amber-400">Open past question drill</button>
-          </article>` : ''}
+        <p class="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-[11px] font-semibold text-slate-500 md:col-span-2">🧪 Mixed mocks, past-question drills and full timed simulations moved to the <button type="button" onclick="navigate('home')" class="font-black text-indigo-600 underline">Exam Command Centre</button> on your dashboard.</p>
       </div>`;
     return;
   }
@@ -3895,6 +3883,281 @@ function predictedScore() {
   }
   return { kind: 'none' };
 }
+/* ==================== Exam simulation engine ====================
+   Full timed sittings that live in the Exam Command Centre: real exam
+   shapes (JAMB 180 questions / 2 hours etc.), subject tabs so students
+   switch subjects mid-sitting exactly like the real CBT hall, a single
+   master clock and a per-subject scorecard at the end. */
+const EXAM_PRESETS = [
+  { key: 'jamb',   name: 'JAMB UTME sitting',    exam: 'JAMB UTME',    maxSubjects: 4, perSubject: (sub) => (sub === 'English' ? 60 : 40), mins: null, minsPerSubject: null, label: 'Use of English 60 + 40 per subject · up to 4 subjects · 2-hour clock (real UTME shape)' },
+  { key: 'waec',   name: 'WAEC WASSCE sitting',  exam: 'WAEC WASSCE',  maxSubjects: 6, perSubject: () => 50, mins: null, minsPerSubject: 60, label: '50 objective questions per subject · 1 hour per paper' },
+  { key: 'neco',   name: 'NECO SSCE sitting',    exam: 'NECO SSCE',    maxSubjects: 6, perSubject: () => 50, mins: null, minsPerSubject: 60, label: '50 objective questions per subject · 1 hour per paper' },
+  { key: 'nabteb', name: 'NABTEB sitting',       exam: 'NABTEB',       maxSubjects: 6, perSubject: () => 50, mins: null, minsPerSubject: 60, label: '50 objective questions per subject · 1 hour per paper' },
+  { key: 'bece',   name: 'BECE sitting',         exam: 'BECE',         maxSubjects: 5, perSubject: () => 40, mins: null, minsPerSubject: 45, label: '40 objective questions per subject · 45 minutes per paper' },
+  { key: 'quick',  name: 'Quick practice sitting', exam: 'Practice sitting', maxSubjects: 8, perSubject: () => 10, mins: null, minsPerSubject: 10, label: '10 questions per subject · 10 minutes each — feel the exam room fast' },
+];
+let simTimerId = null;
+
+function simClockFmt(ms) {
+  const t = Math.max(0, Math.floor(ms / 1000));
+  const h = Math.floor(t / 3600), m = Math.floor((t % 3600) / 60), sec = t % 60;
+  return (h ? String(h).padStart(2, '0') + ':' : '') + String(m).padStart(2, '0') + ':' + String(sec).padStart(2, '0');
+}
+
+/** Mixed paper for one subject: real past questions first, topped up from the mock bank. */
+function simQuestionsFor(subject, n) {
+  const isJss = String(state.profile.classLevel || '').startsWith('JSS');
+  const pool = shuffled(pastFor(subject)).concat(shuffled(quizFor(subject)));
+  if (isJss) return shuffled(quizFor(subject)).slice(0, n);
+  const seen = new Set(); const out = [];
+  for (const q of pool) {
+    if (seen.has(q.id)) continue;
+    seen.add(q.id);
+    out.push(shuffleOptions(q));
+    if (out.length >= n) break;
+  }
+  return out;
+}
+
+function startExamSim(key) {
+  if (!quizGate()) return;
+  const preset = EXAM_PRESETS.find(p => p.key === key);
+  if (!preset) return;
+  const chosen = (state.profile.subjects && state.profile.subjects.length ? state.profile.subjects : Object.keys(CURRICULUM));
+  const sections = chosen.slice(0, preset.maxSubjects)
+    .map(sub => ({ subject: sub, questions: simQuestionsFor(sub, preset.perSubject(sub)) }))
+    .filter(x => x.questions.length);
+  if (!sections.length) { toast('Your subjects have no question bank yet — pick subjects in your profile first.'); return; }
+  const totalMin = preset.mins || sections.length * preset.minsPerSubject;
+  if (simTimerId) { clearInterval(simTimerId); simTimerId = null; }
+  state.examSim = {
+    presetKey: preset.key, exam: preset.exam, sections, subjectIdx: 0, qIdx: 0,
+    answers: {}, deadline: Date.now() + totalMin * 60000, totalMin,
+    submitted: false, result: null,
+  };
+  simTimerId = setInterval(() => {
+    const sim = state.examSim;
+    if (!sim || sim.submitted) { clearInterval(simTimerId); simTimerId = null; return; }
+    const left = sim.deadline - Date.now();
+    const el = document.getElementById('sim-clock');
+    if (el) {
+      el.textContent = simClockFmt(left);
+      if (left <= 300000) el.className = el.className.includes('text-rose-600') ? el.className : el.className + ' text-rose-600';
+    }
+    if (left <= 0) { toast('\u23f0 Time is up — your sitting has been submitted.'); submitExamSim(true); }
+  }, 1000);
+  state.page = 'quiz';
+  armBackGuard();
+  renderPage();
+}
+
+function simSelect(qi, optIdx) {
+  const sim = state.examSim;
+  if (!sim || sim.submitted) return;
+  sim.answers[sim.subjectIdx + '-' + qi] = optIdx;
+  renderPage();
+}
+function simSubject(i) {
+  const sim = state.examSim;
+  if (!sim || sim.submitted) return;
+  sim.subjectIdx = Math.max(0, Math.min(i, sim.sections.length - 1));
+  sim.qIdx = 0;
+  renderPage();
+}
+function simJump(i) { const sim = state.examSim; if (!sim || sim.submitted) return; sim.qIdx = i; renderPage(); }
+function simPrev() {
+  const sim = state.examSim; if (!sim || sim.submitted) return;
+  if (sim.qIdx > 0) sim.qIdx -= 1;
+  else if (sim.subjectIdx > 0) { sim.subjectIdx -= 1; sim.qIdx = sim.sections[sim.subjectIdx].questions.length - 1; }
+  renderPage();
+}
+function simNext() {
+  const sim = state.examSim; if (!sim || sim.submitted) return;
+  const sec = sim.sections[sim.subjectIdx];
+  if (sim.qIdx < sec.questions.length - 1) sim.qIdx += 1;
+  else if (sim.subjectIdx < sim.sections.length - 1) { sim.subjectIdx += 1; sim.qIdx = 0; }
+  renderPage();
+}
+
+function submitExamSim(auto = false) {
+  const sim = state.examSim;
+  if (!sim || sim.submitted) return;
+  if (simTimerId) { clearInterval(simTimerId); simTimerId = null; }
+  const perSubject = sim.sections.map((sec, si) => {
+    let correct = 0;
+    sec.questions.forEach((q, qi) => { if (sim.answers[si + '-' + qi] === q.correct) correct += 1; });
+    const pct = sec.questions.length ? Math.round((correct / sec.questions.length) * 100) : 0;
+    state.quizStats = mergeQuizStats(state.quizStats, sec.subject, {
+      attempts: 0, correct, total: sec.questions.length, percent: pct,
+      bySubject: { [sec.subject]: { correct, total: sec.questions.length } }, byTopic: {},
+    });
+    return { subject: sec.subject, total: sec.questions.length, correct, pct };
+  });
+  const total = perSubject.reduce((a, r) => a + r.total, 0);
+  const correct = perSubject.reduce((a, r) => a + r.correct, 0);
+  const overall = total ? Math.round((correct / total) * 100) : 0;
+  let score = null;
+  if (/JAMB/i.test(sim.exam)) score = perSubject.reduce((a, r) => a + Math.round(r.pct * (400 / (perSubject.length * 100))), 0);
+  sim.submitted = true;
+  sim.result = { perSubject, total, correct, overall, score, auto: !!auto };
+  checkBadges();
+  recordTask('quiz', { total, correct, percent: overall });
+  persistProgress();
+  renderPage();
+  toast('Sitting submitted — scorecard is ready.');
+}
+
+function confirmSubmitExamSim() { if (confirm('Submit this sitting now?')) submitExamSim(); }
+
+function exitExamSim() {
+  if (simTimerId) { clearInterval(simTimerId); simTimerId = null; }
+  state.examSim = null;
+  state.quiz = { answers: {}, submitted: false, score: 0, result: null, mode: 'list', level: '', topicIdx: 0, topicTitle: '' };
+  state.page = 'quiz';
+  renderPage();
+}
+
+/** The simulations + drills block inside the Exam Command Centre. */
+function examSimLabHtml() {
+  const subs = (state.profile.subjects && state.profile.subjects.length ? state.profile.subjects : Object.keys(CURRICULUM));
+  const opts = subs.map(x => `<option value="${x}">${x}</option>`).join('');
+  return `
+      <div class="mt-5 rounded-2xl border-2 border-indigo-200 bg-indigo-50/50 p-4">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <h4 class="text-sm font-bold text-indigo-900">🧪 Full exam simulations</h4>
+          <span class="rounded-full bg-indigo-100 px-2.5 py-1 text-[10px] font-black text-indigo-700">CBT room · subject tabs · master clock</span>
+        </div>
+        <p class="mt-1 text-[11px] leading-relaxed text-indigo-700">Sit the real thing before the real thing: one timed sitting across all your subjects, switching papers mid-exam exactly like the exam hall. Every past question and mixed mock now lives here — the exam centre is your exam gym.</p>
+        <div class="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+          ${EXAM_PRESETS.map(p => `
+          <button type="button" onclick="startExamSim('${p.key}')" class="group rounded-xl border border-indigo-200 bg-white p-3 text-left transition hover:border-indigo-400 hover:shadow-md">
+            <span class="block text-xs font-black text-slate-900 group-hover:text-indigo-700">🎯 ${p.name}</span>
+            <span class="mt-0.5 block text-[10px] leading-snug text-slate-500">${p.label}</span>
+          </button>`).join('')}
+        </div>
+        <div class="mt-3 flex flex-wrap items-center gap-2 border-t border-indigo-200 pt-3">
+          <span class="text-[11px] font-bold text-indigo-800">Per-subject drills:</span>
+          <select id="drill-subject" class="rounded-lg border border-indigo-200 bg-white px-2 py-1.5 text-[11px] font-semibold text-slate-700">${opts}</select>
+          <button type="button" onclick="drillMock()" class="rounded-lg bg-indigo-600 px-3 py-1.5 text-[11px] font-black text-white transition hover:bg-indigo-500">🌀 Mixed mock drill</button>
+          <button type="button" onclick="drillPast()" class="rounded-lg bg-amber-500 px-3 py-1.5 text-[11px] font-black text-white transition hover:bg-amber-400">📜 Past question drill</button>
+        </div>
+      </div>`;
+}
+
+function drillMock() {
+  const sel = document.getElementById('drill-subject');
+  if (sel) state.selectedSubject = sel.value;
+  startMockQuiz();
+}
+function drillPast() {
+  const sel = document.getElementById('drill-subject');
+  if (sel) state.selectedSubject = sel.value;
+  startPastQuiz();
+}
+
+/** The sitting screen: subject tabs + question + palette + master clock. */
+function renderExamSimPage(el) {
+  const sim = state.examSim;
+  if (sim.submitted) {
+    const r = sim.result;
+    const weakest = r.perSubject.slice().sort((a, b) => a.pct - b.pct)[0];
+    el.innerHTML = `
+      <div class="mx-auto max-w-3xl animate-fadeUp">
+        <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-card">
+          <p class="text-[10px] font-black uppercase tracking-wider text-indigo-500">Exam simulation · ${sim.exam}${r.auto ? ' · auto-submitted (time up)' : ''}</p>
+          <h2 class="mt-1 text-xl font-black text-slate-900">Sitting scorecard</h2>
+          <div class="mt-4 flex flex-wrap items-end gap-6">
+            <div>
+              <p class="text-3xl font-black text-slate-900">${r.correct}<span class="text-lg font-bold text-slate-400">/${r.total}</span></p>
+              <p class="text-[11px] font-semibold text-slate-500">overall · ${r.overall}%</p>
+            </div>
+            ${r.score != null ? `<div>
+              <p class="text-3xl font-black text-indigo-700">${r.score}<span class="text-lg font-bold text-indigo-300">/400</span></p>
+              <p class="text-[11px] font-semibold text-slate-500">projected JAMB score</p>
+            </div>` : ''}
+          </div>
+          <div class="mt-5 space-y-2">
+            <p class="text-[11px] font-black uppercase tracking-wider text-slate-400">Per subject</p>
+            ${r.perSubject.map(x => `
+            <div class="flex items-center gap-3">
+              <span class="w-28 truncate text-[11px] font-bold text-slate-600">${x.subject}</span>
+              <div class="h-2 flex-1 overflow-hidden rounded-full bg-slate-100">
+                <div class="h-full rounded-full ${x.pct >= 70 ? 'bg-emerald-500' : x.pct >= 50 ? 'bg-amber-500' : 'bg-rose-500'}" style="width:${x.pct}%"></div>
+              </div>
+              <span class="w-20 text-right text-[11px] font-black text-slate-700">${x.correct}/${x.total} · ${x.pct}%</span>
+            </div>`).join('')}
+          </div>
+          ${weakest ? `<p class="mt-4 rounded-xl bg-amber-50 p-3 text-[11px] font-semibold text-amber-800">🔧 Fix first: <strong>${weakest.subject}</strong> (${weakest.pct}%). Run its weak-topic session, then sit this paper again — improvement between sittings is what examiners reward.</p>` : ''}
+          <div class="mt-5 flex flex-wrap gap-2">
+            <button type="button" onclick="startExamSim('${sim.presetKey}')" class="rounded-xl bg-indigo-600 px-4 py-2 text-xs font-bold text-white transition hover:bg-indigo-500">🔁 Sit it again</button>
+            <button type="button" onclick="exitExamSim()" class="rounded-xl bg-slate-100 px-4 py-2 text-xs font-bold text-slate-700 transition hover:bg-slate-200">Back to drills</button>
+          </div>
+        </article>
+      </div>`;
+    return;
+  }
+  const sec = sim.sections[sim.subjectIdx];
+  const q = sec.questions[sim.qIdx];
+  const chosen = sim.answers[sim.subjectIdx + '-' + sim.qIdx];
+  const left = sim.deadline - Date.now();
+  const answeredIn = (si) => sim.sections[si].questions.filter((_, qi) => sim.answers[si + '-' + qi] !== undefined).length;
+  const totalAnswered = sim.sections.reduce((a, _, si) => a + answeredIn(si), 0);
+  const totalQ = sim.sections.reduce((a, x) => a + x.questions.length, 0);
+  el.innerHTML = `
+    <div class="mx-auto max-w-5xl animate-fadeUp">
+      <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <p class="text-[10px] font-black uppercase tracking-wider text-indigo-500">Exam simulation in progress · ${sim.exam}</p>
+          <p class="text-[11px] font-semibold text-slate-500">${totalAnswered}/${totalQ} answered · switch papers any time, just like the real hall</p>
+        </div>
+        <div class="flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2">
+          <span class="text-[10px] font-black uppercase tracking-wider text-slate-400">Time left</span>
+          <span id="sim-clock" class="font-mono text-lg font-black text-white${left <= 300000 ? ' text-rose-400' : ''}">${simClockFmt(left)}</span>
+        </div>
+      </div>
+      <div class="mb-3 flex gap-2 overflow-x-auto pb-1">
+        ${sim.sections.map((x, si) => `
+        <button type="button" onclick="simSubject(${si})"
+          class="flex shrink-0 items-center gap-2 rounded-xl border px-3 py-2 text-left transition ${si === sim.subjectIdx ? 'border-indigo-500 bg-indigo-600 text-white shadow-md' : 'border-slate-200 bg-white text-slate-700 hover:border-indigo-300'}">
+          <span class="text-xs font-black">${x.subject}</span>
+          <span class="rounded-full ${si === sim.subjectIdx ? 'bg-indigo-500' : 'bg-slate-100'} px-2 py-0.5 text-[9px] font-black">${answeredIn(si)}/${x.questions.length}</span>
+        </button>`).join('')}
+      </div>
+      <div class="grid gap-4 lg:grid-cols-[1fr_240px]">
+        <article class="rounded-2xl border border-slate-200 bg-white p-5 shadow-card">
+          <div class="mb-3 flex items-center gap-2">
+            <span class="rounded-full bg-indigo-50 px-2.5 py-1 text-[10px] font-black text-indigo-700">${sec.subject} · Q${sim.qIdx + 1} of ${sec.questions.length}</span>
+            ${q.src ? `<span class="rounded bg-amber-100 px-1.5 py-0.5 text-[9px] font-bold text-amber-700">${q.src}</span>` : ''}
+          </div>
+          <h3 class="mb-4 text-sm font-bold leading-relaxed text-slate-900">${q.q}</h3>
+          <div class="space-y-2">
+            ${q.options.map((opt, oi) => `
+            <button type="button" onclick="simSelect(${sim.qIdx}, ${oi})"
+              class="flex w-full items-start gap-3 rounded-xl border p-3 text-left transition ${chosen === oi ? 'border-indigo-500 bg-indigo-50 ring-1 ring-indigo-500' : 'border-slate-200 bg-white hover:border-indigo-300'}">
+              <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${chosen === oi ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600'} text-[10px] font-black">${'ABCD'[oi] || oi + 1}</span>
+              <span class="text-xs font-semibold leading-relaxed text-slate-700">${opt}</span>
+            </button>`).join('')}
+          </div>
+          <div class="mt-4 flex items-center justify-between">
+            <button type="button" onclick="simPrev()" class="rounded-xl bg-slate-100 px-4 py-2 text-xs font-bold text-slate-700 transition hover:bg-slate-200">← Previous</button>
+            <button type="button" onclick="simNext()" class="rounded-xl bg-indigo-600 px-4 py-2 text-xs font-bold text-white transition hover:bg-indigo-500">Next →</button>
+          </div>
+        </article>
+        <aside class="rounded-2xl border border-slate-200 bg-white p-4 shadow-card">
+          <p class="mb-2 text-[10px] font-black uppercase tracking-wider text-slate-400">Question palette · ${sec.subject}</p>
+          <div class="grid grid-cols-6 gap-1.5 lg:grid-cols-5">
+            ${sec.questions.map((_, qi) => {
+              const done = sim.answers[sim.subjectIdx + '-' + qi] !== undefined;
+              return `<button type="button" onclick="simJump(${qi})" class="h-8 rounded-lg text-[10px] font-black transition ${qi === sim.qIdx ? 'bg-indigo-600 text-white ring-2 ring-indigo-300' : done ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}">${qi + 1}</button>`;
+            }).join('')}
+          </div>
+          <p class="mt-3 text-[10px] leading-snug text-slate-400">Green = answered. The clock never stops — manage your time across papers like a real candidate.</p>
+          <button type="button" onclick="confirmSubmitExamSim()" class="mt-3 w-full rounded-xl bg-emerald-600 px-4 py-2.5 text-xs font-black text-white transition hover:bg-emerald-500">✅ Submit sitting</button>
+        </aside>
+      </div>
+    </div>`;
+}
+
 function examCommandCenter() {
   const exam = state.profile.targetExam || '';
   if (!exam) return '';
@@ -3957,6 +4220,7 @@ function examCommandCenter() {
           class="rounded-lg border border-slate-200 px-2 py-1 text-[11px] font-semibold text-slate-600" />
         <span>set your real date for an exact countdown</span>
       </div>` : ''}
+      ${examSimLabHtml()}
     </section>`;
 }
 function setExamDate(v) {
@@ -4952,6 +5216,7 @@ Object.assign(window, {
   flipFlashcard, nextFlashcard, prevFlashcard, gotoFlashcard,
   markGot, markLater, setFlashFilter, restartFlash, dismissCelebration,
   startTopicQuiz, startMockQuiz, startPastQuiz, backToQuizList, openTopicCards,
+  startExamSim, simSelect, simSubject, simJump, simPrev, simNext, submitExamSim, confirmSubmitExamSim, exitExamSim, drillMock, drillPast, EXAM_PRESETS,
   setQuizCount, setQuizTimer, openFocusModal, closeFocusModal, focusModalBackdrop, startFocus, stopFocus, updateFocusPill, setExamDate,
   selectQuizAnswer, submitQuiz, retakeQuiz, examJump, examPrev, examNext, submitExam,
   sendChatMessage, askBuddy, clearChat, setResearch, saveGeminiKey, toggleGeminiPanel,
