@@ -127,10 +127,12 @@ const feature = [
   ['badge catalog incl. weekly, monthly and yearly streak badges', /streak-7[\s\S]*streak-30[\s\S]*streak-365/],
   ['profile badges section', /Badges &amp; streaks|Badges & streaks/],
   ['streak freeze ice-shatter overlay', /id="freeze-overlay"/],
-  ['parent report export buttons', /copyParentReport\(\)[\s\S]*downloadParentReport\(\)/],
+  ['guardian WhatsApp share flow', /shareToGuardian\(\)[\s\S]*wa\.me/],
+  ['blurred guardian-only teaser on the parent page', /parent-thumb[\s\S]{0,220}blur/],
+  ['onboarding asks for the guardian WhatsApp number', /guardian-input[\s\S]{0,400}country code first/],
   ['passive streak check on app entry', /checkStreakOnEntry\(\);/],
   ['chart dot tooltip markup', /chart-dot[\s\S]*chart-tip/],
-  ['parent report bundle share button', /shareParentBundle\(\)/]
+  ['parent page keeps the write-up in the shared text', /parentWriteupText|TO-DO THIS WEEK/]
 ];
 for (const [name, re] of feature) check(name, typeof re === 'boolean' ? re : re.test(html));
 

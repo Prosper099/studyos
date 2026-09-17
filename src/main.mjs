@@ -53,10 +53,10 @@ const state = {
   uid: null,
   page: 'home',
   authTab: 'login',
-  onboard: { step: 1, classLevel: '', targetExam: '', subjects: [], targetScore: '', studyPref: '' },
+  onboard: { step: 1, classLevel: '', targetExam: '', subjects: [], targetScore: '', studyPref: '', guardianPhone: '' },
   selectedSubject: 'Mathematics',
   profile: {
-    name: '', email: '', classLevel: '', targetExam: '', targetScore: '', studyPref: '', plan: 'free', planRef: '', planSince: '',
+    name: '', email: '', classLevel: '', targetExam: '', targetScore: '', studyPref: '', guardianPhone: '', plan: 'free', planRef: '', planSince: '',
     subjects: [], onboarded: false
   },
   streak: 0,
@@ -3624,9 +3624,9 @@ function renderProfile(el) {
 
         <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-card">
           <h3 class="mb-1 text-sm font-bold text-slate-900">👨‍👩‍ Family &amp; plan</h3>
-          <p class="mb-3 text-[11px] text-slate-400">Send a parent a plain-English summary of your week — you choose what to share. And when you are ready for the full engine, go Pro.</p>
+          <p class="mb-3 text-[11px] text-slate-400">Reports go straight to your guardian's WhatsApp — this phone only ever shows a blurred teaser. And when you are ready for the full engine, go Pro.</p>
           <div class="flex flex-wrap items-center gap-2">
-            <button type="button" onclick="shareParentReport()" class="rounded-xl bg-emerald-600 px-4 py-2 text-[11px] font-black text-white transition hover:bg-emerald-500">📤 Send parent my report</button>
+            <button type="button" onclick="shareParentReport()" class="rounded-xl bg-emerald-600 px-4 py-2 text-[11px] font-black text-white transition hover:bg-emerald-500">📤 Send guardian my report</button>
             <button type="button" onclick="navigate('parent')" class="rounded-xl bg-slate-100 px-4 py-2 text-[11px] font-black text-slate-700 transition hover:bg-slate-200">👪 Open Parent Report page →</button>
             ${monetizationOn ? (proActive() ? `<span class="rounded-full bg-amber-50 px-3 py-1.5 text-[11px] font-black text-amber-700">⭐ ${state.profile.plan === 'pack' ? 'JAMB Premium Pack active' : 'Pro active'}</span>` : `<button type="button" onclick="openUpgrade('plan')" class="rounded-xl bg-slate-900 px-4 py-2 text-[11px] font-black text-white transition hover:bg-slate-800">⭐ Upgrade to Pro — ₦${PRO_MONTHLY_NGN.toLocaleString()}/mo</button>`) : ''}
           </div>
@@ -3839,7 +3839,7 @@ function buildParentReport() {
   ].join('\n');
 }
 function shareParentReport() {
-  window.open('https://wa.me/?text=' + encodeURIComponent(buildParentReport()), '_blank');
+  shareToGuardian();
 }
 function buildDetailedParentReport() {
   const s = state.quizStats || {};
@@ -3907,12 +3907,11 @@ function wrapLines(text, max) {
   return out;
 }
 let lastCardH = 1260;
-function buildParentCardSvg() {
+function computeWriteup() {
   const s = state.quizStats || {};
   const acc = s.total ? Math.round((s.correct / s.total) * 100) : 0;
   const weak = weakestTopicInfo();
   const todos = computeStudyToDos();
-  const bySubject = Object.entries(s.bySubject || {}).slice(0, 5);
   const now = new Date();
   const active7 = Object.keys(s.days || {}).filter(d => { const diff = (now - new Date(d + 'T00:00:00')) / 86400000; return diff >= 0 && diff < 7; }).length;
   const hist = s.history || [];
@@ -3923,9 +3922,31 @@ function buildParentCardSvg() {
       : a1 - a0 < 0 ? 'Trend: a tougher stretch, ' + (a1 - a0) + ' points over the last five quizzes — normal while tackling harder topics.'
       : 'Trend: steady and consistent — reliability is a real strength.')
     : 'Trend: still building history — a few more quizzes and the line sharpens.';
-  const name = escapeHtml(state.profile.name || 'Student');
-  const cls = escapeHtml(state.profile.classLevel || '');
-  const exam = escapeHtml(state.profile.targetExam || '');
+  const name = state.profile.name || 'Student';
+  const cls = state.profile.classLevel || '';
+  const exam = state.profile.targetExam || '';
+  const analysis = [
+    `Overall, ${name} has answered ${s.total || 0} questions at ${acc}% accuracy across ${s.attempts || 0} quiz${(s.attempts || 0) === 1 ? '' : 'zes'}, with a best score of ${s.bestPercent || 0}%.`,
+    trendText,
+    weak.weakSub ? `Weak area: ${weak.weakSub}${weak.weakTop ? ' — ' + weak.weakTop : ''}, currently at ${weak.topPct || weak.weakPct}%. This is the single biggest opportunity for score growth right now.` : 'No weak areas flagged yet — building steadily across subjects.',
+    `Consistency: ${active7} active study day${active7 === 1 ? '' : 's'} this week with a ${state.streak || 0}-day streak and ${state.streakFreezes || 0} freeze${(state.streakFreezes || 0) === 1 ? '' : 's'} banked. A little encouragement goes a long way!`
+  ];
+  return { s, acc, weak, todos, hist, analysis, name, cls, exam };
+}
+function parentWriteupText() {
+  const wu = computeWriteup();
+  return '📚 StudyOS Progress Report — ' + wu.name + (wu.cls ? ' · ' + wu.cls : '') + (wu.exam ? ' · ' + wu.exam : '') +
+    '\n\n' + wu.analysis.map(l => '• ' + l).join('\n') +
+    '\n\nTO-DO THIS WEEK:\n' + wu.todos.map(t => '☐ ' + t).join('\n') +
+    '\n\nSent straight from the StudyOS app to the saved guardian number — reports are never rerouted. 💛';
+}
+function buildParentCardSvg() {
+  const wu = computeWriteup();
+  const s = wu.s, acc = wu.acc, weak = wu.weak, todos = wu.todos, hist = wu.hist, analysis = wu.analysis;
+  const bySubject = Object.entries(s.bySubject || {}).slice(0, 5);
+  const name = escapeHtml(wu.name);
+  const cls = escapeHtml(wu.cls);
+  const exam = escapeHtml(wu.exam);
   const esc = t => escapeHtml(String(t));
   const W = 750;
   let y = 182;
@@ -3960,12 +3981,6 @@ function buildParentCardSvg() {
     y += 48;
   }
   parts.push(`<text x="40" y="${y}" font-size="15" font-weight="800" fill="#1e293b" letter-spacing="1.5">ANALYSIS &amp; WEAK AREAS</text>`);
-  const analysis = [
-    `Overall, ${name} has answered ${s.total || 0} questions at ${acc}% accuracy across ${s.attempts || 0} quiz${(s.attempts || 0) === 1 ? '' : 'zes'}, with a best score of ${s.bestPercent || 0}%.`,
-    trendText,
-    weak.weakSub ? `Weak area: ${weak.weakSub}${weak.weakTop ? ' — ' + weak.weakTop : ''}, currently at ${weak.topPct || weak.weakPct}%. This is the single biggest opportunity for score growth right now.` : 'No weak areas flagged yet — building steadily across subjects.',
-    `Consistency: ${active7} active study day${active7 === 1 ? '' : 's'} this week with a ${state.streak || 0}-day streak and ${state.streakFreezes || 0} freeze${(state.streakFreezes || 0) === 1 ? '' : 's'} banked. A little encouragement goes a long way!`
-  ];
   let ty = y + 26;
   analysis.forEach(line => {
     wrapLines(line, 88).forEach(wl => {
@@ -4013,65 +4028,40 @@ function rasterizeParentCard(cb) {
     img.src = url;
   } catch (e) { cb(null); }
 }
-function downloadParentCard() {
-  rasterizeParentCard(b => {
-    if (!b) { toast('Image export failed on this browser'); return; }
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(b);
-    a.download = 'studyos-report-' + localISO() + '.png';
-    document.body.appendChild(a); a.click();
-    setTimeout(() => { try { URL.revokeObjectURL(a.href); a.remove(); } catch (e) { /* noop */ } }, 500);
-    toast('Report image saved — send it to your parent 📸');
-  });
+function normalizeWaPhone(v) {
+  let d = String(v || '').replace(/\D+/g, '');
+  if (d.length === 11 && d.startsWith('0')) d = '234' + d.slice(1);
+  return d.length >= 10 && d.length <= 15 ? d : '';
 }
-function shareParentBundle() {
+function setGuardianPhone(v) {
+  if ($('#onboarding-modal').classList.contains('flex')) {
+    state.onboard.guardianPhone = v;
+  } else {
+    state.profile.guardianPhone = v;
+    saveProfile();
+  }
+}
+function shareToGuardian() {
+  const num = normalizeWaPhone(state.profile.guardianPhone);
+  if (!num) {
+    toast("Add your guardian’s WhatsApp number first 🙏");
+    const inp = $('#guardian-profile-input') || $('#guardian-input');
+    if (inp) inp.focus();
+    return;
+  }
+  toast('Preparing the report image…');
   rasterizeParentCard(b => {
-    const text = buildDetailedParentReport();
-    if (b && navigator.share && navigator.canShare) {
-      try {
-        const file = new File([b], 'studyos-report-' + localISO() + '.png', { type: 'image/png' });
-        if (navigator.canShare({ files: [file] })) {
-          navigator.share({ files: [file], text: text, title: 'StudyOS progress report' }).catch(() => { /* user cancelled */ });
-          return;
-        }
-      } catch (e) { /* fall through to fallback */ }
-    }
     if (b) {
       const a = document.createElement('a');
       a.href = URL.createObjectURL(b);
-      a.download = 'studyos-report-' + localISO() + '.png';
+      a.download = 'StudyOS-Progress-Report-' + localISO() + '.png';
       document.body.appendChild(a); a.click();
       setTimeout(() => { try { URL.revokeObjectURL(a.href); a.remove(); } catch (e) { /* noop */ } }, 500);
     }
-    window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
-    toast('Image saved — attach it in WhatsApp next to the write-up');
+    const note = b ? '\n\n📎 The full report image was just saved to this phone — attach it in this chat and press send.' : '';
+    window.open('https://wa.me/' + num + '?text=' + encodeURIComponent(parentWriteupText() + note), '_blank');
+    toast("WhatsApp opened on your guardian’s chat ✅");
   });
-}
-function copyTextFallback(text, done) {
-  try {
-    const ta = document.createElement('textarea');
-    ta.value = text; document.body.appendChild(ta); ta.select();
-    document.execCommand('copy'); document.body.removeChild(ta);
-    done();
-  } catch (e) { toast('Copy failed — try the download button'); }
-}
-function copyParentReport() {
-  const text = buildDetailedParentReport();
-  const done = () => toast('Detailed report copied — paste it anywhere');
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(text).then(done, () => copyTextFallback(text, done));
-  } else copyTextFallback(text, done);
-}
-function downloadParentReport() {
-  try {
-    const blob = new Blob([buildDetailedParentReport()], { type: 'text/plain' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'studyos-report-' + localISO() + '.txt';
-    document.body.appendChild(a); a.click();
-    setTimeout(() => { try { URL.revokeObjectURL(a.href); a.remove(); } catch (e) { /* noop */ } }, 500);
-    toast('Report downloaded as .txt');
-  } catch (e) { toast('Download failed on this browser — use copy instead'); }
 }
 function lockTeaser(label) {
   return `<div class="rounded-xl border border-dashed border-amber-200 bg-amber-50/60 p-3">
@@ -4395,20 +4385,23 @@ function renderParentPage(el) {
   el.innerHTML = `
     ${pageHeader('Parent Report', 'The full picture as a shareable image: the graph, the analysis, weak areas and what to do next.')}
     <section class="rounded-2xl border border-slate-200 bg-white p-4 shadow-card sm:p-5">
-      <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
-        <h3 class="text-sm font-bold text-slate-900">🖼️ Report card image</h3>
-        <span class="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-black text-slate-500">updated live</span>
+      <h3 class="text-sm font-bold text-slate-900">🔒 Guardian report</h3>
+      <p class="mt-1 text-[11px] leading-relaxed text-slate-500">Only a blurred teaser shows on this phone. The full card — graph, analysis, weak areas and to-dos — goes straight to your parent or guardian on WhatsApp.</p>
+      <div class="relative mx-auto mt-4 w-40 sm:w-48">
+        <img id="parent-thumb" alt="Blurred report preview" class="w-full rounded-xl border border-slate-200 shadow-card" style="filter: blur(6px);" />
+        <div class="pointer-events-none absolute inset-0 flex items-center justify-center">
+          <span class="rounded-full bg-slate-900/70 px-3 py-1 text-[10px] font-black tracking-wide text-white">🔒 GUARDIAN ONLY</span>
+        </div>
       </div>
-      <div class="overflow-hidden rounded-2xl border border-slate-100 bg-slate-50 p-2">${buildParentCardSvg()}</div>
-      <div class="mt-4 flex flex-wrap gap-2">
-        <button type="button" onclick="shareParentBundle()" class="flex-1 rounded-xl bg-emerald-600 px-4 py-3 text-xs font-black text-white transition hover:bg-emerald-500">📤 Send image + write-up together</button>
-        <button type="button" onclick="downloadParentCard()" class="flex-1 rounded-xl bg-indigo-600 px-4 py-3 text-xs font-black text-white transition hover:bg-indigo-700">📥 Download image (PNG)</button>
+      <div class="mx-auto mt-4 max-w-sm">
+        <label class="text-[11px] font-black uppercase tracking-wide text-slate-400" for="guardian-profile-input">Guardian’s WhatsApp number</label>
+        <input id="guardian-profile-input" inputmode="tel" oninput="setGuardianPhone(this.value)" value="${escapeHtml(state.profile.guardianPhone || '')}" placeholder="e.g. 2348031234567 — country code first"
+          class="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm font-bold text-slate-800 outline-none focus:border-indigo-400 focus:bg-white" />
       </div>
-      <p class="mt-3 text-center text-[10px] leading-relaxed text-slate-400">On phones that support it, image and write-up fly together in one share; otherwise the image downloads and WhatsApp opens with the write-up ready to send beside it.</p>
-      <div class="mt-3 flex flex-wrap gap-2">
-        <button type="button" onclick="copyParentReport()" class="flex-1 rounded-xl bg-slate-100 px-4 py-2.5 text-[11px] font-black text-slate-700 transition hover:bg-slate-200">📋 Copy detailed text</button>
-        <button type="button" onclick="downloadParentReport()" class="flex-1 rounded-xl bg-slate-100 px-4 py-2.5 text-[11px] font-black text-slate-700 transition hover:bg-slate-200">📥 Download .txt</button>
+      <div class="mt-4 flex justify-center">
+        <button type="button" onclick="shareToGuardian()" class="w-full max-w-sm rounded-xl bg-emerald-600 px-4 py-3.5 text-sm font-black text-white transition hover:bg-emerald-500">📤 Send full report to my guardian on WhatsApp</button>
       </div>
+      <p class="mt-3 text-center text-[10px] leading-relaxed text-slate-400">The detailed image saves to this phone and WhatsApp opens directly on your guardian’s chat with the write-up typed in — attach the saved image and send. Reports always go to the saved number, never a chosen contact.</p>
     </section>
 
     <div class="mt-5 grid gap-5 lg:grid-cols-2">
@@ -4469,6 +4462,7 @@ function renderParentPage(el) {
       </div>
     </div>
   `;
+  rasterizeParentCard(b => { const img = $('#parent-thumb'); if (img && b) img.src = URL.createObjectURL(b); });
 }
 
 /* ==================================================================
@@ -4603,6 +4597,7 @@ async function saveProfile(patch) {
       targetExam: state.profile.targetExam || '',
       targetScore: state.profile.targetScore || '',
       studyPref: state.profile.studyPref || '',
+      guardianPhone: state.profile.guardianPhone || '',
       subjects: state.profile.subjects || [],
       onboarded: !!state.profile.onboarded,
       dept: state.profile.dept || '',
@@ -4687,6 +4682,7 @@ function hydrateFromDoc(data) {
     onboarded: !!data.onboarded,
     targetScore: data.targetScore || '',
     studyPref: data.studyPref || '',
+    guardianPhone: data.guardianPhone || '',
     dept: data.dept || '',
     examDate: data.examDate || '',
     plan: data.plan || 'free',
@@ -4848,7 +4844,7 @@ function startDemoMode() {
   } else {
     state.uid = 'demo-local-user';
     state.profile = {
-      name: 'Demo Student', email: 'demo@studyos.local', classLevel: '', targetExam: '', targetScore: '', studyPref: '',
+      name: 'Demo Student', email: 'demo@studyos.local', classLevel: '', targetExam: '', targetScore: '', studyPref: '', guardianPhone: '',
       subjects: [], onboarded: false
     };
   }
@@ -4888,7 +4884,8 @@ function openOnboarding() {
     targetExam: state.profile.targetExam || '',
     subjects: (state.profile.subjects || []).slice(),
     targetScore: state.profile.targetScore || '',
-    studyPref: state.profile.studyPref || ''
+    studyPref: state.profile.studyPref || '',
+    guardianPhone: state.profile.guardianPhone || ''
   };
   show($('#onboarding-modal'), true);
   $('#onboarding-modal').classList.add('flex');
@@ -4976,7 +4973,13 @@ function renderOnboardStep() {
         <span class="text-sm ${o.studyPref === p.id ? 'text-indigo-600' : 'text-slate-300'}">${o.studyPref === p.id ? '●' : '○'}</span>
       </button>`).join('');
   } else {
-    $('#step-6').innerHTML = planPreviewHtml();
+    $('#step-6').innerHTML = `
+      <div class="mb-3 rounded-xl border border-slate-200 bg-white p-4 text-left">
+        <div class="text-sm font-bold text-slate-900">👨👩‍ Parent / guardian WhatsApp number</div>
+        <p class="mb-2 mt-0.5 text-[11px] text-slate-500">Progress reports go straight to this number, so they can never be rerouted or edited. Required to finish.</p>
+        <input id="guardian-input" inputmode="tel" oninput="setGuardianPhone(this.value)" value="${escapeHtml(o.guardianPhone || '')}" placeholder="e.g. 2348031234567 — country code first"
+          class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm font-bold text-slate-800 outline-none focus:border-indigo-400 focus:bg-white" />
+      </div>` + planPreviewHtml();
   }
 }
 
@@ -5007,9 +5010,11 @@ async function onboardNext() {
     (o.step === 1 && !o.classLevel) || (o.step === 2 && !o.targetExam) ||
     (o.step === 3 && (String(o.classLevel).startsWith('SS') ? !o.dept : false)) ||
     (o.step === 3 && o.subjects.length === 0) || (o.step === 4 && !o.targetScore) ||
-    (o.step === 5 && !o.studyPref);
+    (o.step === 5 && !o.studyPref) || (o.step === 6 && !normalizeWaPhone(o.guardianPhone));
   if (invalid) {
-    err.textContent = o.step === 3 ? 'Select at least one subject to continue.' : 'Please make a selection to continue.';
+    err.textContent = o.step === 3 ? 'Select at least one subject to continue.'
+      : o.step === 6 ? "Add your parent or guardian’s WhatsApp number to finish."
+      : 'Please make a selection to continue.';
     show(err, true);
     return;
   }
@@ -5025,6 +5030,7 @@ async function onboardNext() {
   state.profile.subjects = o.subjects.slice();
   state.profile.targetScore = o.targetScore;
   state.profile.studyPref = o.studyPref;
+  state.profile.guardianPhone = normalizeWaPhone(o.guardianPhone) || '';
   state.profile.onboarded = true;
   if (!state.profile.subjects.includes(state.selectedSubject)) {
     state.selectedSubject = state.profile.subjects[0];
@@ -5155,6 +5161,7 @@ async function handleUser(user) {
       targetExam: state.profile.targetExam || '',
       targetScore: state.profile.targetScore || '',
       studyPref: state.profile.studyPref || '',
+      guardianPhone: state.profile.guardianPhone || '',
       subjects: state.profile.subjects || [],
       onboarded: !!state.profile.onboarded,
       streak: state.streak,
@@ -5242,7 +5249,7 @@ Object.assign(window, {
   selectQuizAnswer, submitQuiz, retakeQuiz, examJump, examPrev, examNext, submitExam,
   sendChatMessage, askBuddy, clearChat, setResearch, saveGeminiKey, toggleGeminiPanel,
   openUpgrade, closeUpgrade, upgradeBackdrop, choosePlan, founderUnlock, whatsappUpgrade, savePaystackKey, shareParentReport,
-  dismissFreezeIce, copyParentReport, downloadParentReport, downloadParentCard, shareParentBundle,
+  dismissFreezeIce, shareToGuardian, setGuardianPhone,
   setGeminiModel, testGemini,
 });
 

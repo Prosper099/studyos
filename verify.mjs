@@ -877,11 +877,17 @@ check('step 6 shows the generated study plan with the target and today’s missi
   byId('onboard-kicker').textContent === 'Step 6 of 6'
   && byId('step-6').innerHTML.includes('300+') && /mission/i.test(byId('step-6').innerHTML),
   byId('step-6').innerHTML.slice(0, 150));
+check('step 6 asks for the guardian WhatsApp number', /guardian/i.test(byId('step-6').innerHTML));
+await w.onboardNext();
+check('step 6 refuses to finish without a guardian WhatsApp number', !byId('onboard-error').classList.contains('hidden'));
+w.setGuardianPhone('2348031234567');
+check('guardian share flow exported and wa.me-bound', typeof w.shareToGuardian === 'function' && /wa\.me\//.test(code));
 await w.onboardNext();
 const docAfterOnboard = globalThis.__FS_STORE.get('users/test-uid-1');
 check('onboarding persisted class + exam + subjects + target + preference to Firestore',
   docAfterOnboard.classLevel === 'SS3' && docAfterOnboard.targetExam === 'JAMB UTME'
   && docAfterOnboard.targetScore === '300+' && docAfterOnboard.studyPref === 'balanced'
+  && docAfterOnboard.guardianPhone === '2348031234567'
   && JSON.stringify(docAfterOnboard.subjects) === JSON.stringify(['Mathematics', 'Physics'])
   && docAfterOnboard.dept === 'Science'
   && docAfterOnboard.onboarded === true, JSON.stringify(docAfterOnboard));
@@ -1237,7 +1243,7 @@ check('logout hides the app shell', byId('main-app').classList.contains('hidden'
   globalThis.navigate('progress');
   check('progress page shows empty state with no history', /No data yet/.test(main.innerHTML));
   globalThis.navigate('parent');
-  check('parent page leads with the report card image', /Report card image/.test(main.innerHTML) && /StudyOS Progress Report/.test(main.innerHTML));
+  check('parent page leads with a blurred guardian-only teaser (no full card on phone)', /parent-thumb/.test(main.innerHTML) && /GUARDIAN ONLY/.test(main.innerHTML) && /Send full report to my guardian on WhatsApp/.test(main.innerHTML));
   check('parent page shows analysis, weak areas and to-dos', /Performance analysis/.test(main.innerHTML) && /Weak areas/.test(main.innerHTML) && /To-dos this week/.test(main.innerHTML));
   check('report card svg contains graph, stats, weak area and to-do sections', (() => {
     const svg = T.buildParentCardSvg();
@@ -1252,7 +1258,7 @@ check('logout hides the app shell', byId('main-app').classList.contains('hidden'
     const svg = T.buildParentCardSvg();
     return /ANALYSIS &amp; WEAK AREAS/.test(svg) && /TO-DO THIS WEEK/.test(svg) && /Overall, /.test(svg);
   })());
-  check('parent page offers image + write-up bundle share', /Send image \+ write-up together/.test(main.innerHTML));
+  check('parent page routes sharing to the saved guardian number only', /shareToGuardian\(\)/.test(main.innerHTML) && /guardian-profile-input/.test(main.innerHTML) && !/shareParentBundle/.test(main.innerHTML));
   check('parent page keeps privacy promises', /You are in control/.test(main.innerHTML) && /do not judge/.test(main.innerHTML));
   Object.assign(st, { history: saved.history, bySubject: saved.bySubject, attempts: saved.attempts, correct: saved.correct, total: saved.total, bestPercent: saved.bestPercent, days: saved.days });
   T.getState().page = saved.page;
