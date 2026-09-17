@@ -2851,7 +2851,8 @@ function renderQuiz(el) {
     const topics = levelTopics(subject, level);
     const qLabel = state.quizSetup.count > 0 ? `${state.quizSetup.count}-question` : 'full';
     el.innerHTML = `
-      ${pageHeader('Practice Exam', 'Your personal CBT centre — quick-start a full exam or configure everything yourself.')}
+      ${pageHeader('Practice Exam', 'Your personal CBT centre — sit full exam simulations or drill topic by topic.')}
+      ${examSimSetupPanel()}
       ${cbtSetupHtml()}
       ${subjectSelector('quiz')}
       <section class="mb-4 rounded-2xl border border-violet-200 bg-gradient-to-br from-violet-50 to-indigo-50 p-5 shadow-card animate-fadeUp">
@@ -2887,7 +2888,6 @@ function renderQuiz(el) {
                 class="self-start rounded-xl ${c.solid} px-4 py-2 text-xs font-bold text-white transition hover:opacity-90">📝 Start ${qLabel} quiz</button>` : `
               <span class="self-start rounded-xl bg-slate-100 px-4 py-2 text-xs font-bold text-slate-400">✍️ Quiz being written</span>`}
           </article>`).join('')}
-        <p class="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-[11px] font-semibold text-slate-500 md:col-span-2">🧪 Mixed mocks, past-question drills and full timed simulations moved to the <button type="button" onclick="navigate('home')" class="font-black text-indigo-600 underline">Exam Command Centre</button> on your dashboard.</p>
       </div>`;
     return;
   }
@@ -3889,13 +3889,21 @@ function predictedScore() {
    switch subjects mid-sitting exactly like the real CBT hall, a single
    master clock and a per-subject scorecard at the end. */
 const EXAM_PRESETS = [
-  { key: 'jamb',   name: 'JAMB UTME sitting',    exam: 'JAMB UTME',    maxSubjects: 4, perSubject: (sub) => (sub === 'English' ? 60 : 40), mins: null, minsPerSubject: null, label: 'Use of English 60 + 40 per subject · up to 4 subjects · 2-hour clock (real UTME shape)' },
-  { key: 'waec',   name: 'WAEC WASSCE sitting',  exam: 'WAEC WASSCE',  maxSubjects: 6, perSubject: () => 50, mins: null, minsPerSubject: 60, label: '50 objective questions per subject · 1 hour per paper' },
-  { key: 'neco',   name: 'NECO SSCE sitting',    exam: 'NECO SSCE',    maxSubjects: 6, perSubject: () => 50, mins: null, minsPerSubject: 60, label: '50 objective questions per subject · 1 hour per paper' },
-  { key: 'nabteb', name: 'NABTEB sitting',       exam: 'NABTEB',       maxSubjects: 6, perSubject: () => 50, mins: null, minsPerSubject: 60, label: '50 objective questions per subject · 1 hour per paper' },
-  { key: 'bece',   name: 'BECE sitting',         exam: 'BECE',         maxSubjects: 5, perSubject: () => 40, mins: null, minsPerSubject: 45, label: '40 objective questions per subject · 45 minutes per paper' },
-  { key: 'quick',  name: 'Quick practice sitting', exam: 'Practice sitting', maxSubjects: 8, perSubject: () => 10, mins: null, minsPerSubject: 10, label: '10 questions per subject · 10 minutes each — feel the exam room fast' },
+  { key: 'jamb',   name: 'JAMB UTME sitting',    exam: 'JAMB UTME',    levels: ['SS'],  maxSubjects: 4, perSubject: (sub) => (sub === 'English' ? 60 : 40), mins: 120, label: 'Use of English 60 + 40 per subject · up to 4 subjects · 2-hour clock (real UTME shape)' },
+  { key: 'waec',   name: 'WAEC WASSCE sitting',  exam: 'WAEC WASSCE',  levels: ['SS'],  maxSubjects: 6, perSubject: () => 50, minsPerSubject: 60, label: '50 objective questions per subject · 1 hour per paper' },
+  { key: 'neco',   name: 'NECO SSCE sitting',    exam: 'NECO SSCE',    levels: ['SS'],  maxSubjects: 6, perSubject: () => 50, minsPerSubject: 60, label: '50 objective questions per subject · 1 hour per paper' },
+  { key: 'nabteb', name: 'NABTEB sitting',       exam: 'NABTEB',       levels: ['SS'],  maxSubjects: 6, perSubject: () => 50, minsPerSubject: 60, label: '50 objective questions per subject · 1 hour per paper' },
+  { key: 'bece',   name: 'BECE sitting',         exam: 'BECE',         levels: ['JSS'], maxSubjects: 5, perSubject: () => 40, minsPerSubject: 45, label: '40 objective questions per subject · 45 minutes per paper' },
 ];
+/* How the student sits the paper:
+   study    — no timer, answer + explanation after every question
+   mock     — full timer, exam conditions, nothing revealed until the scorecard
+   practice — full timer, complete answer review after submitting */
+const SIM_MODES = {
+  study:    { name: 'Study mode',    icon: '📚', blurb: 'No timer. Answer one question and the right answer pops up with a full explanation — learn as you go.' },
+  mock:     { name: 'Mock mode',     icon: '⏱', blurb: 'Full timer, real exam conditions. No answers or explanations while you sit — just your scorecard at the end.' },
+  practice: { name: 'Practice mode', icon: '🎯', blurb: 'Timed sitting, then a complete review afterwards: every question with your answer, the correct one and why.' },
+};
 let simTimerId = null;
 
 function simClockFmt(ms) {
@@ -3919,10 +3927,11 @@ function simQuestionsFor(subject, n) {
   return out;
 }
 
-function startExamSim(key) {
+function startExamSim(key, mode) {
   if (!quizGate()) return;
   const preset = EXAM_PRESETS.find(p => p.key === key);
   if (!preset) return;
+  const m = SIM_MODES[mode] ? mode : 'practice';
   const chosen = (state.profile.subjects && state.profile.subjects.length ? state.profile.subjects : Object.keys(CURRICULUM));
   const sections = chosen.slice(0, preset.maxSubjects)
     .map(sub => ({ subject: sub, questions: simQuestionsFor(sub, preset.perSubject(sub)) }))
@@ -3932,9 +3941,10 @@ function startExamSim(key) {
   if (simTimerId) { clearInterval(simTimerId); simTimerId = null; }
   state.examSim = {
     presetKey: preset.key, exam: preset.exam, sections, subjectIdx: 0, qIdx: 0,
-    answers: {}, deadline: Date.now() + totalMin * 60000, totalMin,
+    answers: {}, mode: m, deadline: m === 'study' ? null : Date.now() + totalMin * 60000, totalMin,
     submitted: false, result: null,
   };
+  if (m === 'study') { state.page = 'quiz'; armBackGuard(); renderPage(); return; }
   simTimerId = setInterval(() => {
     const sim = state.examSim;
     if (!sim || sim.submitted) { clearInterval(simTimerId); simTimerId = null; return; }
@@ -3954,6 +3964,7 @@ function startExamSim(key) {
 function simSelect(qi, optIdx) {
   const sim = state.examSim;
   if (!sim || sim.submitted) return;
+  if (sim.mode === 'study' && sim.answers[sim.subjectIdx + '-' + qi] !== undefined) return;
   sim.answers[sim.subjectIdx + '-' + qi] = optIdx;
   renderPage();
 }
@@ -4017,54 +4028,74 @@ function exitExamSim() {
   renderPage();
 }
 
-/** The simulations + drills block inside the Exam Command Centre. */
-function examSimLabHtml() {
-  const subs = (state.profile.subjects && state.profile.subjects.length ? state.profile.subjects : Object.keys(CURRICULUM));
-  const opts = subs.map(x => `<option value="${x}">${x}</option>`).join('');
-  return `
-      <div class="mt-5 rounded-2xl border-2 border-indigo-200 bg-indigo-50/50 p-4">
-        <div class="flex flex-wrap items-center justify-between gap-2">
-          <h4 class="text-sm font-bold text-indigo-900">🧪 Full exam simulations</h4>
-          <span class="rounded-full bg-indigo-100 px-2.5 py-1 text-[10px] font-black text-indigo-700">CBT room · subject tabs · master clock</span>
-        </div>
-        <p class="mt-1 text-[11px] leading-relaxed text-indigo-700">Sit the real thing before the real thing: one timed sitting across all your subjects, switching papers mid-exam exactly like the exam hall. Every past question and mixed mock now lives here — the exam centre is your exam gym.</p>
-        <div class="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-          ${EXAM_PRESETS.map(p => `
-          <button type="button" onclick="startExamSim('${p.key}')" class="group rounded-xl border border-indigo-200 bg-white p-3 text-left transition hover:border-indigo-400 hover:shadow-md">
-            <span class="block text-xs font-black text-slate-900 group-hover:text-indigo-700">🎯 ${p.name}</span>
-            <span class="mt-0.5 block text-[10px] leading-snug text-slate-500">${p.label}</span>
-          </button>`).join('')}
-        </div>
-        <div class="mt-3 flex flex-wrap items-center gap-2 border-t border-indigo-200 pt-3">
-          <span class="text-[11px] font-bold text-indigo-800">Per-subject drills:</span>
-          <select id="drill-subject" class="rounded-lg border border-indigo-200 bg-white px-2 py-1.5 text-[11px] font-semibold text-slate-700">${opts}</select>
-          <button type="button" onclick="drillMock()" class="rounded-lg bg-indigo-600 px-3 py-1.5 text-[11px] font-black text-white transition hover:bg-indigo-500">🌀 Mixed mock drill</button>
-          <button type="button" onclick="drillPast()" class="rounded-lg bg-amber-500 px-3 py-1.5 text-[11px] font-black text-white transition hover:bg-amber-400">📜 Past question drill</button>
-        </div>
-      </div>`;
+/** Exams available for the student's class level (JSS sees BECE; SS sees JAMB/WAEC/NECO/NABTEB). */
+function simPresetsForLevel() {
+  const lvl = String(state.profile.classLevel || 'SS3');
+  return EXAM_PRESETS.filter(p => p.levels.some(l => lvl.startsWith(l)));
 }
 
-function drillMock() {
-  const sel = document.getElementById('drill-subject');
-  if (sel) state.selectedSubject = sel.value;
-  startMockQuiz();
+/** The pre-exam interface at the top of the Practice Exam page:
+ *  pick the exam, pick the mode (study / mock / practice), then sit it. */
+function examSimSetupPanel() {
+  const avail = simPresetsForLevel();
+  if (!state.simSetup || !avail.some(p => p.key === state.simSetup.preset)) {
+    state.simSetup = { preset: avail.length ? avail[0].key : '', mode: (state.simSetup && SIM_MODES[state.simSetup.mode]) ? state.simSetup.mode : 'practice' };
+  }
+  const sel = state.simSetup;
+  const preset = avail.find(p => p.key === sel.preset) || avail[0];
+  return `
+    <section class="mb-4 rounded-2xl border-2 border-indigo-200 bg-gradient-to-br from-indigo-50 to-violet-50 p-5 shadow-card animate-fadeUp">
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <h3 class="text-sm font-bold text-indigo-900">🧪 Full exam simulations</h3>
+        <span class="rounded-full bg-indigo-100 px-2.5 py-1 text-[10px] font-black text-indigo-700">subject tabs · master clock · scorecard</span>
+      </div>
+      <p class="mt-1 text-[11px] leading-relaxed text-indigo-700">Sit a full paper across all your subjects before the real thing — switch subjects mid-exam exactly like the exam hall. Real WAEC/NECO/JAMB past questions are mixed into every paper.</p>
+      <h4 class="mt-3 text-[11px] font-black uppercase tracking-wide text-indigo-700">1 · Pick your exam</h4>
+      <div class="mt-1.5 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+        ${avail.map(p => `
+        <button type="button" onclick="setSimPreset('${p.key}')" class="rounded-xl border p-3 text-left transition ${sel.preset === p.key ? 'border-indigo-500 bg-white shadow-md ring-2 ring-indigo-200' : 'border-indigo-200 bg-white/60 hover:border-indigo-300'}">
+          <span class="block text-xs font-black text-slate-900">${sel.preset === p.key ? '✅ ' : ''}${p.name}</span>
+          <span class="mt-0.5 block text-[10px] leading-snug text-slate-500">${p.label}</span>
+        </button>`).join('')}
+      </div>
+      <h4 class="mt-3 text-[11px] font-black uppercase tracking-wide text-indigo-700">2 · Pick how you want to sit it</h4>
+      <div class="mt-1.5 grid gap-2 sm:grid-cols-3">
+        ${Object.entries(SIM_MODES).map(([k, m]) => `
+        <button type="button" onclick="setSimMode('${k}')" class="rounded-xl border p-3 text-left transition ${sel.mode === k ? 'border-indigo-500 bg-white shadow-md ring-2 ring-indigo-200' : 'border-indigo-200 bg-white/60 hover:border-indigo-300'}">
+          <span class="block text-xs font-black text-slate-900">${m.icon} ${m.name}${sel.mode === k ? ' ✅' : ''}</span>
+          <span class="mt-0.5 block text-[10px] leading-snug text-slate-500">${m.blurb}</span>
+        </button>`).join('')}
+      </div>
+      <button type="button" onclick="startExamSimFromPanel()" class="mt-4 w-full rounded-xl bg-indigo-600 px-6 py-3 text-xs font-black text-white transition hover:bg-indigo-500 sm:w-auto">🚀 Start ${preset ? preset.name : 'sitting'} · ${SIM_MODES[sel.mode].name}</button>
+      <p class="mt-2 text-[10px] font-semibold text-slate-400">${String(state.profile.classLevel || '').startsWith('JSS') ? 'Exams shown follow your class (Junior Secondary). Senior exams like JAMB and WAEC appear automatically when you move up to SS1.' : 'Your saved subjects become the sitting papers — edit them any time in your profile.'}</p>
+    </section>`;
 }
-function drillPast() {
-  const sel = document.getElementById('drill-subject');
-  if (sel) state.selectedSubject = sel.value;
-  startPastQuiz();
+
+function setSimPreset(key) {
+  state.simSetup = { ...(state.simSetup || {}), preset: key };
+  renderPage();
+}
+function setSimMode(mode) {
+  if (!SIM_MODES[mode]) return;
+  state.simSetup = { ...(state.simSetup || {}), mode };
+  renderPage();
+}
+function startExamSimFromPanel() {
+  const sel = state.simSetup || {};
+  startExamSim(sel.preset, sel.mode);
 }
 
 /** The sitting screen: subject tabs + question + palette + master clock. */
 function renderExamSimPage(el) {
   const sim = state.examSim;
+  const modeInfo = SIM_MODES[sim.mode] || SIM_MODES.practice;
   if (sim.submitted) {
     const r = sim.result;
     const weakest = r.perSubject.slice().sort((a, b) => a.pct - b.pct)[0];
     el.innerHTML = `
       <div class="mx-auto max-w-3xl animate-fadeUp">
         <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-card">
-          <p class="text-[10px] font-black uppercase tracking-wider text-indigo-500">Exam simulation · ${sim.exam}${r.auto ? ' · auto-submitted (time up)' : ''}</p>
+          <p class="text-[10px] font-black uppercase tracking-wider text-indigo-500">Exam simulation · ${sim.exam} · ${modeInfo.name}${r.auto ? ' · auto-submitted (time up)' : ''}</p>
           <h2 class="mt-1 text-xl font-black text-slate-900">Sitting scorecard</h2>
           <div class="mt-4 flex flex-wrap items-end gap-6">
             <div>
@@ -4088,6 +4119,29 @@ function renderExamSimPage(el) {
             </div>`).join('')}
           </div>
           ${weakest ? `<p class="mt-4 rounded-xl bg-amber-50 p-3 text-[11px] font-semibold text-amber-800">🔧 Fix first: <strong>${weakest.subject}</strong> (${weakest.pct}%). Run its weak-topic session, then sit this paper again — improvement between sittings is what examiners reward.</p>` : ''}
+          ${sim.mode !== 'mock' ? `
+          <div class="mt-4">
+            <p class="mb-2 text-[11px] font-black uppercase tracking-wider text-slate-400">Review answers</p>
+            <div class="space-y-2">
+              ${sim.sections.map((sec, si) => `
+              <details class="rounded-xl border border-slate-200 bg-white">
+                <summary class="cursor-pointer px-4 py-2.5 text-xs font-bold text-slate-700">📖 ${sec.subject} — ${r.perSubject[si].correct}/${sec.questions.length} correct</summary>
+                <div class="space-y-3 border-t border-slate-100 p-4">
+                  ${sec.questions.map((q, qi) => {
+                    const ch = sim.answers[si + '-' + qi];
+                    const ok = ch === q.correct;
+                    return `
+                    <div>
+                      <p class="text-[11px] font-bold leading-relaxed text-slate-800">${qi + 1}. ${q.q}</p>
+                      <p class="text-[11px] font-semibold ${ok ? 'text-emerald-700' : 'text-rose-600'}">Your answer: ${ch === undefined ? '— left blank' : q.options[ch]} ${ok ? '✓' : '✗'}</p>
+                      ${!ok ? `<p class="text-[11px] font-semibold text-emerald-700">Correct: ${q.options[q.correct]}</p>` : ''}
+                      ${q.e ? `<p class="text-[11px] leading-relaxed text-slate-500"><b>How it comes about:</b> ${q.e}</p>` : ''}
+                    </div>`;
+                  }).join('')}
+                </div>
+              </details>`).join('')}
+            </div>
+          </div>` : `<p class="mt-4 rounded-xl bg-slate-50 p-3 text-[11px] font-semibold text-slate-500">⏱ Mock mode keeps explanations hidden — sit it in <b>practice mode</b> to review every answer and why it is right.</p>`}
           <div class="mt-5 flex flex-wrap gap-2">
             <button type="button" onclick="startExamSim('${sim.presetKey}')" class="rounded-xl bg-indigo-600 px-4 py-2 text-xs font-bold text-white transition hover:bg-indigo-500">🔁 Sit it again</button>
             <button type="button" onclick="exitExamSim()" class="rounded-xl bg-slate-100 px-4 py-2 text-xs font-bold text-slate-700 transition hover:bg-slate-200">Back to drills</button>
@@ -4099,7 +4153,7 @@ function renderExamSimPage(el) {
   const sec = sim.sections[sim.subjectIdx];
   const q = sec.questions[sim.qIdx];
   const chosen = sim.answers[sim.subjectIdx + '-' + sim.qIdx];
-  const left = sim.deadline - Date.now();
+  const left = sim.deadline ? sim.deadline - Date.now() : 0;
   const answeredIn = (si) => sim.sections[si].questions.filter((_, qi) => sim.answers[si + '-' + qi] !== undefined).length;
   const totalAnswered = sim.sections.reduce((a, _, si) => a + answeredIn(si), 0);
   const totalQ = sim.sections.reduce((a, x) => a + x.questions.length, 0);
@@ -4107,13 +4161,13 @@ function renderExamSimPage(el) {
     <div class="mx-auto max-w-5xl animate-fadeUp">
       <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
         <div>
-          <p class="text-[10px] font-black uppercase tracking-wider text-indigo-500">Exam simulation in progress · ${sim.exam}</p>
+          <p class="text-[10px] font-black uppercase tracking-wider text-indigo-500">Exam simulation in progress · ${sim.exam} · ${modeInfo.name}</p>
           <p class="text-[11px] font-semibold text-slate-500">${totalAnswered}/${totalQ} answered · switch papers any time, just like the real hall</p>
         </div>
-        <div class="flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2">
+        ${sim.deadline ? `<div class="flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2">
           <span class="text-[10px] font-black uppercase tracking-wider text-slate-400">Time left</span>
           <span id="sim-clock" class="font-mono text-lg font-black text-white${left <= 300000 ? ' text-rose-400' : ''}">${simClockFmt(left)}</span>
-        </div>
+        </div>` : `<span class="rounded-xl bg-emerald-50 px-4 py-2 text-[11px] font-black text-emerald-700">📚 Study mode · no timer — every answer explained right away</span>`}
       </div>
       <div class="mb-3 flex gap-2 overflow-x-auto pb-1">
         ${sim.sections.map((x, si) => `
@@ -4131,13 +4185,25 @@ function renderExamSimPage(el) {
           </div>
           <h3 class="mb-4 text-sm font-bold leading-relaxed text-slate-900">${q.q}</h3>
           <div class="space-y-2">
-            ${q.options.map((opt, oi) => `
-            <button type="button" onclick="simSelect(${sim.qIdx}, ${oi})"
-              class="flex w-full items-start gap-3 rounded-xl border p-3 text-left transition ${chosen === oi ? 'border-indigo-500 bg-indigo-50 ring-1 ring-indigo-500' : 'border-slate-200 bg-white hover:border-indigo-300'}">
-              <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${chosen === oi ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600'} text-[10px] font-black">${'ABCD'[oi] || oi + 1}</span>
+            ${q.options.map((opt, oi) => {
+              const reveal = sim.mode === 'study' && chosen !== undefined;
+              const isCorrect = reveal && oi === q.correct;
+              const isWrong = reveal && oi === chosen && chosen !== q.correct;
+              const frame = isCorrect ? 'border-emerald-400 bg-emerald-50' : isWrong ? 'border-rose-400 bg-rose-50' : chosen === oi ? 'border-indigo-500 bg-indigo-50 ring-1 ring-indigo-500' : 'border-slate-200 bg-white hover:border-indigo-300';
+              const letter = isCorrect ? 'bg-emerald-600 text-white' : isWrong ? 'bg-rose-500 text-white' : chosen === oi ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600';
+              return `
+            <button type="button" ${reveal ? 'disabled' : `onclick="simSelect(${sim.qIdx}, ${oi})"`}
+              class="flex w-full items-start gap-3 rounded-xl border p-3 text-left transition ${frame}">
+              <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${letter} text-[10px] font-black">${isCorrect ? '✓' : isWrong ? '✗' : ('ABCD'[oi] || oi + 1)}</span>
               <span class="text-xs font-semibold leading-relaxed text-slate-700">${opt}</span>
-            </button>`).join('')}
+            </button>`; }).join('')}
           </div>
+          ${sim.mode === 'study' && chosen !== undefined ? `
+          <div class="mt-3 rounded-xl border ${chosen === q.correct ? 'border-emerald-200 bg-emerald-50' : 'border-rose-200 bg-rose-50'} p-3">
+            <p class="text-[11px] font-black ${chosen === q.correct ? 'text-emerald-700' : 'text-rose-700'}">${chosen === q.correct ? '✅ Correct!' : `❌ Not quite — the right answer is ${'ABCD'[q.correct] || q.correct}: ${q.options[q.correct]}`}</p>
+            ${q.e ? `<p class="mt-1 text-[11px] leading-relaxed text-slate-600"><b>How the answer comes about:</b> ${q.e}</p>` : '<p class="mt-1 text-[11px] text-slate-500">No stored explanation for this question.</p>'}
+            <button type="button" onclick="simNext()" class="mt-2 rounded-lg bg-slate-900 px-3 py-1.5 text-[11px] font-black text-white transition hover:bg-slate-700">Next question →</button>
+          </div>` : ''}
           <div class="mt-4 flex items-center justify-between">
             <button type="button" onclick="simPrev()" class="rounded-xl bg-slate-100 px-4 py-2 text-xs font-bold text-slate-700 transition hover:bg-slate-200">← Previous</button>
             <button type="button" onclick="simNext()" class="rounded-xl bg-indigo-600 px-4 py-2 text-xs font-bold text-white transition hover:bg-indigo-500">Next →</button>
@@ -4152,7 +4218,7 @@ function renderExamSimPage(el) {
             }).join('')}
           </div>
           <p class="mt-3 text-[10px] leading-snug text-slate-400">Green = answered. The clock never stops — manage your time across papers like a real candidate.</p>
-          <button type="button" onclick="confirmSubmitExamSim()" class="mt-3 w-full rounded-xl bg-emerald-600 px-4 py-2.5 text-xs font-black text-white transition hover:bg-emerald-500">✅ Submit sitting</button>
+          <button type="button" onclick="confirmSubmitExamSim()" class="mt-3 w-full rounded-xl bg-emerald-600 px-4 py-2.5 text-xs font-black text-white transition hover:bg-emerald-500">${sim.mode === 'study' ? '🏁 Finish study session' : '✅ Submit sitting'}</button>
         </aside>
       </div>
     </div>`;
@@ -4220,7 +4286,6 @@ function examCommandCenter() {
           class="rounded-lg border border-slate-200 px-2 py-1 text-[11px] font-semibold text-slate-600" />
         <span>set your real date for an exact countdown</span>
       </div>` : ''}
-      ${examSimLabHtml()}
     </section>`;
 }
 function setExamDate(v) {
@@ -5216,7 +5281,8 @@ Object.assign(window, {
   flipFlashcard, nextFlashcard, prevFlashcard, gotoFlashcard,
   markGot, markLater, setFlashFilter, restartFlash, dismissCelebration,
   startTopicQuiz, startMockQuiz, startPastQuiz, backToQuizList, openTopicCards,
-  startExamSim, simSelect, simSubject, simJump, simPrev, simNext, submitExamSim, confirmSubmitExamSim, exitExamSim, drillMock, drillPast, EXAM_PRESETS,
+  startExamSim, simSelect, simSubject, simJump, simPrev, simNext, submitExamSim, confirmSubmitExamSim, exitExamSim,
+  setSimPreset, setSimMode, startExamSimFromPanel, EXAM_PRESETS, SIM_MODES,
   setQuizCount, setQuizTimer, openFocusModal, closeFocusModal, focusModalBackdrop, startFocus, stopFocus, updateFocusPill, setExamDate,
   selectQuizAnswer, submitQuiz, retakeQuiz, examJump, examPrev, examNext, submitExam,
   sendChatMessage, askBuddy, clearChat, setResearch, saveGeminiKey, toggleGeminiPanel,
