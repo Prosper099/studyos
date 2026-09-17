@@ -3248,7 +3248,7 @@ function renderAssistant(el) {
       <div class="flex flex-col items-center gap-5 md:flex-row md:gap-7 md:text-left">
         <div class="buddy-orb" aria-hidden="true">🤖</div>
         <div>
-          <h2 class="text-3xl font-black leading-tight text-white md:text-4xl">What should we work on today${firstName ? ', ' + firstName : ''}?</h2>
+          <h2 class="text-3xl font-medium leading-tight md:text-4xl"><span class="bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">What should we work on today${firstName ? ', ' + firstName : ''}?</span></h2>
           <div class="buddy-taglines">
             <span>Let's make ${escapeHtml(state.profile.targetExam || 'your exam')} count. 🔥</span>
             <span>One topic, one quiz, one win at a time.</span>
@@ -3262,14 +3262,14 @@ function renderAssistant(el) {
     </div>`;
   el.innerHTML = `
     ${pageHeader('Buddy AI Tutor', 'Your built-in academic assistant. Ask for a definition, a formula, a worked example or exam strategy.')}
-    <div class="mx-auto flex h-[calc(100vh-16rem)] min-h-[26rem] max-w-3xl flex-col overflow-hidden rounded-2xl buddy-dark-card border border-slate-800 shadow-card">
-      <div class="flex items-center gap-3 border-b border-white/10 px-4 py-3">
+    <div class="mx-auto flex h-[calc(100vh-16rem)] min-h-[26rem] max-w-3xl flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-card">
+      <div class="flex items-center gap-3 border-b border-slate-200 px-4 py-3">
         <div class="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-600 text-base">🤖</div>
         <div class="min-w-0 flex-1">
-          <div class="text-sm font-bold text-white">Buddy</div>
-          <div class="flex items-center gap-1.5 text-[11px] text-emerald-400"><span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span> Online · ${BUDDY_KB.length} lessons in memory</div>
+          <div class="text-sm font-bold text-slate-900">Buddy</div>
+          <div class="flex items-center gap-1.5 text-[11px] text-emerald-600"><span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span> Online · ${BUDDY_KB.length} lessons in memory</div>
         </div>
-        <button type="button" onclick="clearChat()" class="rounded-lg bg-white/10 px-2.5 py-1.5 text-[11px] font-bold text-slate-200 transition hover:bg-white/20">Clear</button>
+        <button type="button" onclick="clearChat()" class="rounded-lg bg-slate-100 px-2.5 py-1.5 text-[11px] font-bold text-slate-600 transition hover:bg-slate-200">Clear</button>
       </div>
       ${monetizationOn ? `
       <div class="border-b border-slate-200 bg-slate-50 px-4 py-2">
@@ -3285,7 +3285,7 @@ function renderAssistant(el) {
         <div id="chat-chips" class="mb-2 flex gap-2 overflow-x-auto pb-1 no-scrollbar"></div>
         <form onsubmit="sendChatMessage(event)" class="flex items-end gap-2">
           <textarea id="chat-input" rows="1" placeholder="Ask Buddy anything about your subjects…"
-            class="nice-scroll max-h-28 flex-1 resize-none rounded-xl border p-2.5 text-xs outline-none border-[#2a3a5c] bg-[#18233a] text-slate-100 placeholder:text-[#8091b0] transition focus:border-indigo-400"
+            class="nice-scroll max-h-28 flex-1 resize-none rounded-xl border p-2.5 text-xs outline-none border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 transition focus:border-indigo-400"
             oninput="this.style.height='auto'; this.style.height=Math.min(this.scrollHeight,112)+'px'"></textarea>
           <button type="submit" class="shrink-0 rounded-xl bg-indigo-500 px-4 py-2.5 text-xs font-bold text-white transition hover:bg-indigo-400">Send</button>
         </form>
