@@ -1194,6 +1194,37 @@ check('stale streak resets on the next study activity (no freeze banked)',
 w.navigate('home');
 check('mission shows a live progress counter', /\d\/3 done/.test(page()) || page().includes('COMPLETE 3/3'));
 
+// ---------- manual activation loop (Buddy -> OPay -> WhatsApp key) ----------
+{
+  const st = T.getState();
+  const saved = { email: st.profile.email, plan: st.profile.plan, until: st.profile.planUntil };
+  st.profile.email = 'tester@studyos.app';
+  const code = T.activationKeyFor('tester@studyos.app', 'pro', T.monthBucket(0));
+  check('activation key is 8 characters starting with S (pro) or P (pack)', /^[SP][A-Z2-9]{7}$/.test(code), code);
+  check('pack keys carry the P prefix', T.activationKeyFor('tester@studyos.app', 'pack', T.monthBucket(0))[0] === 'P');
+  T.redeemActivationKey(code.toLowerCase());
+  check('redeeming your own key activates Pro for 30 days',
+    st.profile.plan === 'pro' && st.profile.planUntil > Date.now() + 29 * 86400000);
+  st.profile.plan = 'free'; st.profile.planUntil = 0;
+  T.redeemActivationKey(T.activationKeyFor('someone-else@studyos.app', 'pro', T.monthBucket(0)));
+  check('a key generated for another email does not unlock this student', st.profile.plan === 'free');
+  T.setMonetization(true);
+  st.profile.plan = 'pro'; st.profile.planUntil = Date.now() - 5000;
+  check('expired Pro drops back to the free tier', T.proActive() === false);
+  st.profile.planUntil = Date.now() + 10 * 86400000;
+  check('a Pro still inside its 30 days keeps the gates open', T.proActive() === true);
+  T.setMonetization(false);
+  T.activateViaBuddy('pro');
+  const last = st.chat[st.chat.length - 1];
+  check('Activate sends the student to Buddy with the account, the paid-ping and the key button',
+    st.page === 'assistant' && last && last.html.includes(T.OPAY_ACCOUNT)
+    && last.html.includes('I have paid') && last.html.includes('Enter key'));
+  T.openKeyEntry();
+  check('the activation popup opens ready for the key', !byId('key-modal').classList.contains('hidden'));
+  T.closeKeyEntry();
+  st.profile.email = saved.email; st.profile.plan = saved.plan; st.profile.planUntil = saved.until;
+}
+
 // ---------- one exam interface (legacy CBT hall removed) ----------
 w.backToQuizList();
 w.navigate('quiz');
