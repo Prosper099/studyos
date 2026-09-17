@@ -82,6 +82,7 @@ const state = {
 /* Live Gemini models (free tier). Buddy tries the chosen one first, then falls
    back down this list if Google has retired it — so a key never "just stops working". */
 const GEMINI_MODELS = ['gemini-2.5-flash', 'gemini-2.5-flash-lite', 'gemini-3.1-flash-lite', 'gemini-3-flash-preview'];
+const FOUNDER_GEMINI_KEY = ''; // Prosper: paste your free key from aistudio.google.com here so every student gets the smart Buddy
 
 const EXAM_OPTIONS = {
   SS: [
@@ -1108,6 +1109,7 @@ function buddyReply(rawInput) {
   if (subjectHit) {
     const list = BUDDY_KB.filter(e => e.subject === subjectHit).map(e => e.title);
     return {
+      miss: true,
       html: `<span class="tag">${subjectHit}</span><h4>Here is what I can explain in ${subjectHit}</h4>
         <ul>${list.map(t => `<li>${t}</li>`).join('')}</ul>
         <p>Pick one and I will give you the definition, the formula, a worked example and the trap examiners set.</p>`,
@@ -1118,33 +1120,81 @@ function buddyReply(rawInput) {
   // Nothing matched — be honest and helpful
   const suggestions = BUDDY_KB.slice(0, 3).map(e => e.title);
   return {
+    miss: true,
     html: mdToHtml(`I do not have a prepared lesson on that yet — I would rather say so than guess. 🤔\n\nTry asking about one of my strong topics: **centripetal force**, **redox reactions**, **quadratic equations**, **genetics**, **reported speech** or **${examStrategyChip()}**. You can also ask me to *solve* an equation step by step.`),
     chips: suggestions.map(t => `Explain ${t.toLowerCase()}`)
   };
 }
 
 
+function safeMath(input) {
+  const s = String(input || '').replace(/\s+/g, '').replace(/×/g, '*').replace(/÷/g, '/').replace(/-/g, '-');
+  if (!/^[\d+\-*/().]+$/.test(s) || !/\d/.test(s) || !/[+\-*/]/.test(s)) return null;
+  try {
+    let i = 0;
+    const expr = () => { let v = term(); while (s[i] === '+' || s[i] === '-') { const op = s[i++]; const r = term(); v = op === '+' ? v + r : v - r; } return v; };
+    const term = () => { let v = factor(); while (s[i] === '*' || s[i] === '/') { const op = s[i++]; const r = factor(); v = op === '*' ? v * r : v / r; } return v; };
+    const factor = () => {
+      if (s[i] === '-') { i++; return -factor(); }
+      if (s[i] === '+') { i++; return factor(); }
+      if (s[i] === '(') { i++; const v = expr(); if (s[i] !== ')') throw new Error('bad'); i++; return v; }
+      const m = /^\d+\.?\d*|^\.\d+/.exec(s.slice(i));
+      if (!m) throw new Error('bad');
+      i += m[0].length;
+      return parseFloat(m[0]);
+    };
+    const v = expr();
+    if (i !== s.length || !isFinite(v)) return null;
+    return { expr: s, value: v };
+  } catch (e) { return null; }
+}
+
+const SMALLTALK_RE = /^(hi|hello|hey|howdy|sup|good\s+(morning|afternoon|evening)|thanks?|thank you|well done|good job|appreciate|how are you|what'?s up|whats up|good night|bye|love you)\b/;
+
 /* ==================================================================
-   BUDDY AI ANSWERS — built-in syllabus engine + optional Gemini
-   1. Wikipedia (search + intro extract) — no API key, CORS enabled
-   2. DuckDuckGo Instant Answers — abstract + related topics, no key
-   3. Optional Gemini API key — Buddy synthesises an exam-focused answer
-      from the retrieved sources instead of quoting them.
+   BUDDY AI ANSWERS — built-in syllabus engine first; anything it does
+   not know goes to the Gemini tutor (no web scraping, no sources).
    ================================================================== */
-async function geminiAnswer(question, context) {
-  const key = (state.settings.geminiApiKey || '').trim();
+async function geminiCall(model, key, body) {
+  const res = await fetch(
+    'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent?key=' + encodeURIComponent(key),
+    { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  const json = await res.json().catch(() => null);
+  if (!res.ok) {
+    const err = new Error((json && json.error && json.error.message) || ('Gemini responded ' + res.status));
+    err.status = res.status;
+    throw err;
+  }
+  const text = json.candidates && json.candidates[0] && json.candidates[0].content
+    && json.candidates[0].content.parts && json.candidates[0].content.parts.map(p => p.text || '').join('\n');
+  return text && text.trim() ? text.trim() : null;
+}
+
+function geminiModelChain() {
+  const chosen = (state.settings.geminiModel || GEMINI_MODELS[0]).trim() || GEMINI_MODELS[0];
+  return [chosen, ...GEMINI_MODELS.filter(m => m !== chosen)];
+}
+
+function geminiRetryable(err) {
+  const m = String((err && err.message) || '').toLowerCase();
+  // retired model, or Google throttling ("high demand", quota, overload) → try next model
+  return err.status === 404 || err.status === 429 || err.status === 503
+    || /not found|deprecated|retired|no longer|unsupported|has been shut|high demand|resource exhausted|try again|overloaded|unavailable|capacity/i.test(m);
+}
+
+async function geminiAnswer(question) {
+  const key = (state.settings.geminiApiKey || FOUNDER_GEMINI_KEY || '').trim();
   if (!key) return null;
   const prompt = [
-    `You are Buddy, a friendly Nigerian secondary-school tutor preparing a ${state.profile.classLevel || 'secondary'} student for ${buddyExamLine()}.`,
-    'If the student is greeting you, making small talk or asking plain arithmetic, answer naturally and briefly like a friendly person — never use the definition/formula/example structure for those.',
-    'For genuine study questions, use this structure: a one-sentence definition, the key formula or rule, one worked example with numbers, and one common exam trap.',
+    `You are Buddy, a brilliant and friendly Nigerian secondary-school tutor. The student is in ${state.profile.classLevel || 'secondary'} and is preparing for ${buddyExamLine()}.`,
+    'Answer ANY question a student can ask — Mathematics, Physics, Chemistry, Biology, English, Literature, Economics, Commerce, Financial Accounting, Government, Geography, Agricultural Science, Computer Studies, Civic Education, Christian and Islamic Studies, current affairs or general knowledge.',
+    'For study questions use this exact structure: a one-sentence definition, the key formula or rule (if any), one worked example with real numbers, and one common exam trap.',
+    'For small talk, answer briefly and warmly like a real person, then invite a study question.',
     'Never use LaTeX or code markup: no dollar signs, no backslash commands, no curly braces around powers. Write plain readable text like x^2, 3/4, sqrt(x), pi, × and ÷, and write naira amounts as N500.',
-    'If the retrieved context below is irrelevant or empty, answer from your own knowledge and say so.',
+    'Keep it under 250 words. Use simple, correct Nigerian English. Never mention that you are an AI or a model.',
+    'If a question is harmful or not safe for a student, decline gently in one line and steer back to studying.',
     '',
-    'STUDENT QUESTION: ' + question,
-    '',
-    'RETRIEVED CONTEXT (cite it where useful):',
-    context || '(none)'
+    'STUDENT QUESTION: ' + question
   ].join('\n');
   const body = {
     contents: [{ role: 'user', parts: [{ text: prompt }] }],
@@ -1199,13 +1249,13 @@ async function testGemini() {
   toast('❌ ' + ((lastErr && lastErr.message) || 'Gemini could not be reached'));
 }
 
-/** Build the full Buddy answer from the built-in syllabus knowledge. */
+/** Build the full Buddy answer: built-in syllabus engine first, AI tutor for anything else. */
 async function composeAnswer(question) {
   const local = buddyReply(question);
   const chips = new Set(local.chips || []);
   const raw = String(question || '').trim().toLowerCase();
 
-  // Small talk and plain arithmetic get a human reply — no web research, no Gemini.
+  // Small talk and plain arithmetic get a human reply — fast, no AI needed.
   const arith = safeMath(raw);
   if (SMALLTALK_RE.test(raw) || arith) {
     if (arith) {
@@ -1219,7 +1269,18 @@ async function composeAnswer(question) {
     return { html: local.html, chips: [...chips].slice(0, 4) };
   }
 
-  return { html: local.html, chips: [...chips].slice(0, 4) };
+  // The built-in engine has a prepared lesson → use it (deterministic, syllabus-perfect).
+  if (!local.miss) return { html: local.html, chips: [...chips].slice(0, 4) };
+
+  // No prepared lesson → the AI tutor answers (needs a Gemini key).
+  const answer = await geminiAnswer(question);
+  if (answer && !answer.error) {
+    return { html: `<span class="tag">Buddy · tutor</span>${mdToHtml(answer)}`, chips: [...chips].slice(0, 4) };
+  }
+  const note = answer && answer.error
+    ? `<div class="box" style="border-left-color:#f59e0b">${escapeHtml(answer.error)} — here is what I can offer offline instead.</div>`
+    : '';
+  return { html: local.html + note, chips: [...chips].slice(0, 4) };
 }
 
 function round4(n) { return Math.round(n * 10000) / 10000; }
@@ -5299,7 +5360,7 @@ window.__STUDYOS_TEST__ = {
   gradeQuiz, mergeQuizStats, initials, startPastQuiz, examJump, examPrev, examNext, submitExam,
   scoreKb, buddyReply, plainMath, solveQuadratic, solveSimultaneous, extractCoeffs,
   topicsFor, quizFor, pastFor, PASTQ, buildQuiz, shuffled, flashFor, mdToHtml, escapeHtml, fmtQuad,
-  composeAnswer,
+  composeAnswer, geminiAnswer,
   CURRICULUM, BUDDY_KB, OPTIONS, LEVEL_CATALOGUE, EXAM_OPTIONS,
   subjectsForLevel, selectableSubjects, subjectIsAvailable, hydrateFromDoc,
   examsForLevel, renderOnboardStep, levelTopics, topicQuiz, cardsFor, buildStudyPlan,
