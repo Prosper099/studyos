@@ -55,10 +55,10 @@ const state = {
   authTab: 'login',
   installAvailable: false,
   installed: false,
-  onboard: { step: 1, classLevel: '', targetExam: '', subjects: [], targetScore: '', studyPref: '', guardianPhone: '' },
+  onboard: { step: 1, classLevel: '', targetExam: '', subjects: [], targetScore: '', studyPref: '' },
   selectedSubject: 'Mathematics',
   profile: {
-    name: '', email: '', classLevel: '', targetExam: '', targetScore: '', studyPref: '', guardianPhone: '', plan: 'free', planRef: '', planSince: '',
+    name: '', email: '', classLevel: '', targetExam: '', targetScore: '', studyPref: '', plan: 'free', planRef: '', planSince: '',
     subjects: [], onboarded: false
   },
   streak: 0,
@@ -3628,10 +3628,8 @@ function renderProfile(el) {
 
         <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-card">
           <h3 class="mb-1 text-sm font-bold text-slate-900">👨‍👩‍ Family &amp; plan</h3>
-          <p class="mb-3 text-[11px] text-slate-400">Reports go straight to your guardian's WhatsApp — this phone only ever shows a blurred teaser. And when you are ready for the full engine, go Pro.</p>
+          <p class="mb-3 text-[11px] text-slate-400">When you are ready for the full engine, go Pro.</p>
           <div class="flex flex-wrap items-center gap-2">
-            <button type="button" onclick="shareParentReport()" class="rounded-xl bg-emerald-600 px-4 py-2 text-[11px] font-black text-white transition hover:bg-emerald-500">📤 Send guardian my report</button>
-            <button type="button" onclick="navigate('parent')" class="rounded-xl bg-slate-100 px-4 py-2 text-[11px] font-black text-slate-700 transition hover:bg-slate-200">👪 Open Parent Report page →</button>
             ${monetizationOn ? (proActive() ? `<span class="rounded-full bg-amber-50 px-3 py-1.5 text-[11px] font-black text-amber-700">⭐ ${state.profile.plan === 'pack' ? 'JAMB Premium Pack active' : 'Pro active'}</span>` : `<button type="button" onclick="openUpgrade('plan')" class="rounded-xl bg-slate-900 px-4 py-2 text-[11px] font-black text-white transition hover:bg-slate-800">⭐ Upgrade to Pro — ₦${PRO_MONTHLY_NGN.toLocaleString()}/mo</button>`) : ''}
           </div>
           ${monetizationOn && !proActive() ? `<p class="mt-2 text-[10px] text-slate-400">Free today: ${Math.max(0, FREE_DAILY_QUIZZES - dailyQuizzesUsed())} quiz${FREE_DAILY_QUIZZES - dailyQuizzesUsed() === 1 ? '' : 'zes'} left · ${Math.max(0, FREE_DAILY_BUDDY - dailyBuddyUsed())} Buddy questions left.</p>` : ''}
@@ -3824,71 +3822,6 @@ function savePaystackKey(v) {
   saveProfile({});
   toast(state.settings.paystackKey ? 'Paystack key saved — card payments are live.' : 'Paystack key removed.');
 }
-function buildParentReport() {
-  const st = state.quizStats || {};
-  const acc = st.total ? Math.round((st.correct / st.total) * 100) : 0;
-  const now = new Date();
-  const week = Object.keys(st.days || {}).filter(d => {
-    const diff = (now - new Date(d + 'T00:00:00')) / 86400000;
-    return diff >= 0 && diff < 7;
-  }).length;
-  const weak = weakestTopicInfo();
-  return [
-    'StudyOS weekly report for ' + (state.profile.name || 'Student') + ' (' + (state.profile.classLevel || '') + ')',
-    'Active study days this week: ' + week,
-    'Questions answered so far: ' + (st.total || 0) + ' at ' + acc + '% accuracy',
-    'Quizzes taken: ' + (st.attempts || 0) + ' · best score ' + (st.bestPercent || 0) + '%',
-    weak.weakSub ? 'Current focus area: ' + weak.weakSub + (weak.weakTop ? ' — ' + weak.weakTop : '') + ' (' + (weak.topPct || weak.weakPct) + '%)' : 'Current focus area: building across subjects',
-    'Streak: ' + (state.streak || 0) + ' day(s). A little encouragement goes a long way! — StudyOS'
-  ].join('\n');
-}
-function shareParentReport() {
-  shareToGuardian();
-}
-function buildDetailedParentReport() {
-  const s = state.quizStats || {};
-  const acc = s.total ? Math.round((s.correct / s.total) * 100) : 0;
-  const now = new Date();
-  const daysKey = Object.keys(s.days || {});
-  const activeIn = n => daysKey.filter(d => { const diff = (now - new Date(d + 'T00:00:00')) / 86400000; return diff >= 0 && diff < n; }).length;
-  const weak = weakestTopicInfo();
-  const bySubject = Object.entries(s.bySubject || {});
-  const ranked = bySubject.slice().sort((a, b) => ((b[1].total ? b[1].correct / b[1].total : 0) - (a[1].total ? a[1].correct / a[1].total : 0)));
-  const hist = s.history || [];
-  const avg = arr => arr.length ? Math.round(arr.reduce((a, q) => a + q.p, 0) / arr.length) : null;
-  const a1 = avg(hist.slice(-5)), a0 = avg(hist.slice(-10, -5));
-  const trend = (a1 !== null && a0 !== null)
-    ? (a1 - a0 > 0 ? 'Improving (+' + (a1 - a0) + ' points over the last 5 quizzes)'
-      : a1 - a0 < 0 ? 'A tougher stretch lately (' + (a1 - a0) + ' points) — encouragement welcome'
-      : 'Steady and consistent')
-    : 'Still building history';
-  const lines = [
-    'STUDYOS DETAILED PROGRESS REPORT',
-    'Student: ' + (state.profile.name || 'Student') + ' (' + (state.profile.classLevel || '—') + ')',
-    'Target exam: ' + (state.profile.targetExam || '—'),
-    'Generated: ' + localISO(),
-    '',
-    'ACTIVITY',
-    '- Active study days (last 7 days): ' + activeIn(7),
-    '- Active study days (last 30 days): ' + activeIn(30),
-    '- Current streak: ' + (state.streak || 0) + ' day(s); freezes banked: ' + (state.streakFreezes || 0),
-    '',
-    'PERFORMANCE',
-    '- Quizzes taken: ' + (s.attempts || 0) + ' · best score: ' + (s.bestPercent || 0) + '%',
-    '- Questions answered: ' + (s.total || 0) + ' at ' + acc + '% accuracy',
-    '- Trend: ' + trend
-  ];
-  if (bySubject.length) {
-    lines.push('', 'BY SUBJECT');
-    bySubject.forEach(([subj, st]) => {
-      lines.push('- ' + subj + ': ' + (st.total ? Math.round((st.correct / st.total) * 100) : 0) + '% (' + (st.correct || 0) + '/' + (st.total || 0) + ' questions right)');
-    });
-    if (ranked.length) lines.push('- Strongest subject: ' + ranked[0][0]);
-  }
-  lines.push('- Focus area: ' + (weak.weakSub ? weak.weakSub + (weak.weakTop ? ' — ' + weak.weakTop : '') + ' (' + (weak.topPct || weak.weakPct) + '%)' : 'building across subjects'));
-  lines.push('', 'A little encouragement goes a long way! — StudyOS');
-  return lines.join('\n');
-}
 function computeStudyToDos() {
   const s = state.quizStats || {};
   const weak = weakestTopicInfo();
@@ -3898,174 +3831,6 @@ function computeStudyToDos() {
   todos.push('One 15-minute flashcard session on your weakest subject');
   todos.push(state.streak > 0 ? `Protect your ${state.streak}-day streak — study something today` : 'Start a new streak — one quiz today sets Day 1');
   return todos.slice(0, 4);
-}
-function wrapLines(text, max) {
-  const words = String(text).split(/\s+/);
-  const out = [];
-  let cur = '';
-  for (const w of words) {
-    if ((cur + ' ' + w).trim().length > max) { if (cur.trim()) out.push(cur.trim()); cur = w; }
-    else cur = cur ? cur + ' ' + w : w;
-  }
-  if (cur.trim()) out.push(cur.trim());
-  return out;
-}
-let lastCardH = 1260;
-function computeWriteup() {
-  const s = state.quizStats || {};
-  const acc = s.total ? Math.round((s.correct / s.total) * 100) : 0;
-  const weak = weakestTopicInfo();
-  const todos = computeStudyToDos();
-  const now = new Date();
-  const active7 = Object.keys(s.days || {}).filter(d => { const diff = (now - new Date(d + 'T00:00:00')) / 86400000; return diff >= 0 && diff < 7; }).length;
-  const hist = s.history || [];
-  const avg = arr => arr.length ? Math.round(arr.reduce((a, q) => a + q.p, 0) / arr.length) : null;
-  const a1 = avg(hist.slice(-5)), a0 = avg(hist.slice(-10, -5));
-  const trendText = (a1 !== null && a0 !== null)
-    ? (a1 - a0 > 0 ? 'Trend: improving, up ' + (a1 - a0) + ' points across the last five quizzes — keep it going!'
-      : a1 - a0 < 0 ? 'Trend: a tougher stretch, ' + (a1 - a0) + ' points over the last five quizzes — normal while tackling harder topics.'
-      : 'Trend: steady and consistent — reliability is a real strength.')
-    : 'Trend: still building history — a few more quizzes and the line sharpens.';
-  const name = state.profile.name || 'Student';
-  const cls = state.profile.classLevel || '';
-  const exam = state.profile.targetExam || '';
-  const analysis = [
-    `Overall, ${name} has answered ${s.total || 0} questions at ${acc}% accuracy across ${s.attempts || 0} quiz${(s.attempts || 0) === 1 ? '' : 'zes'}, with a best score of ${s.bestPercent || 0}%.`,
-    trendText,
-    weak.weakSub ? `Weak area: ${weak.weakSub}${weak.weakTop ? ' — ' + weak.weakTop : ''}, currently at ${weak.topPct || weak.weakPct}%. This is the single biggest opportunity for score growth right now.` : 'No weak areas flagged yet — building steadily across subjects.',
-    `Consistency: ${active7} active study day${active7 === 1 ? '' : 's'} this week with a ${state.streak || 0}-day streak and ${state.streakFreezes || 0} freeze${(state.streakFreezes || 0) === 1 ? '' : 's'} banked. A little encouragement goes a long way!`
-  ];
-  return { s, acc, weak, todos, hist, analysis, name, cls, exam };
-}
-function parentWriteupText() {
-  const wu = computeWriteup();
-  return '📚 StudyOS Progress Report — ' + wu.name + (wu.cls ? ' · ' + wu.cls : '') + (wu.exam ? ' · ' + wu.exam : '') +
-    '\n\n' + wu.analysis.map(l => '• ' + l).join('\n') +
-    '\n\nTO-DO THIS WEEK:\n' + wu.todos.map(t => '☐ ' + t).join('\n') +
-    '\n\nSent straight from the StudyOS app to the saved guardian number — reports are never rerouted. 💛';
-}
-function buildParentCardSvg() {
-  const wu = computeWriteup();
-  const s = wu.s, acc = wu.acc, weak = wu.weak, todos = wu.todos, hist = wu.hist, analysis = wu.analysis;
-  const bySubject = Object.entries(s.bySubject || {}).slice(0, 5);
-  const name = escapeHtml(wu.name);
-  const cls = escapeHtml(wu.cls);
-  const exam = escapeHtml(wu.exam);
-  const esc = t => escapeHtml(String(t));
-  const W = 750;
-  let y = 182;
-  const parts = [];
-  parts.push(`<text x="40" y="${y}" font-size="15" font-weight="800" fill="#1e293b" letter-spacing="1.5">PERFORMANCE</text>`);
-  const tiles = [
-    [acc + '%', 'accuracy', '#eef2ff', '#4338ca'],
-    [(s.attempts || 0) + '', 'quizzes', '#ecfdf5', '#047857'],
-    [(s.bestPercent || 0) + '%', 'best', '#fffbeb', '#b45309'],
-    ['🔥 ' + (state.streak || 0), 'streak', '#fff1f2', '#be123c']
-  ];
-  tiles.forEach((t, i) => {
-    const x = 40 + i * 172;
-    parts.push(`<rect x="${x}" y="${y + 14}" width="152" height="86" rx="18" fill="${t[2]}"/><text x="${x + 76}" y="${y + 58}" font-size="27" font-weight="800" fill="${t[3]}" text-anchor="middle">${esc(t[0])}</text><text x="${x + 76}" y="${y + 80}" font-size="12.5" font-weight="700" fill="#64748b" text-anchor="middle">${esc(t[1])}</text>`);
-  });
-  y += 148;
-  parts.push(`<text x="40" y="${y}" font-size="15" font-weight="800" fill="#1e293b" letter-spacing="1.5">IMPROVEMENT LINE</text>`);
-  const chartCore = chartSvgCore(hist, false);
-  const chartOnly = chartCore.slice(0, 4) === '<svg' ? chartCore.replace(/^<svg[^>]*>/, '').replace(/<\/svg>\s*$/, '') : '';
-  parts.push(`<g transform="translate(40, ${y + 14}) scale(1.047)">${chartOnly}</g>`);
-  y += 14 + 245;
-  if (bySubject.length) {
-    parts.push(`<text x="40" y="${y}" font-size="15" font-weight="800" fill="#1e293b" letter-spacing="1.5">BY SUBJECT</text>`);
-    bySubject.forEach(([subj, st], i) => {
-      const p = st.total ? Math.round((st.correct / st.total) * 100) : 0;
-      const yy = y + 26 + i * 44;
-      parts.push(`<text x="40" y="${yy + 4}" font-size="13.5" font-weight="700" fill="#334155">${esc(subj)}</text><text x="710" y="${yy + 4}" font-size="13.5" font-weight="800" fill="#64748b" text-anchor="end">${p}%</text><rect x="40" y="${yy + 12}" width="670" height="10" rx="5" fill="#eef2f7"/><rect x="40" y="${yy + 12}" width="${(670 * p / 100).toFixed(0)}" height="10" rx="5" fill="${p >= 70 ? '#10b981' : p >= 40 ? '#f59e0b' : '#f43f5e'}"/>`);
-    });
-    y += 26 + bySubject.length * 44 + 12;
-  } else {
-    parts.push(`<text x="40" y="${y + 24}" font-size="13.5" font-weight="600" fill="#94a3b8">No subject data yet — a couple of quizzes will fill this in.</text>`);
-    y += 48;
-  }
-  parts.push(`<text x="40" y="${y}" font-size="15" font-weight="800" fill="#1e293b" letter-spacing="1.5">ANALYSIS &amp; WEAK AREAS</text>`);
-  let ty = y + 26;
-  analysis.forEach(line => {
-    wrapLines(line, 88).forEach(wl => {
-      parts.push(`<text x="40" y="${ty}" font-size="13.5" font-weight="600" fill="#475569">${esc(wl)}</text>`);
-      ty += 21;
-    });
-    ty += 6;
-  });
-  y = ty + 14;
-  parts.push(`<text x="40" y="${y}" font-size="15" font-weight="800" fill="#1e293b" letter-spacing="1.5">TO-DO THIS WEEK</text>`);
-  todos.forEach((t, i) => {
-    const yy = y + 30 + i * 30;
-    parts.push(`<rect x="40" y="${yy - 13}" width="18" height="18" rx="6" fill="#eef2ff" stroke="#c7d2fe" stroke-width="1.5"/><text x="70" y="${yy + 2}" font-size="13.5" font-weight="600" fill="#334155">${esc(t)}</text>`);
-  });
-  y += 30 + todos.length * 30 + 34;
-  const H = y + 22;
-  lastCardH = H;
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif">
-    <rect width="${W}" height="${H}" rx="28" fill="#ffffff"/>
-    <rect width="${W}" height="156" rx="28" fill="#1e1b4b"/>
-    <rect y="128" width="${W}" height="28" fill="#1e1b4b"/>
-    <text x="40" y="62" font-size="24" font-weight="800" fill="#ffffff">📚 StudyOS Progress Report</text>
-    <text x="40" y="92" font-size="15" font-weight="700" fill="#a5b4fc">${name}${cls ? ' · ' + cls : ''}${exam ? ' · ' + exam : ''}</text>
-    <text x="40" y="118" font-size="12.5" font-weight="600" fill="#818cf8">${esc(localISO())} · studyos-academic.vercel.app</text>
-    ${parts.join('')}
-    <text x="${W / 2}" y="${H - 22}" font-size="11.5" font-weight="700" fill="#94a3b8" text-anchor="middle">Made with StudyOS — a little encouragement goes a long way 💛</text>
-  </svg>`;
-}
-function rasterizeParentCard(cb) {
-  try {
-    const svg = buildParentCardSvg();
-    const H = lastCardH;
-    const url = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
-    const img = new Image();
-    img.onload = () => {
-      const c = document.createElement('canvas');
-      c.width = W2X(750); c.height = W2X(H);
-      function W2X(v) { return v * 2; }
-      const ctx = c.getContext('2d');
-      ctx.scale(2, 2);
-      ctx.drawImage(img, 0, 0, 750, H);
-      c.toBlob(b => cb(b), 'image/png');
-    };
-    img.onerror = () => cb(null);
-    img.src = url;
-  } catch (e) { cb(null); }
-}
-function normalizeWaPhone(v) {
-  let d = String(v || '').replace(/\D+/g, '');
-  if (d.length === 11 && d.startsWith('0')) d = '234' + d.slice(1);
-  return d.length >= 10 && d.length <= 15 ? d : '';
-}
-function setGuardianPhone(v) {
-  if ($('#onboarding-modal').classList.contains('flex')) {
-    state.onboard.guardianPhone = v;
-  } else {
-    state.profile.guardianPhone = v;
-    saveProfile();
-  }
-}
-function shareToGuardian() {
-  const num = normalizeWaPhone(state.profile.guardianPhone);
-  if (!num) {
-    toast("Add your guardian’s WhatsApp number first 🙏");
-    const inp = $('#guardian-profile-input') || $('#guardian-input');
-    if (inp) inp.focus();
-    return;
-  }
-  toast('Preparing the report image…');
-  rasterizeParentCard(b => {
-    if (b) {
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(b);
-      a.download = 'StudyOS-Progress-Report-' + localISO() + '.png';
-      document.body.appendChild(a); a.click();
-      setTimeout(() => { try { URL.revokeObjectURL(a.href); a.remove(); } catch (e) { /* noop */ } }, 500);
-    }
-    const note = b ? '\n\n📎 The full report image was just saved to this phone — attach it in this chat and press send.' : '';
-    window.open('https://wa.me/' + num + '?text=' + encodeURIComponent(parentWriteupText() + note), '_blank');
-    toast("WhatsApp opened on your guardian’s chat ✅");
-  });
 }
 function lockTeaser(label) {
   return `<div class="rounded-xl border border-dashed border-amber-200 bg-amber-50/60 p-3">
@@ -4370,104 +4135,6 @@ function renderProgressPage(el) {
   `;
 }
 
-function renderParentPage(el) {
-  const s = state.quizStats || {};
-  const acc = s.total ? Math.round((s.correct / s.total) * 100) : 0;
-  const bySubject = Object.entries(s.bySubject || {});
-  const weak = weakestTopicInfo();
-  const todos = computeStudyToDos();
-  const now = new Date();
-  const activeIn = n => Object.keys(s.days || {}).filter(d => { const diff = (now - new Date(d + 'T00:00:00')) / 86400000; return diff >= 0 && diff < n; }).length;
-  const hist = s.history || [];
-  const avg = arr => arr.length ? Math.round(arr.reduce((a, q) => a + q.p, 0) / arr.length) : null;
-  const a1 = avg(hist.slice(-5)), a0 = avg(hist.slice(-10, -5));
-  const trendLine = (a1 !== null && a0 !== null)
-    ? (a1 - a0 > 0 ? `Scores are climbing — up ${a1 - a0} points across the last five quizzes. Whatever they are doing, it is working.`
-      : a1 - a0 < 0 ? `The last five quizzes dipped ${Math.abs(a1 - a0)} points — a normal part of tackling harder topics. Encouragement now matters more than ever.`
-      : 'Scores are holding steady and consistent — reliability is a real strength.')
-    : 'Not enough quiz history yet to compute a trend — the line will appear after a few more quizzes.';
-  el.innerHTML = `
-    ${pageHeader('Parent Report', 'The full picture as a shareable image: the graph, the analysis, weak areas and what to do next.')}
-    <section class="rounded-2xl border border-slate-200 bg-white p-4 shadow-card sm:p-5">
-      <h3 class="text-sm font-bold text-slate-900">🔒 Guardian report</h3>
-      <p class="mt-1 text-[11px] leading-relaxed text-slate-500">Only a blurred teaser shows on this phone. The full card — graph, analysis, weak areas and to-dos — goes straight to your parent or guardian on WhatsApp.</p>
-      <div class="relative mx-auto mt-4 w-40 sm:w-48">
-        <img id="parent-thumb" alt="Blurred report preview" class="w-full rounded-xl border border-slate-200 shadow-card" style="filter: blur(6px);" />
-        <div class="pointer-events-none absolute inset-0 flex items-center justify-center">
-          <span class="rounded-full bg-slate-900/70 px-3 py-1 text-[10px] font-black tracking-wide text-white">🔒 GUARDIAN ONLY</span>
-        </div>
-      </div>
-      <div class="mx-auto mt-4 max-w-sm">
-        <label class="text-[11px] font-black uppercase tracking-wide text-slate-400" for="guardian-profile-input">Guardian’s WhatsApp number</label>
-        <input id="guardian-profile-input" inputmode="tel" oninput="setGuardianPhone(this.value)" value="${escapeHtml(state.profile.guardianPhone || '')}" placeholder="e.g. 2348031234567 — country code first"
-          class="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm font-bold text-slate-800 outline-none focus:border-indigo-400 focus:bg-white" />
-      </div>
-      <div class="mt-4 flex justify-center">
-        <button type="button" onclick="shareToGuardian()" class="w-full max-w-sm rounded-xl bg-emerald-600 px-4 py-3.5 text-sm font-black text-white transition hover:bg-emerald-500">📤 Send full report to my guardian on WhatsApp</button>
-      </div>
-      <p class="mt-3 text-center text-[10px] leading-relaxed text-slate-400">The detailed image saves to this phone and WhatsApp opens directly on your guardian’s chat with the write-up typed in — attach the saved image and send. Reports always go to the saved number, never a chosen contact.</p>
-    </section>
-
-    <div class="mt-5 grid gap-5 lg:grid-cols-2">
-      <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-card">
-        <h3 class="mb-3 text-sm font-bold text-slate-900">📊 Performance analysis</h3>
-        <div class="grid grid-cols-2 gap-3">
-          <div class="rounded-xl bg-slate-50 p-3"><div class="text-xl font-bold text-slate-900">${activeIn(7)}/7</div><div class="text-[11px] text-slate-500">active days this week</div></div>
-          <div class="rounded-xl bg-slate-50 p-3"><div class="text-xl font-bold text-slate-900">${activeIn(30)}/30</div><div class="text-[11px] text-slate-500">active days this month</div></div>
-          <div class="rounded-xl bg-slate-50 p-3"><div class="text-xl font-bold text-slate-900">${acc}%</div><div class="text-[11px] text-slate-500">overall accuracy</div></div>
-          <div class="rounded-xl bg-slate-50 p-3"><div class="text-xl font-bold text-slate-900">🔥 ${state.streak || 0}</div><div class="text-[11px] text-slate-500">day streak · ❄️ ${state.streakFreezes || 0} freezes</div></div>
-        </div>
-        <p class="mt-4 rounded-xl bg-indigo-50/70 px-3 py-2.5 text-[11px] leading-relaxed text-indigo-900">📈 <b>Trend:</b> ${trendLine}</p>
-        ${bySubject.length ? `
-          <h4 class="mb-2 mt-4 text-[11px] font-black uppercase tracking-wide text-slate-400">Accuracy by subject</h4>
-          <div class="space-y-2">
-            ${bySubject.map(([subj, st]) => {
-              const pct = st.total ? Math.round((st.correct / st.total) * 100) : 0;
-              return `<div>
-                <div class="mb-1 flex justify-between text-[11px] font-bold"><span class="text-slate-600">${subj}</span><span class="text-slate-400">${pct}%</span></div>
-                <div class="h-1.5 overflow-hidden rounded-full bg-slate-100"><div class="h-full rounded-full ${subjectColor(subj).solid}" style="width:${pct}%"></div></div>
-              </div>`;
-            }).join('')}
-          </div>` : '<p class="mt-4 text-xs text-slate-400">Take a quiz and the analysis fills in here.</p>'}
-      </section>
-
-      <div class="space-y-5">
-        <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-card">
-          <h3 class="mb-3 text-sm font-bold text-slate-900">⚠️ Weak areas</h3>
-          ${weak.weakSub ? `
-            <div class="rounded-xl border border-orange-100 bg-orange-50 p-3.5">
-              <div class="text-xs font-black text-orange-700">${weak.weakSub}${weak.weakTop ? ' — ' + escapeHtml(weak.weakTop) : ''}</div>
-              <div class="mt-1 text-[11px] leading-relaxed text-orange-600">Scoring ${weak.topPct || weak.weakPct}% here — the single biggest opportunity for score growth right now.</div>
-            </div>
-            ${weak.strongSub ? `<p class="mt-3 text-[11px] leading-relaxed text-slate-500">💪 <b>Strongest:</b> ${weak.strongSub} at ${weak.strongPct}% — worth maintaining with one review quiz a week.</p>` : ''}
-          ` : `<p class="rounded-xl bg-emerald-50 px-3 py-3 text-[11px] font-semibold leading-relaxed text-emerald-700">✅ No weak areas flagged yet — keep building across subjects and the analysis sharpens.</p>`}
-        </section>
-
-        <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-card">
-          <h3 class="mb-3 text-sm font-bold text-slate-900">✅ To-dos this week</h3>
-          <ul class="space-y-2.5">
-            ${todos.map(t => `<li class="flex items-start gap-2.5 text-[11px] leading-relaxed text-slate-600">
-              <span class="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-md border-2 border-indigo-200 bg-indigo-50 text-[9px] font-black text-indigo-500">✓</span>
-              <span>${escapeHtml(t)}</span>
-            </li>`).join('')}
-          </ul>
-          <p class="mt-3 text-[10px] leading-relaxed text-slate-400">These to-dos are also written into the report card image and the detailed text — a parent can read them and cheer accordingly.</p>
-        </section>
-
-        <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-card">
-          <h3 class="mb-3 text-sm font-bold text-slate-900">🛡️ Privacy, always</h3>
-          <ul class="space-y-2 text-[11px] leading-relaxed text-slate-600">
-            <li class="flex gap-2"><span>✅</span><span><b>You are in control.</b> Nothing leaves the app until <i>you</i> download, copy or send it.</span></li>
-            <li class="flex gap-2"><span>✅</span><span><b>Effort, not judgement.</b> Reports show study days, questions answered and streaks. We listen, but we do not judge.</span></li>
-            <li class="flex gap-2"><span>✅</span><span><b>Private stays private.</b> Buddy chats, wrong answers and browsing are never included.</span></li>
-          </ul>
-          <button type="button" onclick="navigate('progress')" class="mt-4 w-full rounded-xl bg-slate-100 px-4 py-2.5 text-xs font-bold text-slate-700 transition hover:bg-slate-200">📈 My full progress page →</button>
-        </section>
-      </div>
-    </div>
-  `;
-  rasterizeParentCard(b => { const img = $('#parent-thumb'); if (img && b) img.src = URL.createObjectURL(b); });
-}
 
 /* ==================================================================
    NAVIGATION & SHELL
@@ -4481,7 +4148,6 @@ const PAGE_TITLES = {
   assistant: ['Buddy AI Tutor', 'Your built-in academic assistant'],
   profile: ['My Profile', 'Your progress and achievements'],
   progress: ['My Progress', 'Watch your improvement climb'],
-  parent: ['Parent Report', 'Share your week with the people rooting for you'],
   badges: ['Badges', 'Your trophy collection']
 };
 
@@ -4529,7 +4195,6 @@ function renderPage() {
     case 'assistant': renderAssistant(main); break;
     case 'profile': renderProfile(main); break;
     case 'progress': renderProgressPage(main); break;
-    case 'parent': renderParentPage(main); break;
     case 'badges': renderBadges(main); break;
     default: renderHome(main);
   }
@@ -4601,7 +4266,6 @@ async function saveProfile(patch) {
       targetExam: state.profile.targetExam || '',
       targetScore: state.profile.targetScore || '',
       studyPref: state.profile.studyPref || '',
-      guardianPhone: state.profile.guardianPhone || '',
       subjects: state.profile.subjects || [],
       onboarded: !!state.profile.onboarded,
       dept: state.profile.dept || '',
@@ -4686,7 +4350,6 @@ function hydrateFromDoc(data) {
     onboarded: !!data.onboarded,
     targetScore: data.targetScore || '',
     studyPref: data.studyPref || '',
-    guardianPhone: data.guardianPhone || '',
     dept: data.dept || '',
     examDate: data.examDate || '',
     plan: data.plan || 'free',
@@ -4848,7 +4511,7 @@ function startDemoMode() {
   } else {
     state.uid = 'demo-local-user';
     state.profile = {
-      name: 'Demo Student', email: 'demo@studyos.local', classLevel: '', targetExam: '', targetScore: '', studyPref: '', guardianPhone: '',
+      name: 'Demo Student', email: 'demo@studyos.local', classLevel: '', targetExam: '', targetScore: '', studyPref: '',
       subjects: [], onboarded: false
     };
   }
@@ -4888,8 +4551,7 @@ function openOnboarding() {
     targetExam: state.profile.targetExam || '',
     subjects: (state.profile.subjects || []).slice(),
     targetScore: state.profile.targetScore || '',
-    studyPref: state.profile.studyPref || '',
-    guardianPhone: state.profile.guardianPhone || ''
+    studyPref: state.profile.studyPref || ''
   };
   show($('#onboarding-modal'), true);
   $('#onboarding-modal').classList.add('flex');
@@ -4977,13 +4639,7 @@ function renderOnboardStep() {
         <span class="text-sm ${o.studyPref === p.id ? 'text-indigo-600' : 'text-slate-300'}">${o.studyPref === p.id ? '●' : '○'}</span>
       </button>`).join('');
   } else {
-    $('#step-6').innerHTML = `
-      <div class="mb-3 rounded-xl border border-slate-200 bg-white p-4 text-left">
-        <div class="text-sm font-bold text-slate-900">👨👩‍ Parent / guardian WhatsApp number</div>
-        <p class="mb-2 mt-0.5 text-[11px] text-slate-500">Progress reports go straight to this number, so they can never be rerouted or edited. Required to finish.</p>
-        <input id="guardian-input" inputmode="tel" oninput="setGuardianPhone(this.value)" value="${escapeHtml(o.guardianPhone || '')}" placeholder="e.g. 2348031234567 — country code first"
-          class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm font-bold text-slate-800 outline-none focus:border-indigo-400 focus:bg-white" />
-      </div>` + planPreviewHtml();
+    $('#step-6').innerHTML = planPreviewHtml();
   }
 }
 
@@ -5014,11 +4670,9 @@ async function onboardNext() {
     (o.step === 1 && !o.classLevel) || (o.step === 2 && !o.targetExam) ||
     (o.step === 3 && (String(o.classLevel).startsWith('SS') ? !o.dept : false)) ||
     (o.step === 3 && o.subjects.length === 0) || (o.step === 4 && !o.targetScore) ||
-    (o.step === 5 && !o.studyPref) || (o.step === 6 && !normalizeWaPhone(o.guardianPhone));
+    (o.step === 5 && !o.studyPref);
   if (invalid) {
-    err.textContent = o.step === 3 ? 'Select at least one subject to continue.'
-      : o.step === 6 ? "Add your parent or guardian’s WhatsApp number to finish."
-      : 'Please make a selection to continue.';
+    err.textContent = o.step === 3 ? 'Select at least one subject to continue.' : 'Please make a selection to continue.';
     show(err, true);
     return;
   }
@@ -5034,7 +4688,6 @@ async function onboardNext() {
   state.profile.subjects = o.subjects.slice();
   state.profile.targetScore = o.targetScore;
   state.profile.studyPref = o.studyPref;
-  state.profile.guardianPhone = normalizeWaPhone(o.guardianPhone) || '';
   state.profile.onboarded = true;
   if (!state.profile.subjects.includes(state.selectedSubject)) {
     state.selectedSubject = state.profile.subjects[0];
@@ -5165,7 +4818,6 @@ async function handleUser(user) {
       targetExam: state.profile.targetExam || '',
       targetScore: state.profile.targetScore || '',
       studyPref: state.profile.studyPref || '',
-      guardianPhone: state.profile.guardianPhone || '',
       subjects: state.profile.subjects || [],
       onboarded: !!state.profile.onboarded,
       streak: state.streak,
@@ -5303,15 +4955,15 @@ Object.assign(window, {
   setQuizCount, setQuizTimer, openFocusModal, closeFocusModal, focusModalBackdrop, startFocus, stopFocus, updateFocusPill, setExamDate,
   selectQuizAnswer, submitQuiz, retakeQuiz, examJump, examPrev, examNext, submitExam,
   sendChatMessage, askBuddy, clearChat, setResearch, saveGeminiKey, toggleGeminiPanel,
-  openUpgrade, closeUpgrade, upgradeBackdrop, choosePlan, founderUnlock, whatsappUpgrade, savePaystackKey, shareParentReport,
-  dismissFreezeIce, shareToGuardian, setGuardianPhone, installStudyOS, dismissInstall,
+  openUpgrade, closeUpgrade, upgradeBackdrop, choosePlan, founderUnlock, whatsappUpgrade, savePaystackKey,
+  dismissFreezeIce, installStudyOS, dismissInstall,
   setGeminiModel, testGemini,
 });
 
 /* Test hook (used by the automated checks) */
 window.__STUDYOS_TEST__ = {
   computeStreak, applyStreak, BADGES, FREEZE_EVERY_TASKS, MAX_FREEZES,
-  checkBadges, recordTask, persistProgress, checkStreakOnEntry, buildDetailedParentReport, computeStudyToDos, buildParentCardSvg,
+  checkBadges, recordTask, persistProgress, checkStreakOnEntry, computeStudyToDos,
   gradeQuiz, mergeQuizStats, initials, startPastQuiz, examJump, examPrev, examNext, submitExam,
   scoreKb, buddyReply, plainMath, solveQuadratic, solveSimultaneous, extractCoeffs,
   topicsFor, quizFor, pastFor, PASTQ, buildQuiz, shuffled, flashFor, mdToHtml, escapeHtml, fmtQuad,
@@ -5321,7 +4973,7 @@ window.__STUDYOS_TEST__ = {
   examsForLevel, renderOnboardStep, levelTopics, topicQuiz, cardsFor, buildStudyPlan,
   markGot, markLater, pushHistory, progressChartSvg, activityHeatSvg, shuffleOptions, localISO,
   examCountdown, subjectReadiness, gradeBand, predictedScore, targetNumber, examCommandCenter, examDateEstimate,
-  proActive, quizGate, buddyGate, activatePlan, buildParentReport, FREE_DAILY_QUIZZES, FREE_DAILY_BUDDY, closeUpgrade, setMonetization,
+  proActive, quizGate, buddyGate, activatePlan, FREE_DAILY_QUIZZES, FREE_DAILY_BUDDY, closeUpgrade, setMonetization,
   getState: () => state
 };
 

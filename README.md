@@ -58,9 +58,6 @@ JSS students only ever see BECE-appropriate content; SS students see JAMB/WAEC/N
   live (Wikipedia + DuckDuckGo) when it doesn't know something. Optional Gemini API key.
 - **Google Sign-In + cloud sync** — streaks, preferences and quiz stats sync to Firestore
   under `users/{uid}`. Works fully offline in Demo Mode (localStorage fallback).
-- **Parent report** — onboarding captures the guardian's WhatsApp number; the phone shows only a
-  blurred teaser, and one button sends the detailed report image + write-up straight to the
-  guardian's chat (never a chosen contact), so reports can't be rerouted or doctored.
 - **Premium engine** — a complete freemium + Paystack checkout system is built in but
   **dormant** (`monetizationOn = false`): everything is unlocked while StudyOS grows.
 
