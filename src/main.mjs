@@ -1125,128 +1125,12 @@ function buddyReply(rawInput) {
 
 
 /* ==================================================================
-   BUDDY ONLINE RESEARCH — live internet access
+   BUDDY AI ANSWERS — built-in syllabus engine + optional Gemini
    1. Wikipedia (search + intro extract) — no API key, CORS enabled
    2. DuckDuckGo Instant Answers — abstract + related topics, no key
    3. Optional Gemini API key — Buddy synthesises an exam-focused answer
       from the retrieved sources instead of quoting them.
    ================================================================== */
-const RESEARCH = {
-  wikipedia: async (query) => {
-    const url = 'https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*'
-      + '&prop=extracts&exintro=1&explaintext=1&exchars=1400&redirects=1'
-      + '&generator=search&gsrsearch=' + encodeURIComponent(query) + '&gsrlimit=2';
-    const res = await fetch(url);
-    if (!res.ok) throw new Error('Wikipedia responded ' + res.status);
-    const json = await res.json();
-    const pages = (json.query && json.query.pages) || {};
-    return Object.values(pages)
-      .filter(pg => pg.extract && pg.title)
-      .sort((a, b) => (a.index || 99) - (b.index || 99))
-      .slice(0, 2)
-      .map(pg => ({
-        title: pg.title,
-        text: pg.extract.trim(),
-        url: 'https://en.wikipedia.org/wiki/' + encodeURIComponent(pg.title.replace(/ /g, '_'))
-      }));
-  },
-  duckduckgo: async (query) => {
-    const url = 'https://api.duckduckgo.com/?q=' + encodeURIComponent(query)
-      + '&format=json&no_html=1&skip_disambig=1&t=studyos';
-    const res = await fetch(url);
-    if (!res.ok) throw new Error('DuckDuckGo responded ' + res.status);
-    const json = await res.json();
-    const related = (json.RelatedTopics || [])
-      .filter(t => t && t.Text && t.FirstURL)
-      .slice(0, 4)
-      .map(t => ({ title: t.Text.split(' - ')[0].slice(0, 90), text: t.Text, url: t.FirstURL }));
-    if (json.AbstractText) {
-      return [{ title: json.Heading || query, text: json.AbstractText, url: json.AbstractURL || '' }].concat(related);
-    }
-    return related;
-  },
-  // Textbook-style wikis: same MediaWiki API as Wikipedia, CORS-open with origin=*
-  wikibooks: async (query) => {
-    const url = 'https://en.wikibooks.org/w/api.php?action=query&format=json&origin=*'
-      + '&prop=extracts&exintro=1&explaintext=1&exchars=900&redirects=1'
-      + '&generator=search&gsrsearch=' + encodeURIComponent(query) + '&gsrlimit=1';
-    const res = await fetch(url);
-    if (!res.ok) throw new Error('Wikibooks responded ' + res.status);
-    const json = await res.json();
-    return Object.values((json.query && json.query.pages) || {})
-      .filter(pg => pg.extract && pg.title)
-      .map(pg => ({ title: pg.title, text: pg.extract.trim(),
-        url: 'https://en.wikibooks.org/wiki/' + encodeURIComponent(pg.title.replace(/ /g, '_')) }));
-  },
-  wikiversity: async (query) => {
-    const url = 'https://en.wikiversity.org/w/api.php?action=query&format=json&origin=*'
-      + '&prop=extracts&exintro=1&explaintext=1&exchars=900&redirects=1'
-      + '&generator=search&gsrsearch=' + encodeURIComponent(query) + '&gsrlimit=1';
-    const res = await fetch(url);
-    if (!res.ok) throw new Error('Wikiversity responded ' + res.status);
-    const json = await res.json();
-    return Object.values((json.query && json.query.pages) || {})
-      .filter(pg => pg.extract && pg.title)
-      .map(pg => ({ title: pg.title, text: pg.extract.trim(),
-        url: 'https://en.wikiversity.org/wiki/' + encodeURIComponent(pg.title.replace(/ /g, '_')) }));
-  }
-};
-
-/** Fetch live sources for a question. Never throws — returns what it could get. */
-async function researchOnline(question) {
-  const out = { sources: [], errors: [] };
-  const q = String(question || '').trim();
-  if (!q) return out;
-  const jobs = [
-    RESEARCH.wikipedia(q).then(r => { out.sources.push(...r.map(s => ({ ...s, from: 'Wikipedia' }))); })
-      .catch(e => out.errors.push('Wikipedia: ' + (e.message || e))),
-    RESEARCH.duckduckgo(q).then(r => { out.sources.push(...r.map(s => ({ ...s, from: 'DuckDuckGo' }))); })
-      .catch(e => out.errors.push('DuckDuckGo: ' + (e.message || e))),
-    RESEARCH.wikibooks(q).then(r => { out.sources.push(...r.map(s => ({ ...s, from: 'Wikibooks' }))); })
-      .catch(e => out.errors.push('Wikibooks: ' + (e.message || e))),
-    RESEARCH.wikiversity(q).then(r => { out.sources.push(...r.map(s => ({ ...s, from: 'Wikiversity' }))); })
-      .catch(e => out.errors.push('Wikiversity: ' + (e.message || e)))
-  ];
-  await Promise.all(jobs);
-  // de-duplicate by URL
-  const seen = new Set();
-  out.sources = out.sources.filter(s => {
-    const key = (s.url || s.title).toLowerCase();
-    if (seen.has(key)) return false;
-    seen.add(key);
-    return true;
-  }).slice(0, 5);
-  return out;
-}
-
-/** Optional Gemini synthesis. Only runs if the student supplied a key. */
-async function geminiCall(model, key, body) {
-  const res = await fetch(
-    'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent?key=' + encodeURIComponent(key),
-    { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-  const json = await res.json().catch(() => null);
-  if (!res.ok) {
-    const err = new Error((json && json.error && json.error.message) || ('Gemini responded ' + res.status));
-    err.status = res.status;
-    throw err;
-  }
-  const text = json.candidates && json.candidates[0] && json.candidates[0].content
-    && json.candidates[0].content.parts && json.candidates[0].content.parts.map(p => p.text || '').join('\n');
-  return text && text.trim() ? text.trim() : null;
-}
-
-function geminiModelChain() {
-  const chosen = (state.settings.geminiModel || GEMINI_MODELS[0]).trim() || GEMINI_MODELS[0];
-  return [chosen, ...GEMINI_MODELS.filter(m => m !== chosen)];
-}
-
-function geminiRetryable(err) {
-  const m = String((err && err.message) || '').toLowerCase();
-  // retired model, or Google throttling ("high demand", quota, overload) → try next model
-  return err.status === 404 || err.status === 429 || err.status === 503
-    || /not found|deprecated|retired|no longer|unsupported|has been shut|high demand|resource exhausted|try again|overloaded|unavailable|capacity/i.test(m);
-}
-
 async function geminiAnswer(question, context) {
   const key = (state.settings.geminiApiKey || '').trim();
   if (!key) return null;
@@ -1315,45 +1199,7 @@ async function testGemini() {
   toast('❌ ' + ((lastErr && lastErr.message) || 'Gemini could not be reached'));
 }
 
-function sourcesHtml(sources) {
-  if (!sources || !sources.length) return '';
-  return `<h4>🌐 Sources</h4><ul>${sources.map(s =>
-    `<li><a href="${s.url}" target="_blank" rel="noopener noreferrer" class="font-semibold text-indigo-600 underline decoration-indigo-300 hover:decoration-indigo-600">${escapeHtml(s.title)}</a>
-     <span class="text-slate-400">· ${escapeHtml(s.from || '')}</span></li>`).join('')}</ul>`;
-}
-
-function researchHtml(sources) {
-  if (!sources || !sources.length) return '';
-  return `<h4>🔎 Live from the web</h4>${sources.slice(0, 2).map(s =>
-    `<div class="box"><b>${escapeHtml(s.title)}</b><br>${escapeHtml(s.text.slice(0, 700))}${s.text.length > 700 ? '…' : ''}</div>`).join('')}`;
-}
-
-/* Safe four-operator calculator: digits and + - * / ( ) only, parsed by hand (never eval). */
-function safeMath(input) {
-  const s = String(input || '').replace(/\s+/g, '').replace(/×/g, '*').replace(/÷/g, '/').replace(/-/g, '-');
-  if (!/^[\d+\-*/().]+$/.test(s) || !/\d/.test(s) || !/[+\-*/]/.test(s)) return null;
-  try {
-    let i = 0;
-    const expr = () => { let v = term(); while (s[i] === '+' || s[i] === '-') { const op = s[i++]; const r = term(); v = op === '+' ? v + r : v - r; } return v; };
-    const term = () => { let v = factor(); while (s[i] === '*' || s[i] === '/') { const op = s[i++]; const r = factor(); v = op === '*' ? v * r : v / r; } return v; };
-    const factor = () => {
-      if (s[i] === '-') { i++; return -factor(); }
-      if (s[i] === '+') { i++; return factor(); }
-      if (s[i] === '(') { i++; const v = expr(); if (s[i] !== ')') throw new Error('bad'); i++; return v; }
-      const m = /^\d+\.?\d*|^\.\d+/.exec(s.slice(i));
-      if (!m) throw new Error('bad');
-      i += m[0].length;
-      return parseFloat(m[0]);
-    };
-    const v = expr();
-    if (i !== s.length || !isFinite(v)) return null;
-    return { expr: s, value: v };
-  } catch (e) { return null; }
-}
-
-const SMALLTALK_RE = /^(hi|hello|hey|howdy|sup|good\s+(morning|afternoon|evening)|thanks?|thank you|well done|good job|appreciate|how are you|what'?s up|whats up|good night|bye|love you)\b/;
-
-/** Build the full Buddy answer: local knowledge + optional live research. */
+/** Build the full Buddy answer from the built-in syllabus knowledge. */
 async function composeAnswer(question) {
   const local = buddyReply(question);
   const chips = new Set(local.chips || []);
@@ -1373,32 +1219,7 @@ async function composeAnswer(question) {
     return { html: local.html, chips: [...chips].slice(0, 4) };
   }
 
-  if (!state.settings.research) {
-    return { html: local.html, chips: [...chips].slice(0, 4) };
-  }
-
-  const research = await researchOnline(question);
-  const context = research.sources
-    .map(s => `[${s.from}] ${s.title}: ${s.text.slice(0, 1200)}`).join('\n\n');
-
-  let head = local.html;
-  let geminiNote = '';
-
-  if ((state.settings.geminiApiKey || '').trim()) {
-    const answer = await geminiAnswer(question, context);
-    if (answer && !answer.error) {
-      head = `<span class="tag">Buddy · live research</span>${mdToHtml(answer)}`;
-    } else if (answer && answer.error) {
-      geminiNote = `<div class="box" style="border-left-color:#f59e0b">Gemini key issue: ${escapeHtml(answer.error)} — showing the built-in answer and raw sources instead.</div>`;
-    }
-  }
-
-  const body = research.sources.length
-    ? `${geminiNote}${head}${researchHtml(research.sources)}${sourcesHtml(research.sources)}`
-    : `${geminiNote}${head}<div class="box" style="border-left-color:#f59e0b">I could not reach the internet for this one${research.errors.length ? ' (' + escapeHtml(research.errors[0]) + ')' : ''} — here is my built-in lesson instead.</div>`;
-
-  chips.add('Search the web: ' + question.slice(0, 40));
-  return { html: body, chips: [...chips].slice(0, 4) };
+  return { html: local.html, chips: [...chips].slice(0, 4) };
 }
 
 function round4(n) { return Math.round(n * 10000) / 10000; }
@@ -2151,7 +1972,8 @@ function shuffleOptions(q) {
  *  count = 0 means "everything available". Topic quizzes top up from the mixed
  *  bank and past papers when the student asks for more questions than the topic has. */
 function buildQuiz(subject, mode, level, topicIdx) {
-  const count = state.quizSetup.count > 0 ? state.quizSetup.count : Infinity;
+  const wantCount = state.quizSetup.count > 0 ? state.quizSetup.count : Infinity;
+  const count = proActive() ? wantCount : Math.min(wantCount === Infinity ? FREE_TASTE_QUIZ : wantCount, FREE_TASTE_QUIZ);
   let pool = [];
   const cls = state.profile.classLevel || 'SS3';
   const isJss = String(cls).startsWith('JSS');
@@ -2517,13 +2339,28 @@ function renderStudy(el) {
     </div>`;
 }
 
+function bundleLockHtml(icon, title, line, reason) {
+  return `
+    <div class="mx-auto max-w-md rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-card animate-fadeUp">
+      <div class="text-4xl">${icon}</div>
+      <h2 class="mt-3 text-lg font-black text-slate-900">${title}</h2>
+      <p class="mt-2 text-xs leading-relaxed text-slate-500">${line} One payment of ₦${PRO_PACK_NGN.toLocaleString()} unlocks everything — forever.</p>
+      <button type="button" onclick="openUpgrade('${reason}')" class="mt-4 rounded-xl bg-indigo-600 px-5 py-2.5 text-xs font-black text-white transition hover:bg-indigo-500">⭐ See the Bundle</button>
+    </div>`;
+}
+function backToStudy() { activeTopic = null; navigate('study'); }
 function renderTopic(el, subject, title) {
   const topic = topicsFor(subject, state.profile.classLevel).find(t => t.title === title)
     || topicsFor(subject, 'SS3').find(t => t.title === title);
   if (!topic) { renderStudy(el); return; }
+  if (!proActive()) {
+    el.innerHTML = `<button type="button" onclick="backToStudy()" class="mb-4 inline-flex items-center gap-1.5 rounded-xl bg-white px-3 py-2 text-xs font-bold text-slate-600 ring-1 ring-inset ring-slate-200 transition hover:text-indigo-600">← Back to ${subject}</button>`
+      + bundleLockHtml('📖', topic.title, 'Full lesson notes are part of the StudyOS Bundle.', 'notes');
+    return;
+  }
   const c = subjectColor(subject);
   el.innerHTML = `
-    <button type="button" onclick="navigate('study')" class="mb-4 inline-flex items-center gap-1.5 rounded-xl bg-white px-3 py-2 text-xs font-bold text-slate-600 ring-1 ring-inset ring-slate-200 transition hover:text-indigo-600">← Back to ${subject}</button>
+    <button type="button" onclick="backToStudy()" class="mb-4 inline-flex items-center gap-1.5 rounded-xl bg-white px-3 py-2 text-xs font-bold text-slate-600 ring-1 ring-inset ring-slate-200 transition hover:text-indigo-600">← Back to ${subject}</button>
     <article class="rounded-2xl border border-slate-200 bg-white p-5 shadow-card md:p-7 animate-fadeUp">
       <div class="mb-4 flex flex-wrap items-center gap-2">
         <span class="rounded-full ${c.bg} ${c.text} px-2.5 py-1 text-[11px] font-bold">${subject} · ${topic.level}</span>
@@ -2692,6 +2529,7 @@ function confettiBurst() {
 }
 
 function renderFlashcards(el) {
+  if (!proActive()) { el.innerHTML = bundleLockHtml('🃏', 'Flashcards', 'Memory cards are part of the StudyOS Bundle.', 'cards'); return; }
   const subject = state.selectedSubject;
   const level = state.profile.classLevel || 'SS3';
   const f = state.flash;
@@ -3371,11 +3209,6 @@ function renderAssistant(el) {
       </div>
 
       <div class="flex flex-wrap items-center gap-2 border-b border-slate-200 bg-slate-50 px-4 py-2">
-        <button type="button" onclick="setResearch(${state.settings.research ? 'false' : 'true'})"
-          class="flex items-center gap-2 rounded-full px-2.5 py-1 text-[11px] font-bold transition ${state.settings.research ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-500'}">
-          <span class="h-2 w-2 rounded-full ${state.settings.research ? 'bg-emerald-500' : 'bg-slate-400'}"></span>
-          🌐 Live internet research: ${state.settings.research ? 'ON' : 'OFF'}
-        </button>
         <span class="text-[11px] text-slate-400">${state.settings.geminiApiKey ? '✨ Gemini synthesis active' : 'Sources: Wikipedia + DuckDuckGo'}</span>
         <div id="gemini-panel" class="hidden w-full rounded-xl border border-indigo-100 bg-white p-3">
           <label class="block text-[11px] font-bold text-slate-700" for="gemini-key">Optional: Gemini API key (Buddy writes its own answers from the sources)</label>
@@ -3421,7 +3254,7 @@ function renderAssistant(el) {
 
   const box = $('#chat-box');
   if (!state.chat.length) {
-    pushChat('buddy', mdToHtml(`Hi${state.profile.name ? ' **' + state.profile.name.split(' ')[0] + '**' : ''}! I'm **Buddy** 🤖\n\nI know the core syllabus for **${(state.profile.subjects && state.profile.subjects.length ? state.profile.subjects : Object.keys(CURRICULUM)).join(', ')}** — definitions, formulas, worked examples and the traps examiners love. I can **solve equations step by step**, and with **live research** turned on I also pull current information from **Wikipedia and DuckDuckGo** and cite every source, so my answers never go stale.\n\nWhat would you like to learn today?`), ['Centripetal force', 'Quadratic equations', 'Redox reactions', 'JAMB exam strategy']);
+    pushChat('buddy', mdToHtml(`Hi${state.profile.name ? ' **' + state.profile.name.split(' ')[0] + '**' : ''}! I'm **Buddy** 🤖\n\nI know the core syllabus for **${(state.profile.subjects && state.profile.subjects.length ? state.profile.subjects : Object.keys(CURRICULUM)).join(', ')}** — definitions, formulas, worked examples and the traps examiners love. I can **solve equations step by step**, and every answer comes straight from your syllabus — clean and exam-focused.\n\nWhat would you like to learn today?`), ['Centripetal force', 'Quadratic equations', 'Redox reactions', 'JAMB exam strategy']);
   } else {
     state.chat.forEach(m => appendBubble(box, m.role, m.html));
     renderChips(state.chat.length ? state.chat[state.chat.length - 1].chips : []);
@@ -3492,18 +3325,11 @@ async function askBuddy(text, forceResearch) {
   if (!text || !String(text).trim()) return;
   const question = String(text).trim();
 
-  // A "Search the web: …" chip turns research on for that one question.
-  let researched = state.settings.research;
-  let ask = question;
-  const webPrefix = /^search the web:\s*/i;
-  if (webPrefix.test(question)) { ask = question.replace(webPrefix, ''); researched = true; }
-  if (forceResearch) researched = true;
-  if (forceResearch === false) researched = false;
-  const usedResearch = researched;
+  const ask = question;
 
   if (!buddyGate()) {
     if (state.page !== 'assistant') navigate('assistant');
-    pushChat('buddy', `You have used today's ${FREE_DAILY_BUDDY} free Buddy questions — Pro students ask without limit. Upgrade and keep me by your side. ⭐`);
+    pushChat('buddy', 'Buddy is part of the StudyOS Bundle — one payment of ₦5,000 and I answer everything, forever. ⭐');
     openUpgrade('buddy');
     return;
   }
@@ -3514,13 +3340,10 @@ async function askBuddy(text, forceResearch) {
   renderChips([]);
 
   const seq = ++buddySeq;
-  showTyping(usedResearch ? 'Researching online…' : null);
+  showTyping(null);
 
   try {
-    const savedMode = state.settings.research;
-    state.settings.research = usedResearch;
     const reply = await composeAnswer(ask);
-    state.settings.research = savedMode;
     const t = document.getElementById('typing-row');
     if (t) t.remove();
     if (seq !== buddySeq) return; // a newer question superseded this one
@@ -3528,17 +3351,10 @@ async function askBuddy(text, forceResearch) {
   } catch (err) {
     const t = document.getElementById('typing-row');
     if (t) t.remove();
-    console.warn('[StudyOS] Buddy research failed:', err);
+    console.warn('[StudyOS] Buddy reply failed:', err);
     const reply = buddyReply(ask);
-    pushChat('buddy', reply.html + '<div class="box" style="border-left-color:#f59e0b">Live research failed, so this is my built-in lesson.</div>', reply.chips);
+    pushChat('buddy', reply.html, reply.chips);
   }
-}
-
-function setResearch(on) {
-  state.settings.research = !!on;
-  renderPage();
-  saveSettings();
-  toast(state.settings.research ? 'Live research ON — Buddy will search the web' : 'Live research OFF — built-in lessons only');
 }
 
 function saveGeminiKey() {
@@ -3650,7 +3466,7 @@ function renderProfile(el) {
           <div class="flex flex-wrap items-center gap-2">
             ${monetizationOn ? (proActive() ? `<span class="rounded-full bg-amber-50 px-3 py-1.5 text-[11px] font-black text-amber-700">⭐ Bundle active — yours forever</span>` : `<button type="button" onclick="openUpgrade('plan')" class="rounded-xl bg-slate-900 px-4 py-2 text-[11px] font-black text-white transition hover:bg-slate-800">⭐ Get the StudyOS Bundle — ₦${PRO_PACK_NGN.toLocaleString()} once</button>`) : ''}
           </div>
-          ${monetizationOn && !proActive() ? `<p class="mt-2 text-[10px] text-slate-400">Free today: ${Math.max(0, FREE_DAILY_QUIZZES - dailyQuizzesUsed())} quiz${FREE_DAILY_QUIZZES - dailyQuizzesUsed() === 1 ? '' : 'zes'} left · ${Math.max(0, FREE_DAILY_BUDDY - dailyBuddyUsed())} Buddy questions left.</p>` : ''}
+          ${monetizationOn && !proActive() ? `<p class="mt-2 text-[10px] text-slate-400">Free right now: 5-question tasting quizzes. The Bundle unlocks full notes, flashcards, Buddy and every exam.</p>` : ''}
         </section>
 
         <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-card">
@@ -3766,13 +3582,14 @@ const PRO_MONTHLY_NGN = 2000, PRO_PACK_NGN = 5000;
 let monetizationOn = false; // GROWTH PHASE: every feature is free for everyone. Flip to true when paid plans launch.
 function setMonetization(on) { monetizationOn = !!on; renderPage(); }
 const FREE_DAILY_QUIZZES = 3, FREE_DAILY_BUDDY = 20;
+const FREE_TASTE_QUIZ = 5; // free plan: every quiz is a 5-question taste until the Bundle is activated
 const PRO_UNLOCK_CODE = 'STUDYOS-PRO-2026'; // founder stop-gap — change before launch
 
 // ---------- manual activation loop: Buddy shows the OPay account, founder sends a key ----------
 const OPAY_ACCOUNT = '9118980906';
 const OPAY_NAME = 'Prosper Chibuikem Ndubuizu';
 const FOUNDER_WA = '2349118980906'; // 09118980906 in international format
-const ACTIVATION_SECRET = 's0-act-7f3e91b4c2d8a5'; // change only if keys ever leak
+const ACTIVATION_SECRET = 's0-bnd-8c2f5a9d3e7b14'; // rotated 2026-09 — every key issued before this is dead
 function _actHash(str) { let h = 2166136261 >>> 0; for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; } return h >>> 0; }
 function monthBucket(offset) { const d = new Date(); d.setMonth(d.getMonth() + (offset || 0)); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'); }
 function activationKeyFor(email, plan, bucket) {
@@ -3828,16 +3645,15 @@ function keyBackdrop(event) { if (event && event.target === event.currentTarget)
 function proActive() { return !monetizationOn || ((state.profile.plan === 'pro' || state.profile.plan === 'pack') && (!state.profile.planUntil || state.profile.planUntil > Date.now())); }
 function dailyQuizzesUsed() { return (state.daily && state.daily.quizzes) || 0; }
 function dailyBuddyUsed() { return (state.daily && state.daily.buddy) || 0; }
-function quizGate() {
-  if (proActive() || dailyQuizzesUsed() < FREE_DAILY_QUIZZES) return true;
-  openUpgrade('quiz');
-  return false;
-}
-function buddyGate() { return proActive() || dailyBuddyUsed() < FREE_DAILY_BUDDY; }
+function quizGate() { return true; } // free plan: unlimited 5-question tasting quizzes — the length cap lives in buildQuiz
+function buddyGate() { return proActive(); }
 const UPGRADE_REASONS = {
-  quiz: `You have used today's ${FREE_DAILY_QUIZZES} free quizzes. Pro students practise without limits — and every quiz feeds your projected score.`,
-  buddy: `You have used today's ${FREE_DAILY_BUDDY} free Buddy questions. Pro students ask without limits.`,
-  plan: 'The countdown, daily plan and projections are part of StudyOS Pro.'
+  quiz: 'Full-length quizzes are part of the StudyOS Bundle — free quizzes are 5-question tastes.',
+  buddy: 'Buddy is part of the StudyOS Bundle — unlimited answers, one payment, yours forever.',
+  notes: 'Full lesson notes are part of the StudyOS Bundle — one payment, yours forever.',
+  cards: 'Flashcards are part of the StudyOS Bundle — one payment, yours forever.',
+  exam: 'Full exam simulations are part of the StudyOS Bundle — one payment, yours forever.',
+  plan: 'The countdown, daily plan and projections are part of the StudyOS Bundle.'
 };
 function openUpgrade(reason) {
   const m = document.getElementById('upgrade-modal');
@@ -4036,7 +3852,7 @@ function simQuestionsFor(subject, n) {
 }
 
 function startExamSim(key, mode, opts) {
-  if (!quizGate()) return;
+  if (!proActive()) { openUpgrade('exam'); return; }
   const preset = EXAM_PRESETS.find(p => p.key === key);
   if (!preset) return;
   const m = SIM_MODES[mode] ? mode : 'practice';
@@ -5468,7 +5284,7 @@ Object.assign(window, {
   setSimPreset, setSimMode, setSimQuestions, setSimMinutes, startExamSimFromPanel, openExamSetup, closeExamSetup, EXAM_PRESETS, SIM_MODES,
   setQuizCount, setQuizTimer, openFocusModal, closeFocusModal, focusModalBackdrop, startFocus, stopFocus, updateFocusPill, setExamDate,
   selectQuizAnswer, submitQuiz, retakeQuiz, examJump, examPrev, examNext, submitExam,
-  sendChatMessage, askBuddy, clearChat, setResearch, saveGeminiKey, toggleGeminiPanel,
+  sendChatMessage, askBuddy, clearChat, saveGeminiKey, toggleGeminiPanel, backToStudy,
   openUpgrade, closeUpgrade, upgradeBackdrop, choosePlan, founderUnlock, whatsappUpgrade, savePaystackKey,
   activateViaBuddy, pingFounderPaid, copyOpayAccount, openKeyEntry, closeKeyEntry, keyBackdrop, redeemActivationKey,
   activationKeyFor, monthBucket, proActive, OPAY_ACCOUNT,
@@ -5483,7 +5299,7 @@ window.__STUDYOS_TEST__ = {
   gradeQuiz, mergeQuizStats, initials, startPastQuiz, examJump, examPrev, examNext, submitExam,
   scoreKb, buddyReply, plainMath, solveQuadratic, solveSimultaneous, extractCoeffs,
   topicsFor, quizFor, pastFor, PASTQ, buildQuiz, shuffled, flashFor, mdToHtml, escapeHtml, fmtQuad,
-  researchOnline, composeAnswer, RESEARCH,
+  composeAnswer,
   CURRICULUM, BUDDY_KB, OPTIONS, LEVEL_CATALOGUE, EXAM_OPTIONS,
   subjectsForLevel, selectableSubjects, subjectIsAvailable, hydrateFromDoc,
   examsForLevel, renderOnboardStep, levelTopics, topicQuiz, cardsFor, buildStudyPlan,
