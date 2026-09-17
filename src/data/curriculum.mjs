@@ -11,6 +11,7 @@ import History from './curriculum-history.mjs';
 import Economics from './curriculum-economics.mjs';
 import Commerce from './curriculum-commerce.mjs';
 import FinancialAccounting from './curriculum-financial-accounting.mjs';
+import { SS1_EXPANSION } from './curriculum-ss1-expansion.mjs';
 
 export const CURRICULUM = {
   'Mathematics': Mathematics,
@@ -27,3 +28,14 @@ export const CURRICULUM = {
   'Commerce': Commerce,
   'Financial Accounting': FinancialAccounting
 };
+
+/* Append the SS1 expansion bank: guarantees every senior subject a pool of
+   50+ class-appropriate questions from the student's first term in SS1. */
+for (const [sub, byTopic] of Object.entries(SS1_EXPANSION)) {
+  const s = CURRICULUM[sub];
+  if (!s) continue;
+  for (const [title, qs] of Object.entries(byTopic)) {
+    const t = (s.topics.SS1 || []).find(x => x.title === title);
+    if (t) t.quiz = (t.quiz || []).concat(qs);
+  }
+}

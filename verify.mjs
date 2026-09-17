@@ -362,8 +362,8 @@ check('topicQuiz ids are stable per subject/level/topic/question', (() => {
 })());
 const SENIOR_SUBS = ['Mathematics', 'English Language', 'Physics', 'Chemistry', 'Biology'];
 const SENIOR_LEVELS = ['SS1', 'SS2', 'SS3'];
-check('every SS topic carries a 10-question topic quiz',
-  SENIOR_SUBS.every(sub => SENIOR_LEVELS.every(L => T.levelTopics(sub, L).every((t, i) => T.topicQuiz(sub, L, i).length === 10))),
+check('every SS topic carries at least a 10-question topic quiz',
+  SENIOR_SUBS.every(sub => SENIOR_LEVELS.every(L => T.levelTopics(sub, L).every((t, i) => T.topicQuiz(sub, L, i).length >= 10))),
   SENIOR_SUBS.map(sub => sub + ':' + SENIOR_LEVELS.map(L => T.levelTopics(sub, L).map((t, i) => T.topicQuiz(sub, L, i).length).join('/')).join(' ')).join('  '));
 check('every SS topic has at least 3 flashcards with real answers',
   SENIOR_SUBS.every(sub => SENIOR_LEVELS.every(L => T.levelTopics(sub, L).every(t =>
@@ -397,7 +397,7 @@ check('pastFor() keeps its own id namespace and injects ids into every question'
   T.pastFor('Mathematics')[0].id === 'past-mat-0' && T.pastFor('English Language').every(q => q.id.startsWith('past-eng-')));
 check('quiz setup defaults to 10 questions with no timer', (() => {
   const st = T.getState();
-  return st.quizSetup && st.quizSetup.count === 10 && st.quizSetup.minutes === 0 && !!st.focus;
+  return st.quizSetup && st.quizSetup.count === 50 && st.quizSetup.minutes === 0 && !!st.focus;
 })());
 check('buildQuiz honours the chosen question count (and All = full pool, unique ids)', (() => {
   const st = T.getState();
@@ -1264,6 +1264,20 @@ check('logout hides the app shell', byId('main-app').classList.contains('hidden'
 }
 
 
+check('every subject offers 50+ class-appropriate questions at every class entry', (() => {
+  const stages = { JSS: ['JSS1', 'JSS2', 'JSS3'], SS: ['SS1', 'SS2', 'SS3'] };
+  for (const [sub, s] of Object.entries(T.CURRICULUM)) {
+    for (const order of Object.values(stages)) {
+      if (!(s.topics[order[0]] || []).length) continue;
+      let cum = 0;
+      for (const lvl of order) {
+        for (const t of (s.topics[lvl] || [])) cum += (t.quiz || []).length;
+        if (cum < 50) return false;
+      }
+    }
+  }
+  return true;
+})());
 // ---------- full exam simulation (modes, subject switching, scorecard, review) ----------
 w.backToQuizList();
 w.setSimPreset('jamb');

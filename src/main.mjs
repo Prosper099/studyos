@@ -69,7 +69,7 @@ const state = {
   tasks: { quizzes: 0, perfects: 0, cards: 0, sessions: 0, tasksTotal: 0,
            focusSessions: 0, focusMinutes: 0, pastDrills: 0, timedAces: 0, nightOwl: false, earlyBird: false },
   quizStats: { attempts: 0, correct: 0, total: 0, bestPercent: 0, bySubject: {} },
-  quizSetup: { count: 10, minutes: 0 },
+  quizSetup: { count: 50, minutes: 0 },
   examPrefs: { classLevel: '', examType: '', subjects: [], count: 20, counts: {}, minutes: 60, lastWeak: '' },
   examCustomOpen: false,
   focus: { active: false, endsAt: 0, minutes: 0 },
@@ -2892,7 +2892,7 @@ function renderQuiz(el) {
           <div>
             <h3 class="text-[11px] font-black uppercase tracking-wide text-violet-700">Questions per quiz</h3>
             <div class="mt-1.5 flex flex-wrap gap-1.5">
-              ${[5, 10, 15, 20, 30].map(num => `<button type="button" onclick="setQuizCount(${num})" class="rounded-full px-3 py-1.5 text-[11px] font-bold transition ${state.quizSetup.count === num ? 'bg-violet-600 text-white' : 'bg-white text-slate-600 ring-1 ring-inset ring-slate-200 hover:bg-slate-50'}">${num}</button>`).join('')}
+              ${[10, 25, 50].map(num => `<button type="button" onclick="setQuizCount(${num})" class="rounded-full px-3 py-1.5 text-[11px] font-bold transition ${state.quizSetup.count === num ? 'bg-violet-600 text-white' : 'bg-white text-slate-600 ring-1 ring-inset ring-slate-200 hover:bg-slate-50'}">${num}</button>`).join('')}
               <button type="button" onclick="setQuizCount(0)" class="rounded-full px-3 py-1.5 text-[11px] font-bold transition ${state.quizSetup.count === 0 ? 'bg-violet-600 text-white' : 'bg-white text-slate-600 ring-1 ring-inset ring-slate-200 hover:bg-slate-50'}">All</button>
             </div>
           </div>
@@ -3925,7 +3925,7 @@ const EXAM_PRESETS = [
   { key: 'waec',   name: 'WAEC WASSCE sitting',  exam: 'WAEC WASSCE',  levels: ['SS'],  maxSubjects: 6, perSubject: () => 50, minsPerSubject: 60, label: '50 objective questions per subject · 1 hour per paper' },
   { key: 'neco',   name: 'NECO SSCE sitting',    exam: 'NECO SSCE',    levels: ['SS'],  maxSubjects: 6, perSubject: () => 50, minsPerSubject: 60, label: '50 objective questions per subject · 1 hour per paper' },
   { key: 'nabteb', name: 'NABTEB sitting',       exam: 'NABTEB',       levels: ['SS'],  maxSubjects: 6, perSubject: () => 50, minsPerSubject: 60, label: '50 objective questions per subject · 1 hour per paper' },
-  { key: 'bece',   name: 'BECE sitting',         exam: 'BECE',         levels: ['JSS'], maxSubjects: 5, perSubject: () => 40, minsPerSubject: 45, label: '40 objective questions per subject · 45 minutes per paper' },
+  { key: 'bece',   name: 'BECE sitting',         exam: 'BECE',         levels: ['JSS'], maxSubjects: 5, perSubject: () => 50, minsPerSubject: 45, label: '50 objective questions per subject · 45 minutes per paper' },
 ];
 /* How the student sits the paper:
    study    — no timer, answer + explanation after every question
