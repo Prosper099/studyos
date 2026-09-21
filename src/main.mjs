@@ -1297,16 +1297,31 @@ function computeStreak(lastActiveDate, todayStr) {
      same   — already counted today, nothing changes
      start  — brand-new streak (day 1)
      extend — consecutive day, streak grows
-     saved  — a gap, but a freeze was consumed: streak survives
+     saved  — a gap, but a freeze was consumed: streak survives and the
+              study day still counts (+1); a passive entry only anchors
      reset  — a gap with no freeze: streak restarts at 1                    */
-function applyStreak(streak, lastActiveDate, todayStr, freezes = 0) {
+function isoDayShift(dateStr, delta) {
+  const d = new Date(dateStr + 'T00:00:00');
+  d.setDate(d.getDate() + delta);
+  const p = n => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+}
+
+function applyStreak(streak, lastActiveDate, todayStr, freezes = 0, passive = false) {
   const s = Number(streak) || 0, f = Number(freezes) || 0;
   const signal = computeStreak(lastActiveDate, todayStr);
-  if (signal === 0) return { streak: s, freezes: f, changed: false, event: 'same' };
-  if (signal === -1) return { streak: s + 1, freezes: f, changed: true, event: 'extend' };
-  if (signal === 2) return { streak: 1, freezes: f, changed: true, event: 'start' };
-  if (f > 0) return { streak: s, freezes: f - 1, changed: true, event: 'saved' };
-  return { streak: 1, freezes: f, changed: true, event: 'reset' };
+  if (signal === 0) return { streak: s, freezes: f, changed: false, event: 'same', last: lastActiveDate };
+  if (signal === -1) return { streak: s + 1, freezes: f, changed: true, event: 'extend', last: todayStr };
+  if (signal === 2) return { streak: 1, freezes: f, changed: true, event: 'start', last: todayStr };
+  if (f > 0) {
+    // A freeze bridges the gap. Real study on the return day still counts (+1);
+    // a passive entry only keeps the chain alive by anchoring it at the bridged
+    // day, so studying later THAT day reads as consecutive and extends.
+    return passive
+      ? { streak: s, freezes: f - 1, changed: true, event: 'saved', last: isoDayShift(todayStr, -1) }
+      : { streak: s + 1, freezes: f - 1, changed: true, event: 'saved', last: todayStr };
+  }
+  return { streak: 1, freezes: f, changed: true, event: 'reset', last: todayStr };
 }
 
 /* ---------------- Streak freezes, tasks & badges ---------------- */
@@ -5101,11 +5116,11 @@ async function copyRules() {
 function checkStreakOnEntry() {
   const d = todayISO();
   if (computeStreak(state.lastActiveDate, d) !== 1) return; // only gaps are settled here
-  const rolled = applyStreak(state.streak, state.lastActiveDate, d, state.streakFreezes);
+  const rolled = applyStreak(state.streak, state.lastActiveDate, d, state.streakFreezes, true);
   if (!rolled.changed) return;
   state.streak = rolled.streak;
   state.streakFreezes = rolled.freezes;
-  state.lastActiveDate = d;
+  state.lastActiveDate = rolled.last;
   queueCelebration({ type: rolled.event });
   updateChrome();
   persistProgress();

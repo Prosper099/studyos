@@ -213,9 +213,9 @@ check('streak: 3-day gap → reset to 1', T.applyStreak(5, '2026-09-05', '2026-0
 check('streak: month boundary', T.applyStreak(4, '2026-08-31', '2026-09-01').streak === 5);
 check('streak: future/garbage date → 1', T.applyStreak(9, '2027-01-01', '2026-09-09').streak === 1
   && T.applyStreak(9, 'nonsense', '2026-09-09').streak === 1);
-check('streak freeze: gap consumes one freeze and keeps the streak', (() => {
+check('streak freeze: gap consumes one freeze and the study day still counts (+1)', (() => {
   const r = T.applyStreak(6, '2026-09-05', '2026-09-09', 1);
-  return r.streak === 6 && r.freezes === 0 && r.changed && r.event === 'saved';
+  return r.streak === 7 && r.freezes === 0 && r.changed && r.event === 'saved' && r.last === '2026-09-09';
 })());
 check('streak freeze: gap with no freeze resets to 1', (() => {
   const r = T.applyStreak(6, '2026-09-05', '2026-09-09', 0);
@@ -229,16 +229,26 @@ check('streak freeze: brand-new user starts at Day 1 without spending a freeze',
   const r = T.applyStreak(0, '', '2026-09-09', 2);
   return r.streak === 1 && r.freezes === 2 && r.event === 'start';
 })());
-check('passive entry roll: missed day consumes a freeze and keeps the streak', (() => {
+check('passive entry roll: freeze consumed, streak kept, chain anchored at the bridged day', (() => {
   const st = T.getState();
   const saved = [st.streak, st.lastActiveDate, st.streakFreezes];
+  const p = n => String(n).padStart(2, '0');
+  const loc = dt => `${dt.getFullYear()}-${p(dt.getMonth() + 1)}-${p(dt.getDate())}`;
+  const twoAgo = new Date(); twoAgo.setDate(twoAgo.getDate() - 2);
+  const yest = new Date(); yest.setDate(yest.getDate() - 1);
   st.streak = 5; st.streakFreezes = 1;
-  const d = new Date(); d.setDate(d.getDate() - 2);
-  st.lastActiveDate = d.toISOString().slice(0, 10);
+  st.lastActiveDate = loc(twoAgo);
   T.checkStreakOnEntry();
-  const ok = st.streak === 5 && st.streakFreezes === 0;
+  const ok = st.streak === 5 && st.streakFreezes === 0 && st.lastActiveDate === loc(yest);
   [st.streak, st.lastActiveDate, st.streakFreezes] = saved;
   return ok;
+})());
+check('study on a freeze-bridged day still counts: same-day activity extends the streak', (() => {
+  const p = n => String(n).padStart(2, '0');
+  const loc = dt => `${dt.getFullYear()}-${p(dt.getMonth() + 1)}-${p(dt.getDate())}`;
+  const yest = new Date(); yest.setDate(yest.getDate() - 1);
+  const r = T.applyStreak(5, loc(yest), loc(new Date()));
+  return r.streak === 6 && r.event === 'extend' && r.freezes === 0;
 })());
 check('passive entry roll: missed day with no freeze resets to Day 1', (() => {
   const st = T.getState();
