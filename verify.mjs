@@ -989,11 +989,13 @@ check('exam countdown is a sensible SS3 estimate and honours a set date', (() =>
   const st = T.getState();
   const cd = T.examCountdown();
   const saved = st.profile.examDate;
-  st.profile.examDate = '2027-01-01';
+  const p = n => String(n).padStart(2, '0');
+  const plus = new Date(Date.now() + 120 * 86400000); // date-relative: never goes stale
+  st.profile.examDate = `${plus.getFullYear()}-${p(plus.getMonth() + 1)}-${p(plus.getDate())}`;
   const cd2 = T.examCountdown();
   st.profile.examDate = saved;
   return !!cd && cd.estimated === true && cd.days > 150 && cd.days < 400
-    && !!cd2 && cd2.estimated === false && cd2.days > 100 && cd2.days < 140;
+    && !!cd2 && cd2.estimated === false && cd2.days >= 119 && cd2.days <= 121;
 })());
 check('grade bands follow WAEC cut-offs',
   T.gradeBand(82) === 'A1' && T.gradeBand(72) === 'B2' && T.gradeBand(52) === 'C6' && T.gradeBand(39) === 'F9');
