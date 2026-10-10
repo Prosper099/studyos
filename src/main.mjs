@@ -3405,10 +3405,14 @@ async function askBuddy(text, forceResearch) {
   renderChips([]);
 
   const seq = ++buddySeq;
-  showTyping(null);
+  const startedAt = Date.now();
+  showTyping('Buddy is typing…');
 
   try {
     const reply = await composeAnswer(ask);
+    // WhatsApp-style dwell: let the typing dots breathe before the answer lands.
+    const dwell = Math.min(2600, 900 + Math.min(1700, (reply.html || '').length * 4));
+    await new Promise(r => setTimeout(r, Math.max(0, dwell - (Date.now() - startedAt))));
     const t = document.getElementById('typing-row');
     if (t) t.remove();
     if (seq !== buddySeq) return; // a newer question superseded this one
@@ -4897,6 +4901,7 @@ function startDemoMode() {
   }
   // Streaks are activity-based: login never extends or resets them; recordTask evaluates.
   saveLocal();
+  checkStreakOnEntry();
   enterApp();
   toast('Demo mode — data stays in this browser only');
 }
@@ -5131,7 +5136,6 @@ function enterApp() {
   show($('#auth-screen'), false);
   $('#main-app').classList.remove('hidden');
   $('#main-app').classList.add('flex');
-  checkStreakOnEntry();
   updateChrome();
   activeTopic = null;
   renderPage();
@@ -5174,24 +5178,28 @@ async function handleUser(user) {
   state.uid = user.uid;
   state.mode = 'firebase';
 
-  let data = null;
-  const ref = doc(db, 'users', user.uid);
-  try {
-    const snap = await getDoc(ref);
-    data = snap.exists() ? snap.data() : null;
-  } catch (err) {
-    warnFirestoreOnce(err);
-  }
-
-  hydrateFromDoc(data || {});
+  // Optimistic entry: reveal the app instantly on sensible defaults; the cloud
+  // profile merges in behind the scenes so sign-in never feels slow.
+  hydrateFromDoc({});
   state.profile.name = state.profile.name || user.displayName || (user.email ? user.email.split('@')[0] : 'Student');
   state.profile.email = user.email || state.profile.email || '';
+  enterApp();
 
-  // Streak bookkeeping (Duolingo method: freeze shields a missed day, else reset)
-  // Streaks are activity-based: login never extends or resets them; recordTask evaluates.
-
-  try {
-    await setDoc(ref, {
+  const ref = doc(db, 'users', user.uid);
+  (async () => {
+    let data = null;
+    try {
+      const snap = await getDoc(ref);
+      data = snap.exists() ? snap.data() : null;
+    } catch (err) {
+      warnFirestoreOnce(err);
+    }
+    hydrateFromDoc(data || {});
+    checkStreakOnEntry();
+    updateChrome();
+    renderPage();
+    try {
+      await setDoc(ref, {
       name: state.profile.name,
       email: state.profile.email,
       classLevel: state.profile.classLevel || '',
@@ -5208,24 +5216,23 @@ async function handleUser(user) {
       quizStats: state.quizStats,
       updatedAt: serverTimestamp()
     }, { merge: true });
-  } catch (err) {
-    warnFirestoreOnce(err);
-  }
+    } catch (err) {
+      warnFirestoreOnce(err);
+    }
 
-  // Live sync from other tabs/devices
-  try {
-    userUnsub = onSnapshot(ref, snap => {
-      if (!snap.exists()) return;
-      const d = snap.data();
-      hydrateFromDoc(d);
-      updateChrome();
-      if (state.page === 'profile') renderPage();
-    }, err => warnFirestoreOnce(err));
-  } catch (err) {
-    warnFirestoreOnce(err);
-  }
-
-  enterApp();
+    // Live sync from other tabs/devices
+    try {
+      userUnsub = onSnapshot(ref, snap => {
+        if (!snap.exists()) return;
+        const d = snap.data();
+        hydrateFromDoc(d);
+        updateChrome();
+        if (state.page === 'profile') renderPage();
+      }, err => warnFirestoreOnce(err));
+    } catch (err) {
+      warnFirestoreOnce(err);
+    }
+  })();
 }
 
 function boot() {

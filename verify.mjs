@@ -1143,8 +1143,9 @@ w.selectQuizAnswer(before.quizFor('Mathematics')[0].id, 0);
 check('selecting an answer re-renders without submitting', page().includes('Submit Answers'));
 w.navigate('assistant');
 check('Buddy chat exposes the input form', page().includes('id="chat-input"') && page().includes('sendChatMessage'));
-await w.askBuddy('explain centripetal force');
-(globalThis.__timers.splice(0).forEach(fn => fn()));
+const buddyP = w.askBuddy('explain centripetal force');
+for (let i = 0; i < 6; i++) { await new Promise(r => setImmediate(r)); globalThis.__timers.splice(0).forEach(fn => fn()); }
+await buddyP;
 check('Buddy answered in the chat log with the centripetal-force lesson',
   byId('chat-box').innerHTML.includes('Centripetal Force')
   && byId('chat-box').innerHTML.includes('F = mv'),
